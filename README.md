@@ -1,4 +1,4 @@
-![logo](shared/assets/Logo_Principal.png)
+![logo](shared/assets/logo_default.png)
 
 # Salud Movil
 
@@ -35,3 +35,27 @@ Luego desde la carpeta root hay que inicializar y correr el servidor del fronten
   npm install
   npm run dev
 ```
+
+### Entorno
+
+Crea un archivo .env donde definiras las siguientes variables
+
+``` bash
+HOST=your_host
+PORT=your_port
+
+DB_HOST=your_database_host
+DB_USER=your_database_user
+DB_PASSWORD=your_db_password
+
+JWT_SECRET=your_secret
+JWT_EXPIRES_IN=your_expiration
+```
+
+### Arquitectura
+
+#### Estructura de carpetas
+#### Stack Tecnologico
+#### Dependencias
+
+### Uso Básico
