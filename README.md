@@ -16,6 +16,8 @@ Primero clona el repositorio en tu entorno local usando el siguiente comando
   git clone https://github.com/danildperez04/salud-movil.git
 ```
 
+### Dependencias
+
 ### Instalación del backend
 
 Primero hay que inicializar y correr el servidor backend con los siguientes comandos
@@ -52,10 +54,21 @@ JWT_SECRET=your_secret
 JWT_EXPIRES_IN=your_expiration
 ```
 
-### Arquitectura
+## Arquitectura
 
-#### Estructura de carpetas
-#### Stack Tecnologico
-#### Dependencias
+### Estructura de carpetas
+### Stack Tecnologico
 
-### Uso Básico
+## Uso Básico
+
+### Auth
+
+```
+POST /auth/login
+```
+
+### Users
+
+```
+GET /users/
+```
