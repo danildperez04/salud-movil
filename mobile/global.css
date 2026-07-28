@@ -1,0 +1,57 @@
+@import 'tailwindcss';
+@import 'uniwind';
+
+/* ===== BASE TOKENS ===== */
+@theme {
+    /* Primarios */
+    --color-primary: #0E2A3A;
+    --color-primary-light: #2DB79A;
+
+    /* Brand */
+    --color-brand-blue: #0E2A3A;
+    --color-brand-green: #2DB79A;
+
+    /* Secundarios */
+    --color-secondary-green-light: #77D1B5;
+    --color-secondary-teal: #135E6D;
+    --color-secondary-steel: #2D7F8E;
+
+    /* Neutros */
+    --color-neutral-carbon: #1A2129;
+    --color-neutral-medium: #6B7280;
+    --color-neutral-light: #E5E7EB;
+    --color-neutral-white: #FFFFFF;
+
+    /* Semánticos */
+    --color-background: #FFFFFF;
+    --color-background-dark: #0E2A3A;
+    --color-background-subtle: #E5E7EB;
+
+    --color-text: #1A2129;
+    --color-text-inverted: #FFFFFF;
+    --color-text-muted: #6B7280;
+    --color-text-accent: #2DB79A;
+
+    --color-border: #E5E7EB;
+    --color-border-dark: #135E6D;
+
+    /* Tipografía */
+    --font-heading: 'Poppins_700Bold';
+    --font-heading-semibold: 'Poppins_600SemiBold';
+    --font-heading-medium: 'Poppins_500Medium';
+    --font-body: 'Inter_400Regular';
+    --font-body-medium: 'Inter_500Medium';
+    --font-body-semibold: 'Inter_600SemiBold';
+
+    /* Tamaños de fuente */
+    --text-h1: 48px;
+    --text-h2: 32px;
+    --text-h3: 24px;
+    --text-body: 16px;
+    --text-small: 14px;
+    --text-button: 16px;
+    --text-caption: 12px;
+
+    /* Radius */
+    --radius-brand: 20px;
+}
