@@ -3,13 +3,27 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import config from './config/configuration';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
-  imports: [ConfigModule.forRoot({
-    isGlobal: true,
-    envFilePath: '.env',
-    load: [config],
-  })],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env',
+      load: [config],
+    }),
+    TypeOrmModule.forRoot({
+      type: config().db.type,
+      host: config().db.host,
+      port: config().db.port,
+      username: config().db.user,
+      password: config().db.password,
+      database: config().db.database,
+      entities: [__dirname + '/**/*.entity{.ts,.js}'],
+      synchronize: true,
+      logging: true,
+    }),
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
