@@ -14,18 +14,13 @@ export class AppointmentReminder {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column({ name: 'appointment_id', type: 'uuid' })
-  appointmentId!: string;
-
   @Column({ name: 'date_hour_send', type: 'timestamp' })
   dateHourSend!: Date;
-
-  @Column({ name: 'notification_state_id' })
-  notificationStateId!: number;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
 
+  // === Relations ===
   @ManyToOne(() => Appointment, (appointment) => appointment.reminders)
   @JoinColumn({ name: 'appointment_id' })
   appointment!: Appointment;
