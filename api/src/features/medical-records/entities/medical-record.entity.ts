@@ -5,19 +5,18 @@ import {
   JoinColumn,
   ManyToOne,
   OneToMany,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { Patient } from '../../users/entities/patient.entity';
 import { MedicalVisit } from './medical-visit.entity';
+import { User } from '../../users/entities/user.entity';
 
 @Entity('medical_record')
 export class MedicalRecord {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
-
-  @Column({ name: 'patient_id', type: 'uuid', unique: true })
-  patientId!: string;
 
   @Column({ name: 'primary_diagnosis' })
   primaryDiagnosis!: string;
@@ -31,18 +30,21 @@ export class MedicalRecord {
   @Column({ name: 'blood_type', length: 10, nullable: true })
   bloodType!: string;
 
-  @Column({ name: 'created_by', type: 'uuid', nullable: true })
-  createdBy!: string | null;
-
   @CreateDateColumn({ name: 'create_date' })
   createDate!: Date;
 
   @UpdateDateColumn({ name: 'update_date' })
   updateDate!: Date;
 
+  // === Relations ===
+
   @ManyToOne(() => Patient)
   @JoinColumn({ name: 'patient_id' })
   patient!: Patient;
+
+  @OneToOne(() => User)
+  @JoinColumn({ name: 'created_by' })
+  createdBy!: User;
 
   @OneToMany(() => MedicalVisit, (visit) => visit.medicalRecord)
   visits!: MedicalVisit[];

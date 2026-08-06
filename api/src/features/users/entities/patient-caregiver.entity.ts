@@ -4,7 +4,7 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
-  PrimaryColumn,
+  PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Patient } from './patient.entity';
 import { Caregiver } from './caregiver.entity';
@@ -12,14 +12,8 @@ import { RelationshipType } from '../../catalogues/entities/relationship-type.en
 
 @Entity('patient_caregiver')
 export class PatientCaregiver {
-  @PrimaryColumn({ name: 'patient_id', type: 'uuid' })
-  patientId!: string;
-
-  @PrimaryColumn({ name: 'caregiver_id', type: 'uuid' })
-  caregiverId!: string;
-
-  @Column({ name: 'relationship_type_id' })
-  relationshipTypeId!: number;
+  @PrimaryGeneratedColumn('uuid')
+  id!: string;
 
   @Column({ name: 'date_link', type: 'date', default: () => 'CURRENT_DATE' })
   dateLink!: Date;
@@ -29,6 +23,8 @@ export class PatientCaregiver {
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
+
+  // === Relations ===
 
   @ManyToOne(() => Patient)
   @JoinColumn({ name: 'patient_id' })

@@ -15,9 +15,6 @@ export class HealthIndicator {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column({ name: 'type_indicator_id' })
-  typeIndicatorId!: number;
-
   @Column({ type: 'decimal', precision: 8, scale: 2 })
   value!: string;
 
@@ -39,6 +36,8 @@ export class HealthIndicator {
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
 
+  // === Relations ===
+
   @ManyToOne(() => Patient)
   @JoinColumn({ name: 'patient_id' })
   patient!: Patient;
@@ -49,5 +48,5 @@ export class HealthIndicator {
 
   @ManyToOne(() => User)
   @JoinColumn({ name: 'registered_by' })
-  registeredByUser!: User;
+  registeredBy!: User;
 }

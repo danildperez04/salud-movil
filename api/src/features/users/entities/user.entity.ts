@@ -58,6 +58,8 @@ export class User {
   @DeleteDateColumn({ name: 'deleted_at' })
   deletedAt!: Date | null;
 
+  // === Relations ===
+
   @ManyToOne(() => Role, (role) => role.users)
   @JoinColumn({ name: 'role_id' })
   role!: Role;

@@ -18,23 +18,14 @@ export class Medication {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column({ name: 'patient_id', type: 'uuid' })
-  patientId!: string;
-
   @Column({ name: 'drug_name' })
   drugName!: string;
 
   @Column({ length: 255 })
   dose!: string;
 
-  @Column({ name: 'route_administration_id' })
-  routeAdministrationId!: number;
-
   @Column({ length: 255, nullable: true })
   instructions!: string;
-
-  @Column({ name: 'prescribed_by', type: 'uuid', nullable: true })
-  prescribedBy!: string | null;
 
   @Column({ name: 'start_date', type: 'date' })
   startDate!: Date;
@@ -50,6 +41,8 @@ export class Medication {
 
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt!: Date;
+
+  // === Relations ===
 
   @ManyToOne(() => Patient)
   @JoinColumn({ name: 'patient_id' })

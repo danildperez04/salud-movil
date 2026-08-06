@@ -23,6 +23,8 @@ export class MedicationReminder {
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
 
+  // === Relations ===
+
   @ManyToOne(() => MedicationSchedule)
   @JoinColumn({ name: 'schedule_id' })
   schedule!: MedicationSchedule;

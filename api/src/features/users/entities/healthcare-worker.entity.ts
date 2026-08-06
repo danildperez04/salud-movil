@@ -5,7 +5,7 @@ import {
   JoinColumn,
   ManyToOne,
   OneToOne,
-  PrimaryColumn,
+  PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { User } from './user.entity';
@@ -14,26 +14,19 @@ import { HealthCenter } from '../../health-centers/entities/health-center.entity
 
 @Entity('healthcare_worker')
 export class HealthcareWorker {
-  @PrimaryColumn('uuid')
+  @PrimaryGeneratedColumn('uuid')
   id!: string;
-
-  @Column({ name: 'major_id' })
-  majorId!: number;
 
   @Column({ name: 'license_number' })
   licenseNumber!: string;
-
-  @Column({ name: 'employee_id' })
-  employeeId!: string;
-
-  @Column({ name: 'health_center_id', type: 'uuid' })
-  healthCenterId!: string;
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
 
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt!: Date;
+
+  // === Relations ===
 
   @OneToOne(() => User)
   @JoinColumn({ name: 'id', referencedColumnName: 'id' })
