@@ -14,12 +14,6 @@ export class MedicalVisit {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column({ name: 'medical_record_id', type: 'uuid' })
-  medicalRecordId!: string;
-
-  @Column({ name: 'healthcare_worker_id', type: 'uuid' })
-  healthcareWorkerId!: string;
-
   @Column({ name: 'visit_date', type: 'timestamp' })
   visitDate!: Date;
 
@@ -37,6 +31,8 @@ export class MedicalVisit {
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
+
+  // === Relations ===
 
   @ManyToOne(() => MedicalRecord, (record) => record.visits)
   @JoinColumn({ name: 'medical_record_id' })

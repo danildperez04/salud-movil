@@ -27,17 +27,13 @@ export class HealthCenter {
   @Column({ name: 'phone_number' })
   phoneNumber!: string;
 
-  @Column({ name: 'health_center_type_id' })
-  healthCenterTypeId!: number;
-
-  @Column({ name: 'municipality_id' })
-  municipalityId!: number;
-
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
 
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt!: Date;
+
+  // === Relations ===
 
   @ManyToOne(() => HealthCenterType)
   @JoinColumn({ name: 'health_center_type_id' })

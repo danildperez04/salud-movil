@@ -19,6 +19,8 @@ export class Caregiver {
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt!: Date;
 
+  // === Relations ===
+
   @OneToOne(() => User)
   @JoinColumn({ name: 'id', referencedColumnName: 'id' })
   user!: User;

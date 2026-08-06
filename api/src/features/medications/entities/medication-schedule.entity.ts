@@ -15,9 +15,6 @@ export class MedicationSchedule {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column({ name: 'medicine_id', type: 'uuid' })
-  medicineId!: string;
-
   @Column({ type: 'time' })
   hour!: string;
 
@@ -26,6 +23,8 @@ export class MedicationSchedule {
 
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
+
+  // === Relations ===
 
   @ManyToOne(() => Medication, (medication) => medication.schedules)
   @JoinColumn({ name: 'medicine_id' })
