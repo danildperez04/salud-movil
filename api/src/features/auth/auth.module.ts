@@ -11,6 +11,8 @@ import { Role } from '../catalogues/entities/role.entity';
 import { Municipality } from '../catalogues/entities/municipality.entity';
 import { PasswordReset } from './entities/password-reset.entity';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { RolesGuard } from '../../common/guards/roles.guard';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -33,7 +35,11 @@ import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtAuthGuard],
+  providers: [
+    AuthService,
+    JwtAuthGuard,
+    { provide: APP_GUARD, useClass: RolesGuard },
+  ],
   exports: [JwtModule, JwtAuthGuard],
 })
 export class AuthModule {}
