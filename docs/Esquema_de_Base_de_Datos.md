@@ -9,7 +9,7 @@
 
 ## 1. Propósito y alcance
 
-Este documento describe el modelo de datos de **Salud Móvil** de forma estructurada y legible, sin sintaxis SQL. Define las entidades, sus campos, relaciones, reglas de integridad e índices necesarios para implementar las 17 historias de usuario del backlog (6 épicas) del MVP.
+Este documento describe el modelo de datos de **Salud Móvil** de forma estructurada y legible, sin sintaxis SQL. Define las entidades, sus campos, relaciones, reglas de integridad e índices necesarios para implementar las 31 historias de usuario del backlog (6 épicas) del MVP.
 
 El modelo se basa en el script DDL original y lo **modifica** para cumplir los criterios de aceptación del backlog. Los cambios aplicados se listan en la sección 9.
 
@@ -22,8 +22,8 @@ El modelo se basa en el script DDL original y lo **modifica** para cumplir los c
 - **Nombres de tablas:** en minúsculas, palabras separadas por guion bajo.
 - **Fechas y horas:** las marcas de tiempo se almacenan en la zona horaria del sistema. Las horas de toma de medicamentos no incluyen zona horaria.
 - **Momentos de creación:** toda entidad principal registra `created_at` (fecha de creación). Las que permiten edición registran también `updated_at`.
-- **Estados de eliminación:** en lugar de borrar físicamente, se usa un campo booleano `is_active` donde corresponde (usuario, medicamento); `user` además soporta borrado lógico con `deleted_at`.
-- **Borrado en cascada:** al eliminar un paciente se eliminan en cascada sus expedientes, indicadores, medicamentos, citas y vínculos con cuidadores.
+- **Estados de eliminación (borrado lógico / soft delete):** en lugar de borrar físicamente, todas las tablas principales registran `deleted_at` (marca temporal de borrado lógico; nula mientras el registro exista). Las consultas estándar excluyen automáticamente las filas borradas. Los catálogos `cat_*` no usan borrado lógico (datos de referencia). Además se conservan los estados de negocio `is_active` (usuario) y `active` (medicamento), con semántica distinta del borrado.
+- **Borrado en cascada:** el borrado físico elimina en cascada (a nivel de base de datos) los registros dependientes de un paciente. El borrado lógico se propaga por la jerarquía de agregados mediante cascada de aplicación (soft-remove): al marcar un `user` como borrado se marcan sus perfiles (paciente/cuidador/personal de salud) y, en cascada, el expediente, las consultas, los indicadores, los medicamentos (con horarios, días y recordatorios), las citas (con recordatorios) y los vínculos con cuidadores.
 
 ---
 
@@ -299,7 +299,7 @@ El modelo se basa en el script DDL original y lo **modifica** para cumplir los c
 | Boaco | Boaco, Camoapa, San José de los Remates, San Lorenzo, Santa Lucía, Teustepe |
 | Carazo | Diriamba, Dolores, El Rosario, Jinotepe, La Conquista, La Paz de Carazo, San Marcos, Santa Teresa |
 | Chinandega | Chichigalpa, Chinandega, Cinco Pinos, Corinto, El Realejo, El Viejo, Posoltega, Puerto Morazán, San Francisco del Norte, San Pedro del Norte, Santo Tomás del Norte, Somotillo, Villanueva |
-| Chontales | Acoyapa, Comalapa, El Ayote, El Coral, Juigalpa, La Libertad, San Francisco de Cuapa, San Pedro de Lóvago, Santo Domingo, Santo Tomás |
+| Chontales | Acoyapa, Comalapa, El Coral, Juigalpa, La Libertad, San Francisco de Cuapa, San Pedro de Lóvago, Santo Domingo, Santo Tomás |
 | Estelí | Condega, Estelí, La Trinidad, Pueblo Nuevo, San Juan de Limay, San Nicolás |
 | Granada | Diriá, Diriomo, Granada, Nandaime |
 | Jinotega | El Cuá, Jinotega, La Concordia, San José de Bocay, San Rafael del Norte, San Sebastián de Yalí, Santa María de Pantasma, Wiwilí de Jinotega |
@@ -312,9 +312,9 @@ El modelo se basa en el script DDL original y lo **modifica** para cumplir los c
 | Rivas | Altagracia, Belén, Buenos Aires, Cárdenas, Moyogalpa, Potosí, Rivas, San Jorge, San Juan del Sur, Tola |
 | Río San Juan | El Almendro, El Castillo, Morrito, San Carlos |
 | Costa Caribe Norte | Bonanza, Mulukukú, Prinzapolka, Puerto Cabezas, Rosita, Siuna, Waslala, Waspán |
-| Costa Caribe Sur | Bluefields, Corn Island, Desembocadura de la Cruz de Río Grande, El Rama, El Tortuguero, Kukra Hill, La Cruz de Río Grande, Laguna de Perlas, Muelle de los Bueyes, Nueva Guinea, Paiwas |
+| Costa Caribe Sur | Bluefields, Corn Island, Desembocadura de la Cruz de Río Grande, El Ayote, El Rama, El Tortuguero, Kukra Hill, La Cruz de Río Grande, Laguna de Perlas, Muelle de los Bueyes, Nueva Guinea, Paiwas |
 
-**Nota:** El municipio de El Ayote aparece históricamente duplicado entre Chontales y Costa Caribe Sur en distintas fuentes. Se recomienda mantenerlo en un solo departamento (Costa Caribe Sur) en el semillero para evitar registros contradictorios.
+**Nota:** El municipio de El Ayote pertenece al departamento Costa Caribe Sur (antes RAAS). Se ubicó únicamente en este departamento en el semillero para evitar registros contradictorios.
 
 ---
 
@@ -367,6 +367,7 @@ El modelo se basa en el script DDL original y lo **modifica** para cumplir los c
 | health_center_id | UUID | Centro de salud al que está asignado (FK a `health_center`) |
 | emergency_contact_name | Texto (255) | Nombre del contacto de emergencia |
 | emergency_contact_phone_number | Texto (255) | Teléfono del contacto de emergencia |
+| deleted_at | Fecha y hora (nula) | Borrado lógico del perfil (nula si el registro existe) |
 
 **Nota:** la dirección, el municipio, el departamento y la cédula se heredan de `user` (no se duplican aquí).
 
@@ -386,10 +387,11 @@ El modelo se basa en el script DDL original y lo **modifica** para cumplir los c
 | Campo | Tipo | Descripción |
 |---|---|---|
 | id | UUID | Identificador (clave primaria y a la vez FK a `user.id`) |
+| deleted_at | Fecha y hora (nula) | Borrado lógico del perfil (nula si el registro existe) |
 
 **Relaciones:**
 - Cada cuidador es **un usuario** (`user`).
-- Se vincula a **uno o varios pacientes** mediante `patient_caregiver` (HU-03: un cuidador puede seguir a varios pacientes).
+- Se vincula a **uno o varios pacientes** mediante `patient_caregiver` (HU-05: un cuidador puede seguir a varios pacientes).
 
 ### 5.4 Personal de salud — `healthcare_worker`
 
@@ -402,6 +404,7 @@ El modelo se basa en el script DDL original y lo **modifica** para cumplir los c
 | license_number | Texto (255) | Número de licencia médica |
 | employee_id | Texto (255) | Identificación o carnet del personal en el centro de salud (código de empleado) |
 | health_center_id | UUID | Centro de salud donde labora (FK a `health_center`) |
+| deleted_at | Fecha y hora (nula) | Borrado lógico del perfil (nula si el registro existe) |
 
 **Relaciones:**
 - Cada personal de salud es **un usuario** (`user`). La cédula, dirección y municipio se heredan de `user`.
@@ -411,7 +414,7 @@ El modelo se basa en el script DDL original y lo **modifica** para cumplir los c
 
 ### 5.5 Vínculo paciente-cuidador — `patient_caregiver`
 
-**Propósito:** relaciona a un cuidador con un paciente e indica el parentesco (HU-02 y HU-03).
+**Propósito:** relaciona a un cuidador con un paciente e indica el parentesco (HU-02 y HU-05).
 
 | Campo | Tipo | Descripción |
 |---|---|---|
@@ -421,13 +424,14 @@ El modelo se basa en el script DDL original y lo **modifica** para cumplir los c
 | date_link | Fecha | Fecha en que se estableció el vínculo (por defecto, día actual) |
 | is_primary | Booleano | Indica si este cuidador es el principal (por defecto, falso) |
 | created_at | Fecha y hora | Fecha de creación del registro |
+| deleted_at | Fecha y hora (nula) | Borrado lógico del vínculo (nula si el registro existe) |
 
 **Relaciones:**
 - Muchos a muchos entre `patient` y `caregiver`, con atributo propio (parentesco y fecha).
 - La clave primaria es la combinación de paciente y cuidador.
 
 **Reglas:**
-- Un cuidador puede vincularse a varios pacientes (HU-03).
+- Un cuidador puede vincularse a varios pacientes (HU-05).
 - Un paciente puede tener varios cuidadores.
 
 ### 5.6 Centro de salud — `health_center`
@@ -444,6 +448,7 @@ El modelo se basa en el script DDL original y lo **modifica** para cumplir los c
 | municipality_id | Número pequeño | Municipio donde se ubica el centro (FK a `cat_municipality`) |
 | created_at | Fecha y hora | Fecha de creación del registro |
 | updated_at | Fecha y hora | Fecha de última modificación |
+| deleted_at | Fecha y hora (nula) | Borrado lógico del centro (nula si el registro existe) |
 
 **Relaciones:**
 - Cada centro es de **un tipo** (`cat_health_center_type`).
@@ -465,6 +470,7 @@ El modelo se basa en el script DDL original y lo **modifica** para cumplir los c
 | created_by | UUID (nulo) | Usuario que creó el expediente (FK a `user.id`) |
 | create_date | Fecha y hora | Fecha de creación (por defecto, momento actual) |
 | update_date | Fecha y hora | Fecha de última modificación (por defecto, momento actual) |
+| deleted_at | Fecha y hora (nula) | Borrado lógico del expediente (nula si el registro existe) |
 
 **Relaciones:**
 - Un paciente tiene **un único expediente** (relación 1:1).
@@ -476,7 +482,7 @@ El modelo se basa en el script DDL original y lo **modifica** para cumplir los c
 
 ### 5.8 Consulta médica — `medical_visit` *(tabla nueva)*
 
-**Propósito:** cada consulta médica realizada al paciente dentro de su expediente (HU-04: registrar consultas con diagnóstico, observaciones y fecha). El historial clínico se construye ordenando estas consultas cronológicamente (HU-05).
+**Propósito:** cada consulta médica realizada al paciente dentro de su expediente (HU-10: registrar consultas con diagnóstico, observaciones y fecha). El historial clínico se construye ordenando estas consultas cronológicamente (HU-11).
 
 | Campo | Tipo | Descripción |
 |---|---|---|
@@ -489,17 +495,18 @@ El modelo se basa en el script DDL original y lo **modifica** para cumplir los c
 | treatment | Texto largo | Tratamiento indicado en la consulta |
 | next_visit_date | Fecha (nula) | Fecha sugerida para el próximo control |
 | created_at | Fecha y hora | Fecha de creación del registro |
+| deleted_at | Fecha y hora (nula) | Borrado lógico de la consulta (nula si el registro existe) |
 
 **Relaciones:**
 - Cada consulta pertenece a **un expediente** (`medical_record`).
 - Cada consulta es atendida por **un integrante** del personal de salud (`healthcare_worker`).
 
 **Reglas:**
-- El paciente puede consultar su propio expediente y sus visitas (HU-06); el personal de salud, las de los pacientes asignados.
+- El paciente puede consultar su propio expediente y sus visitas (HU-12); el personal de salud, las de los pacientes de su centro de salud.
 
 ### 5.9 Indicador de salud — `health_indicator`
 
-**Propósito:** registro de un valor de salud del paciente (presión arterial, glucosa, peso o temperatura) con fecha y hora (HU-07).
+**Propósito:** registro de un valor de salud del paciente (presión arterial, glucosa, peso o temperatura) con fecha y hora (HU-13).
 
 | Campo | Tipo | Descripción |
 |---|---|---|
@@ -512,6 +519,7 @@ El modelo se basa en el script DDL original y lo **modifica** para cumplir los c
 | registered_by | UUID | Usuario que registró el valor (FK a `user.id`) |
 | notes | Texto (nulo) | Observaciones del registro |
 | created_at | Fecha y hora | Fecha de creación del registro |
+| deleted_at | Fecha y hora (nula) | Borrado lógico del indicador (nula si el registro existe) |
 
 **Relaciones:**
 - Cada indicador pertenece a **un paciente** (`patient`).
@@ -530,11 +538,11 @@ El modelo se basa en el script DDL original y lo **modifica** para cumplir los c
 **Reglas de integridad:**
 - `value` debe ser mayor que cero.
 - `value_secondary`, cuando existe, debe ser mayor que cero.
-- La serie histórica se consulta por paciente, tipo y fecha (HU-08 y HU-09).
+- La serie histórica se consulta por paciente, tipo y fecha (HU-14, HU-15 y HU-16).
 
 ### 5.10 Medicamento — `medication`
 
-**Propósito:** tratamiento farmacológico prescrito a un paciente (HU-14).
+**Propósito:** tratamiento farmacológico prescrito a un paciente (HU-23).
 
 | Campo | Tipo | Descripción |
 |---|---|---|
@@ -550,6 +558,7 @@ El modelo se basa en el script DDL original y lo **modifica** para cumplir los c
 | active | Booleano | Si el tratamiento está activo (por defecto, verdadero) |
 | created_at | Fecha y hora | Fecha de creación del registro |
 | updated_at | Fecha y hora | Fecha de última modificación |
+| deleted_at | Fecha y hora (nula) | Borrado lógico del medicamento (nula si el registro existe) |
 
 **Relaciones:**
 - Cada medicamento pertenece a **un paciente** (`patient`).
@@ -562,7 +571,7 @@ El modelo se basa en el script DDL original y lo **modifica** para cumplir los c
 
 ### 5.11 Horario de medicamento — `medication_schedule`
 
-**Propósito:** define **una hora de toma** de un medicamento. Para dosis múltiples al día se crea una fila por hora (HU-14 y HU-15).
+**Propósito:** define **una hora de toma** de un medicamento. Para dosis múltiples al día se crea una fila por hora (HU-23 y HU-24).
 
 | Campo | Tipo | Descripción |
 |---|---|---|
@@ -571,6 +580,7 @@ El modelo se basa en el script DDL original y lo **modifica** para cumplir los c
 | hour | Hora (sin zona horaria) | Hora de la toma |
 | times_per_day | Número pequeño | Número descriptivo de tomas diarias (ej. 3 para "cada 8 horas") |
 | created_at | Fecha y hora | Fecha de creación del registro |
+| deleted_at | Fecha y hora (nula) | Borrado lógico del horario (nula si el registro existe) |
 
 **Relaciones:**
 - Cada horario pertenece a **un medicamento** (`medication`).
@@ -589,6 +599,7 @@ El modelo se basa en el script DDL original y lo **modifica** para cumplir los c
 |---|---|---|
 | schedule_id | UUID | Horario (FK a `medication_schedule.id`) |
 | week_day | Número pequeño | Día de la semana (1 = lunes, …, 7 = domingo) |
+| deleted_at | Fecha y hora (nula) | Borrado lógico del día de horario (nula si el registro existe) |
 
 **Relaciones:**
 - Cada fila pertenece a **un horario** (`medication_schedule`).
@@ -599,7 +610,7 @@ El modelo se basa en el script DDL original y lo **modifica** para cumplir los c
 
 ### 5.13 Recordatorio de medicamento — `medication_reminder`
 
-**Propósito:** registra cada recordatorio programado/envido para una hora de toma (HU-15).
+**Propósito:** registra cada recordatorio programado/envido para una hora de toma (HU-25 y HU-26).
 
 | Campo | Tipo | Descripción |
 |---|---|---|
@@ -609,6 +620,7 @@ El modelo se basa en el script DDL original y lo **modifica** para cumplir los c
 | notification_state_id | Número pequeño | Estado de la notificación (FK a `cat_notification_state`) |
 | confirmation_date | Fecha y hora (nula) | Fecha en que el paciente confirmó la toma |
 | created_at | Fecha y hora | Fecha de creación del registro |
+| deleted_at | Fecha y hora (nula) | Borrado lógico del recordatorio (nula si el registro existe) |
 
 **Relaciones:**
 - Cada recordatorio pertenece a **un horario** (`medication_schedule`).
@@ -616,7 +628,7 @@ El modelo se basa en el script DDL original y lo **modifica** para cumplir los c
 
 ### 5.14 Cita médica — `appointment`
 
-**Propósito:** cita médica programada entre un paciente y el personal de salud (HU-10).
+**Propósito:** cita médica programada entre un paciente y el personal de salud (HU-18).
 
 | Campo | Tipo | Descripción |
 |---|---|---|
@@ -633,6 +645,7 @@ El modelo se basa en el script DDL original y lo **modifica** para cumplir los c
 | cancelled_at | Fecha y hora (nula) | Fecha y hora de cancelación |
 | created_at | Fecha y hora | Fecha de creación del registro |
 | updated_at | Fecha y hora | Fecha de última modificación |
+| deleted_at | Fecha y hora (nula) | Borrado lógico de la cita (nula si el registro existe) |
 
 **Relaciones:**
 - Cada cita involucra **un paciente** (`patient`).
@@ -642,12 +655,12 @@ El modelo se basa en el script DDL original y lo **modifica** para cumplir los c
 - Cada cita puede generar **varios recordatorios** (`appointment_reminder`).
 
 **Reglas:**
-- Las citas pueden programarse, modificarse y cancelarse (HU-11). La modificación/cancelación queda reflejada en `updated_at` y, si aplica, en `cancel_reason`, `cancelled_at` y el estado.
-- Las próximas citas del paciente se consultan por fecha ascendente (HU-12).
+- Las citas pueden programarse, modificarse y cancelarse (HU-19 y HU-20). La modificación/cancelación queda reflejada en `updated_at` y, si aplica, en `cancel_reason`, `cancelled_at` y el estado.
+- Las próximas citas del paciente se consultan por fecha ascendente (HU-21).
 
 ### 5.15 Recordatorio de cita — `appointment_reminder`
 
-**Propósito:** registra el recordatorio programado antes de una cita (HU-13).
+**Propósito:** registra el recordatorio programado antes de una cita (HU-27).
 
 | Campo | Tipo | Descripción |
 |---|---|---|
@@ -656,6 +669,7 @@ El modelo se basa en el script DDL original y lo **modifica** para cumplir los c
 | date_hour_send | Fecha y hora | Fecha y hora en que se envía el recordatorio |
 | notification_state_id | Número pequeño | Estado de la notificación (FK a `cat_notification_state`) |
 | created_at | Fecha y hora | Fecha de creación del registro |
+| deleted_at | Fecha y hora (nula) | Borrado lógico del recordatorio (nula si el registro existe) |
 
 **Relaciones:**
 - Cada recordatorio pertenece a **una cita** (`appointment`).
@@ -700,6 +714,8 @@ El modelo se basa en el script DDL original y lo **modifica** para cumplir los c
 | medical_record.created_by | user.id | Restringido |
 | medication.prescribed_by | user.id | Restringido |
 
+**Nota:** los comportamientos de esta tabla aplican a los **borrados físicos** (definidos a nivel de base de datos). El borrado lógico (soft delete) se propaga mediante la **cascada de aplicación** descrita en la sección 2 (soft-remove de TypeORM), que no afecta estas restricciones físicas.
+
 ### 6.2 Restricciones de valor (CHECK)
 
 | Tabla | Restricción |
@@ -720,6 +736,8 @@ El modelo se basa en el script DDL original y lo **modifica** para cumplir los c
 | patient_caregiver | Combinación (patient_id, caregiver_id) |
 | medication_schedule_day | Combinación (schedule_id, week_day) |
 
+**Nota:** las restricciones de unicidad son **totales** (incluyen las filas con borrado lógico). Por lo tanto, un usuario con `deleted_at` definido sigue ocupando su `email`, `username` y `dni`; si se requiere reutilizar esos valores, será necesario eliminarlos físicamente o migrar a índices únicos parciales (`WHERE deleted_at IS NULL`).
+
 ---
 
 ## 7. Índices propuestos
@@ -728,13 +746,13 @@ Los índices agilizan las consultas más frecuentes de la aplicación:
 
 | Tabla | Índice | Justificación |
 |---|---|---|
-| health_indicator | (patient_id, type_indicator_id, date_hour) | Historial de indicadores por paciente y tipo, ordenado por fecha (HU-08, HU-09) |
-| appointment | (patient_id, date_hour) | Próximas citas del paciente (HU-12) |
+| health_indicator | (patient_id, type_indicator_id, date_hour) | Historial de indicadores por paciente y tipo, ordenado por fecha (HU-14, HU-15 y HU-16) |
+| appointment | (patient_id, date_hour) | Próximas citas del paciente (HU-21) |
 | appointment | (healthcare_worker_id, date_hour) | Agenda del personal de salud |
-| medical_visit | (medical_record_id, visit_date) | Historial clínico cronológico (HU-05) |
-| medication | (patient_id) | Medicamentos de un paciente (HU-14) |
-| medication_schedule | (medicine_id) | Horarios de un medicamento (HU-14) |
-| patient_caregiver | (caregiver_id) | Pacientes vinculados a un cuidador (HU-03) |
+| medical_visit | (medical_record_id, visit_date) | Historial clínico cronológico (HU-11) |
+| medication | (patient_id) | Medicamentos de un paciente (HU-23) |
+| medication_schedule | (medicine_id) | Horarios de un medicamento (HU-23) |
+| patient_caregiver | (caregiver_id) | Pacientes vinculados a un cuidador (HU-05) |
 | patient | (health_center_id) | Pacientes asignados a un centro de salud (panel médico) |
 
 ---
@@ -747,8 +765,8 @@ La tabla `cat_role` alimenta el control de acceso basado en roles del backend:
 |---|---|---|
 | Patient (1) | `patient` | Registra indicadores, consulta su expediente, próximas citas, recibe recordatorios |
 | Caregiver (2) | `caregiver` | Consulta el historial de sus pacientes vinculados, registra indicadores |
-| Healthcare_Worker (3) | `health_staff` | Registra pacientes, consultas y citas; consulta indicadores y expedientes de pacientes asignados |
-| Administrator (4) | `admin` | Asigna pacientes al personal de salud, administra usuarios y centros |
+| Healthcare_Worker (3) | `health_staff` | Registra pacientes, consultas y citas; consulta indicadores y expedientes de los pacientes de su centro de salud |
+| Administrator (4) | `admin` | Asigna pacientes a un centro de salud, administra usuarios y centros |
 
 ---
 
@@ -756,12 +774,12 @@ La tabla `cat_role` alimenta el control de acceso basado en roles del backend:
 
 | # | Cambio | Motivo |
 |---|---|---|
-| 1 | Se añade la tabla **`medical_visit`** | Permitir registrar cada consulta médica (HU-04) y construir el historial cronológico (HU-05). El expediente maestro (`medical_record`) se mantiene 1:1 por paciente |
-| 2 | Se añade **`value_secondary`** a `health_indicator` | Almacenar la presión arterial diastólica (HU-07); la sistólica va en `value` |
+| 1 | Se añade la tabla **`medical_visit`** | Permitir registrar cada consulta médica (HU-10) y construir el historial cronológico (HU-11). El expediente maestro (`medical_record`) se mantiene 1:1 por paciente |
+| 2 | Se añade **`value_secondary`** a `health_indicator` | Almacenar la presión arterial diastólica (HU-13); la sistólica va en `value` |
 | 3 | Se elimina `frequency_id` de `medication_schedule` y la tabla **`cat_frequency`** | El modelo mezclaba una hora única con frecuencias "cada N horas", lo cual era ambiguo. Ahora cada fila es una hora de toma y `times_per_day` describe cuántas tomas hay al día |
 | 4 | Se añade `times_per_day` a `medication_schedule` | Describir de forma clara la frecuencia de tomas diarias |
 | 5 | Se añaden **`created_at` y `updated_at`** a las tablas principales | Trazabilidad de creación y modificación de registros |
-| 6 | Se añaden `created_by`, `cancel_reason` y `updated_at` a `appointment` | Soporte a modificación y cancelación de citas (HU-11) con registro del responsable y motivo |
+| 6 | Se añaden `created_by`, `cancel_reason` y `updated_at` a `appointment` | Soporte a modificación y cancelación de citas (HU-19 y HU-20) con registro del responsable y motivo |
 | 7 | Se añade **`created_at`** a `patient_caregiver`, `medication_reminder` y `appointment_reminder` | Trazabilidad de vínculos y recordatorios |
 | 8 | Se añaden **restricciones CHECK** | Garantizar valores coherentes (fechas de tratamiento y valores de indicadores positivos) |
 | 9 | Se añaden **índices compuestos** | Rendimiento de las consultas más frecuentes por paciente, tipo y fecha |
@@ -774,6 +792,7 @@ La tabla `cat_role` alimenta el control de acceso basado en roles del backend:
 | 16 | Se añaden `instructions` y `prescribed_by` a `medication`; `notes` a `health_indicator` | Completar los datos de tratamiento y de registro de indicadores |
 | 17 | Se añaden a `appointment`: `appointment_type_id`, `duration_minutes` y `cancelled_at`; a `patient_caregiver`: `is_primary` | Agenda con tipo y duración, trazabilidad de cancelación y cuidador principal |
 | 18 | Se añaden los catálogos `cat_appointment_type`, `cat_department` y `cat_municipality` | Tipos de cita y ubicación geográfica normalizada; el departamento se deriva del municipio (3NF) |
+| 19 | Se implementa el **borrado lógico (soft delete)** en todas las tablas principales: `deleted_at` (marca temporal) y cascada de aplicación (soft-remove) por jerarquía de agregados | Evitar la pérdida de información clínica; implementa la mejora futura prevista en la sección 10. Los catálogos y los estados de negocio (`is_active`, `active`) se conservan |
 
 **No aplicados en esta versión** (mejoras futuras, ver sección 10).
 
@@ -785,4 +804,3 @@ La tabla `cat_role` alimenta el control de acceso basado en roles del backend:
 - **Modo offline**: mecanismo de sincronización para registrar indicadores sin conexión en zonas de baja conectividad.
 - **Fotos o adjuntos**: en consultas médicas (`medical_visit`) para recetas o documentos clínicos.
 - **Auditoría de cambios**: tabla de auditoría para registrar quién modificó datos clínicos.
-- **Eliminación lógica** en todas las entidades, si el requisito regulatorio lo exige.

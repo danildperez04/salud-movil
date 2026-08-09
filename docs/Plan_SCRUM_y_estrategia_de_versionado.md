@@ -39,8 +39,8 @@
 | **Sprint** | **Fechas** | **Actividades principales** | **Responsables** |
 | - | - | - | - |
 | **Sprint 1** | **20 de julio – 27 de julio** | Configuración del proyecto, Git/GitHub, README técnico, diagramación de la base de datos y planificación inicial. | Freddy, Danild y Julio |
-| **Sprint 2** | **28 de julio – 10 de agosto** | Desarrollo de la propuesta de valor, estrategia de canales, reglas de identidad visual, wireframes, autenticación, registro de pacientes y expediente clínico. | Eliva, Joshua, Danild y Julio |
-| **Sprint 3** | **11 de agosto – 17 de agosto** | Desarrollo de UX/UI, monitoreo de indicadores de salud, panel médico, historial clínico y gestión de citas. | Joshua, Julio y Danild |
+| **Sprint 2** | **28 de julio – 10 de agosto** | Desarrollo de la propuesta de valor, estrategia de canales, reglas de identidad visual, wireframes, autenticación, gestión de usuarios, registro de pacientes y expediente clínico. | Eliva, Joshua, Danild y Julio |
+| **Sprint 3** | **11 de agosto – 17 de agosto** | Desarrollo de UX/UI, monitoreo de indicadores de salud, historial clínico y gestión de citas. | Joshua, Julio y Danild |
 | **Sprint 4** | **18 de agosto – 24 de agosto** | Seguridad, buenas prácticas, plan financiero, objetivos SMART, recordatorios de medicamentos y citas, integración del sistema. | Todo el equipo |
 | **Sprint 5** | **25 de agosto – 1 de septiembre** | Pruebas finales, corrección de errores, documentación, ejecución de la solución, push a main, preparación del pitch y presentación final. | Todo el equipo |
 | **Entrega** | **2 de septiembre** | Presentación oficial del proyecto. | Todo el equipo |
@@ -89,10 +89,11 @@ Durante el desarrollo del MVP se utilizará la nomenclatura **MAJOR.MINOR.PATCH*
 | **Versión** | **Fecha estimada** | **Contenido** |
 | - | - | - |
 | **v0.1.0** | 27 de julio | Configuración inicial, repositorio, README técnico y base de datos. |
-| **v0.2.0** | 10 de agosto | Registro de pacientes, autenticación y expediente clínico. |
-| **v0.3.0** | 17 de agosto | Monitoreo de indicadores, historial clínico y panel médico. |
-| **v0.4.0** | 24 de agosto | Gestión de citas, recordatorios y seguridad del sistema. |
-| **v1.0.0** | **1 de septiembre** | MVP completo, pruebas finales y versión lista para la presentación del proyecto. |
+| **v0.2.0** | 9 de agosto | Autenticación y gestión de usuarios. |
+| **v0.3.0** | 16 de agosto | Registro de pacientes, expediente clínico y monitoreo de indicadores. |
+| **v0.4.0** | 24 de agosto | Gestión de citas, recordatorios y medicación. |
+| **v0.5.0** | 28 de agosto | Panel web del personal de salud: registro de cuentas y asignación de pacientes a su centro de salud. |
+| **v1.0.0** | **1 de septiembre** | MVP completo, pruebas finales y versión lista para la presentación del proyecto (2 de septiembre). |
 
 
 
