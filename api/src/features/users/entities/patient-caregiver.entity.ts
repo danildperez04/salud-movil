@@ -1,10 +1,11 @@
 import {
   Column,
   CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
-  PrimaryGeneratedColumn,
+  PrimaryColumn,
 } from 'typeorm';
 import { Patient } from './patient.entity';
 import { Caregiver } from './caregiver.entity';
@@ -12,8 +13,11 @@ import { RelationshipType } from '../../catalogues/entities/relationship-type.en
 
 @Entity('patient_caregiver')
 export class PatientCaregiver {
-  @PrimaryGeneratedColumn('uuid')
-  id!: string;
+  @PrimaryColumn({ name: 'patient_id', type: 'uuid' })
+  patientId!: string;
+
+  @PrimaryColumn({ name: 'caregiver_id', type: 'uuid' })
+  caregiverId!: string;
 
   @Column({ name: 'date_link', type: 'date', default: () => 'CURRENT_DATE' })
   dateLink!: Date;
@@ -24,17 +28,20 @@ export class PatientCaregiver {
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
 
+  @DeleteDateColumn({ name: 'deleted_at' })
+  deletedAt!: Date | null;
+
   // === Relations ===
 
-  @ManyToOne(() => Patient)
+  @ManyToOne(() => Patient, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'patient_id' })
   patient!: Patient;
 
-  @ManyToOne(() => Caregiver)
+  @ManyToOne(() => Caregiver, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'caregiver_id' })
   caregiver!: Caregiver;
 
-  @ManyToOne(() => RelationshipType)
+  @ManyToOne(() => RelationshipType, { onDelete: 'RESTRICT', nullable: false })
   @JoinColumn({ name: 'relationship_type_id' })
   relationshipType!: RelationshipType;
 }

@@ -1,6 +1,7 @@
 import {
   Column,
   CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
@@ -36,17 +37,20 @@ export class HealthIndicator {
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
 
+  @DeleteDateColumn({ name: 'deleted_at' })
+  deletedAt!: Date | null;
+
   // === Relations ===
 
-  @ManyToOne(() => Patient)
+  @ManyToOne(() => Patient, { onDelete: 'CASCADE', nullable: false })
   @JoinColumn({ name: 'patient_id' })
   patient!: Patient;
 
-  @ManyToOne(() => TypeIndicator)
+  @ManyToOne(() => TypeIndicator, { onDelete: 'RESTRICT', nullable: false })
   @JoinColumn({ name: 'type_indicator_id' })
   typeIndicator!: TypeIndicator;
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, { onDelete: 'RESTRICT', nullable: false })
   @JoinColumn({ name: 'registered_by' })
   registeredBy!: User;
 }

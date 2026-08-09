@@ -1,6 +1,7 @@
 import {
   Column,
   CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
@@ -32,13 +33,19 @@ export class MedicalVisit {
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
 
+  @DeleteDateColumn({ name: 'deleted_at' })
+  deletedAt!: Date | null;
+
   // === Relations ===
 
-  @ManyToOne(() => MedicalRecord, (record) => record.visits)
+  @ManyToOne(() => MedicalRecord, (record) => record.visits, {
+    onDelete: 'CASCADE',
+    nullable: false,
+  })
   @JoinColumn({ name: 'medical_record_id' })
   medicalRecord!: MedicalRecord;
 
-  @ManyToOne(() => HealthcareWorker)
+  @ManyToOne(() => HealthcareWorker, { onDelete: 'RESTRICT', nullable: false })
   @JoinColumn({ name: 'healthcare_worker_id' })
   healthcareWorker!: HealthcareWorker;
 }

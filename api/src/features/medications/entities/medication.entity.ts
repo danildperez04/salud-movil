@@ -1,6 +1,7 @@
 import {
   Column,
   CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
@@ -42,20 +43,28 @@ export class Medication {
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt!: Date;
 
+  @DeleteDateColumn({ name: 'deleted_at' })
+  deletedAt!: Date | null;
+
   // === Relations ===
 
-  @ManyToOne(() => Patient)
+  @ManyToOne(() => Patient, { onDelete: 'CASCADE', nullable: false })
   @JoinColumn({ name: 'patient_id' })
   patient!: Patient;
 
-  @ManyToOne(() => RouteAdministration)
+  @ManyToOne(() => RouteAdministration, {
+    onDelete: 'RESTRICT',
+    nullable: false,
+  })
   @JoinColumn({ name: 'route_administration_id' })
   routeAdministration!: RouteAdministration;
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, { onDelete: 'RESTRICT', nullable: true })
   @JoinColumn({ name: 'prescribed_by' })
   prescribedByUser!: User;
 
-  @OneToMany(() => MedicationSchedule, (schedule) => schedule.medication)
+  @OneToMany(() => MedicationSchedule, (schedule) => schedule.medication, {
+    cascade: ['soft-remove'],
+  })
   schedules!: MedicationSchedule[];
 }
