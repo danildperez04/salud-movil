@@ -1,6 +1,7 @@
 import {
   Column,
   CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
@@ -9,6 +10,7 @@ import {
 } from 'typeorm';
 import { Medication } from './medication.entity';
 import { MedicationScheduleDay } from './medication-schedule-day.entity';
+import { MedicationReminder } from './medication-reminder.entity';
 
 @Entity('medication_schedule')
 export class MedicationSchedule {
@@ -24,12 +26,25 @@ export class MedicationSchedule {
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
 
+  @DeleteDateColumn({ name: 'deleted_at' })
+  deletedAt!: Date | null;
+
   // === Relations ===
 
-  @ManyToOne(() => Medication, (medication) => medication.schedules)
+  @ManyToOne(() => Medication, (medication) => medication.schedules, {
+    onDelete: 'CASCADE',
+    nullable: false,
+  })
   @JoinColumn({ name: 'medicine_id' })
   medication!: Medication;
 
-  @OneToMany(() => MedicationScheduleDay, (day) => day.schedule)
+  @OneToMany(() => MedicationScheduleDay, (day) => day.schedule, {
+    cascade: ['soft-remove'],
+  })
   days!: MedicationScheduleDay[];
+
+  @OneToMany(() => MedicationReminder, (reminder) => reminder.schedule, {
+    cascade: ['soft-remove'],
+  })
+  reminders!: MedicationReminder[];
 }

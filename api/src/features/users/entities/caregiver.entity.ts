@@ -1,16 +1,19 @@
 import {
   CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   JoinColumn,
+  OneToMany,
   OneToOne,
-  PrimaryGeneratedColumn,
+  PrimaryColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { User } from './user.entity';
+import { PatientCaregiver } from './patient-caregiver.entity';
 
 @Entity('caregiver')
 export class Caregiver {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryColumn('uuid')
   id!: string;
 
   @CreateDateColumn({ name: 'created_at' })
@@ -19,9 +22,19 @@ export class Caregiver {
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt!: Date;
 
+  @DeleteDateColumn({ name: 'deleted_at' })
+  deletedAt!: Date | null;
+
   // === Relations ===
 
-  @OneToOne(() => User)
+  @OneToOne(() => User, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'id', referencedColumnName: 'id' })
   user!: User;
+
+  // === Inverse relations (soft-delete cascade) ===
+
+  @OneToMany(() => PatientCaregiver, (link) => link.caregiver, {
+    cascade: ['soft-remove'],
+  })
+  caregiverLinks!: PatientCaregiver[];
 }

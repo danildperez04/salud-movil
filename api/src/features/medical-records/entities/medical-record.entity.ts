@@ -1,6 +1,7 @@
 import {
   Column,
   CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
@@ -18,7 +19,7 @@ export class MedicalRecord {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column({ name: 'primary_diagnosis' })
+  @Column({ name: 'primary_diagnosis', length: 255 })
   primaryDiagnosis!: string;
 
   @Column({ name: 'medical_history', type: 'text' })
@@ -36,16 +37,21 @@ export class MedicalRecord {
   @UpdateDateColumn({ name: 'update_date' })
   updateDate!: Date;
 
+  @DeleteDateColumn({ name: 'deleted_at' })
+  deletedAt!: Date | null;
+
   // === Relations ===
 
-  @ManyToOne(() => Patient)
+  @OneToOne(() => Patient, { onDelete: 'CASCADE', nullable: false })
   @JoinColumn({ name: 'patient_id' })
   patient!: Patient;
 
-  @OneToOne(() => User)
+  @ManyToOne(() => User, { onDelete: 'RESTRICT', nullable: true })
   @JoinColumn({ name: 'created_by' })
   createdBy!: User;
 
-  @OneToMany(() => MedicalVisit, (visit) => visit.medicalRecord)
+  @OneToMany(() => MedicalVisit, (visit) => visit.medicalRecord, {
+    cascade: ['soft-remove'],
+  })
   visits!: MedicalVisit[];
 }

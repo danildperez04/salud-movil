@@ -5,18 +5,22 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { Role } from '../../catalogues/entities/role.entity';
 import { Municipality } from '../../catalogues/entities/municipality.entity';
+import { Patient } from './patient.entity';
+import { Caregiver } from './caregiver.entity';
+import { HealthcareWorker } from './healthcare-worker.entity';
 
 @Entity('user')
 export class User {
   @PrimaryGeneratedColumn('uuid')
   id!: string;
 
-  @Column({ nullable: true })
+  @Column({ nullable: true, unique: true })
   dni!: string;
 
   @Column()
@@ -60,11 +64,34 @@ export class User {
 
   // === Relations ===
 
-  @ManyToOne(() => Role, (role) => role.users)
+  @ManyToOne(() => Role, (role) => role.users, {
+    onDelete: 'RESTRICT',
+    nullable: false,
+  })
   @JoinColumn({ name: 'role_id' })
   role!: Role;
 
-  @ManyToOne(() => Municipality, (municipality) => municipality.users)
+  @ManyToOne(() => Municipality, (municipality) => municipality.users, {
+    onDelete: 'RESTRICT',
+    nullable: false,
+  })
   @JoinColumn({ name: 'municipality_id' })
   municipality!: Municipality;
+
+  // === Inverse relations (soft-delete cascade) ===
+
+  @OneToOne(() => Patient, (patient) => patient.user, {
+    cascade: ['soft-remove'],
+  })
+  patient!: Patient;
+
+  @OneToOne(() => Caregiver, (caregiver) => caregiver.user, {
+    cascade: ['soft-remove'],
+  })
+  caregiver!: Caregiver;
+
+  @OneToOne(() => HealthcareWorker, (worker) => worker.user, {
+    cascade: ['soft-remove'],
+  })
+  healthcareWorker!: HealthcareWorker;
 }

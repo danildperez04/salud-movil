@@ -1,6 +1,7 @@
 import {
   Column,
   CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
@@ -20,12 +21,18 @@ export class AppointmentReminder {
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
 
+  @DeleteDateColumn({ name: 'deleted_at' })
+  deletedAt!: Date | null;
+
   // === Relations ===
-  @ManyToOne(() => Appointment, (appointment) => appointment.reminders)
+  @ManyToOne(() => Appointment, (appointment) => appointment.reminders, {
+    onDelete: 'CASCADE',
+    nullable: false,
+  })
   @JoinColumn({ name: 'appointment_id' })
   appointment!: Appointment;
 
-  @ManyToOne(() => NotificationState)
+  @ManyToOne(() => NotificationState, { onDelete: 'RESTRICT', nullable: false })
   @JoinColumn({ name: 'notification_state_id' })
   notificationState!: NotificationState;
 }

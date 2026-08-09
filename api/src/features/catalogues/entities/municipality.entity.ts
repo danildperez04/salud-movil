@@ -17,7 +17,10 @@ export class Municipality {
   @Column({ length: 100 })
   name!: string;
 
-  @ManyToOne(() => Department, (department) => department.municipalities)
+  @ManyToOne(() => Department, (department) => department.municipalities, {
+    onDelete: 'RESTRICT',
+    nullable: false,
+  })
   @JoinColumn({ name: 'department_id' })
   department!: Department;
 

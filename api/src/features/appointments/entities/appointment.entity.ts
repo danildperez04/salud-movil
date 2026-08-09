@@ -1,6 +1,7 @@
 import {
   Column,
   CreateDateColumn,
+  DeleteDateColumn,
   Entity,
   JoinColumn,
   ManyToOne,
@@ -41,28 +42,39 @@ export class Appointment {
   @UpdateDateColumn({ name: 'updated_at' })
   updatedAt!: Date;
 
+  @DeleteDateColumn({ name: 'deleted_at' })
+  deletedAt!: Date | null;
+
   // === Relations ===
 
-  @ManyToOne(() => Patient)
+  @ManyToOne(() => Patient, { onDelete: 'CASCADE', nullable: false })
   @JoinColumn({ name: 'patient_id' })
   patient!: Patient;
 
-  @ManyToOne(() => HealthcareWorker)
+  @ManyToOne(() => HealthcareWorker, { onDelete: 'RESTRICT', nullable: false })
   @JoinColumn({ name: 'healthcare_worker_id' })
   healthcareWorker!: HealthcareWorker;
 
-  @ManyToOne(() => AppointmentState)
+  @ManyToOne(() => AppointmentState, {
+    onDelete: 'RESTRICT',
+    nullable: false,
+  })
   @JoinColumn({ name: 'appointment_state_id' })
   appointmentState!: AppointmentState;
 
-  @ManyToOne(() => AppointmentType)
+  @ManyToOne(() => AppointmentType, {
+    onDelete: 'RESTRICT',
+    nullable: false,
+  })
   @JoinColumn({ name: 'appointment_type_id' })
   appointmentType!: AppointmentType;
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, { onDelete: 'RESTRICT', nullable: true })
   @JoinColumn({ name: 'created_by' })
   createdBy!: User;
 
-  @OneToMany(() => AppointmentReminder, (reminder) => reminder.appointment)
+  @OneToMany(() => AppointmentReminder, (reminder) => reminder.appointment, {
+    cascade: ['soft-remove'],
+  })
   reminders!: AppointmentReminder[];
 }
