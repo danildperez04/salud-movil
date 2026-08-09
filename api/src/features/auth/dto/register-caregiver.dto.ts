@@ -1,5 +1,4 @@
 import {
-  IsBoolean,
   IsEmail,
   IsNotEmpty,
   IsOptional,
@@ -9,44 +8,38 @@ import {
   MinLength,
 } from 'class-validator';
 
-export class UpdateUserDto {
-  @IsOptional()
+export class RegisterCaregiverDto {
   @IsString()
   @IsNotEmpty()
-  name?: string;
+  name!: string;
 
-  @IsOptional()
   @IsEmail()
-  email?: string;
+  @IsNotEmpty()
+  email!: string;
 
-  @IsOptional()
   @IsString()
   @Length(3, 50)
   @Matches(/^[a-zA-Z0-9_.-]+$/, {
     message: 'El nombre de usuario solo puede contener letras, números, . _ -',
   })
-  username?: string;
+  username!: string;
 
-  @IsOptional()
+  @IsString()
+  @MinLength(8)
+  password!: string;
+
   @IsString()
   @IsNotEmpty()
-  phoneNumber?: string;
+  phoneNumber!: string;
 
-  @IsOptional()
   @IsString()
   @IsNotEmpty()
-  address?: string;
+  address!: string;
 
   @IsOptional()
   @IsString()
   dni?: string;
 
-  @IsOptional()
-  @IsBoolean()
-  isActive?: boolean;
-
-  @IsOptional()
-  @IsString()
-  @MinLength(8)
-  password?: string;
+  @IsNotEmpty()
+  municipalityId!: number;
 }

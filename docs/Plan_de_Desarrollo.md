@@ -1,6 +1,6 @@
 # Plan de Desarrollo — Salud Móvil (MVP)
 
-**Fecha de elaboración:** 6 de agosto de 2026 (actualizado el 7 de agosto de 2026)
+**Fecha de elaboración:** 6 de agosto de 2026 (actualizado el 9 de agosto de 2026)
 **Entrega objetivo:** v1.0.0 funcional el **1 de septiembre de 2026** · presentación oficial el **2 de septiembre de 2026**
 
 ## 1. Objetivo
@@ -21,16 +21,19 @@ Del total de 31 historias (127 Story Points), **23 son Must Have (imprescindible
 
 | Presente | Falta |
 |---|---|
-| Scaffold NestJS 11 con TypeORM y PostgreSQL conectado | Autenticación (JWT/RBAC) |
-| Config de entorno tipada (`src/config/configuration.ts`) y `.env.example` completo (`DB_PORT`, `DB_NAME`, `DB_TYPE`, JWT) | Módulo `auth` (`POST /auth/register`, `POST /auth/login`, `GET /auth/me`) |
-| `UsersModule` registrado en `app.module.ts` | CRUD real de usuarios: el controller expone rutas, pero el service devuelve placeholders y los DTOs están vacíos |
-| Entidades de dominio creadas: `user`, `patient`, `caregiver`, `healthcare_worker`, `patient_caregiver`, `health_center`, `medical_record`, `medical_visit`, `health_indicator`, `medication`, `medication_schedule`, `medication_schedule_day`, `medication_reminder`, `appointment`, `appointment_reminder` y los 12 catálogos | Migraciones (usa `synchronize: true`) |
-| Soft delete (`@DeleteDateColumn`) y borrados en cascada a nivel de BD | `ValidationPipe` con `whitelist + transform`, CORS, prefijo `/api` y helmet |
+| Scaffold NestJS 11 con TypeORM y PostgreSQL conectado | Migraciones (usa `synchronize: true` en dev; pendientes las SQL para producción, Fase 7) |
+| Config de entorno tipada (`src/config/configuration.ts`) y `.env.example` completo (`DB_PORT`, `DB_NAME`, `DB_TYPE`, JWT) | Helmet y rate limiting (Fase 7) |
+| Autenticación JWT/RBAC con guards globales (`JwtAuthGuard` + `RolesGuard`) y decoradores `@Roles()` / `@Public()` | |
+| `AuthModule`: `POST /auth/register` (cuidador), `POST /auth/login`, `GET /auth/me`, `POST /auth/forgot-password`, `POST /auth/reset-password`, `POST /auth/change-password` | |
+| CRUD de usuarios para el administrador (HU-01): `POST/GET/PATCH/DELETE /users` con creación de personal de salud en transacción (user + `healthcare_worker`) | |
+| `UsersModule` registrado en `app.module.ts` | |
+| Entidades de dominio creadas: `user`, `patient`, `caregiver`, `healthcare_worker`, `patient_caregiver`, `health_center`, `medical_record`, `medical_visit`, `health_indicator`, `medication`, `medication_schedule`, `medication_schedule_day`, `medication_reminder`, `appointment`, `appointment_reminder`, `password_reset` y los 12 catálogos | |
+| Soft delete (`@DeleteDateColumn`) y borrados en cascada a nivel de BD | |
+| `ValidationPipe` global con `whitelist + transform + forbidNonWhitelisted` y CORS habilitado (sin prefijo `/api`, decisión del equipo) | |
 
-**Deuda técnica a corregir en Fase 0:**
-- `main.ts` ya registra un `ValidationPipe` global básico, pero le faltan las opciones `whitelist` y `transform`, el CORS, el prefijo global `/api` y helmet.
-- El README raíz documenta endpoints de auth (`POST /auth/login`) que aún no existen.
-- El módulo `users` expone rutas CRUD, pero el service no interactúa con el repositorio y los DTOs están vacíos.
+**Deuda técnica pendiente:**
+- Helmet y rate limiting (`@nestjs/throttler`) se añaden en la Fase 7 de seguridad.
+- Migraciones SQL: `synchronize: true` sigue activo y debe reemplazarse antes de v1.0.0.
 
 ### 2.2 Mobile — `mobile/` (Expo SDK 57 + React Native + Uniwind/Tailwind)
 
@@ -77,10 +80,10 @@ Del total de 31 historias (127 Story Points), **23 son Must Have (imprescindible
 
 **API**
 - [x] Registrar `UsersModule` en `app.module.ts`.
-- [ ] `main.ts`: completar `ValidationPipe` (whitelist + transform), CORS habilitado, prefijo global `/api`, helmet.
+- [x] `main.ts`: `ValidationPipe` global con `whitelist + transform + forbidNonWhitelisted` y CORS habilitado (sin prefijo `/api`, decisión del equipo; helmet en Fase 7).
 - [x] Completar `.env.example` (faltaban `DB_PORT`, `DB_NAME`, `DB_TYPE`).
 - [ ] Crear carpeta de migraciones y mecanismo de ejecución (reemplazar `synchronize: true` en el arranque de producción).
-- [ ] Completar el CRUD real de `users` (repositorio + DTOs con validación).
+- [x] Completar el CRUD real de `users` (repositorio + DTOs con validación + transacción).
 
 **Mobile**
 - [ ] Corregir rutas de `metro.config.js` (o mover `global.css` y `uniwind-types.d.ts` a `src/` según lo que convenga).
@@ -93,13 +96,13 @@ Del total de 31 historias (127 Story Points), **23 son Must Have (imprescindible
 ### Fase 1 — Autenticación y Usuarios → HU-01, HU-02, HU-03, HU-04, HU-08 (8–9 de agosto) — v0.2.0
 
 **API**
-- [ ] `AuthModule`: `POST /auth/register`, `POST /auth/login`, `GET /auth/me`.
-- [ ] JWT (`@nestjs/jwt`) + guard de autenticación + `RolesGuard` con decorador `@Roles()`.
-- [ ] Creación de cuentas de personal de salud por el administrador (HU-01).
-- [ ] Registro de cuenta de cuidador (HU-02), creación de cuenta del paciente por el personal de salud (HU-06) e inicio de sesión (HU-03).
-- [ ] Restablecimiento de contraseña (HU-04).
-- [ ] Perfil de usuario y cierre de sesión (HU-08).
-- [ ] Seed de usuarios: un `admin` y personal de salud de ejemplo.
+- [x] `AuthModule`: `POST /auth/register`, `POST /auth/login`, `GET /auth/me`.
+- [x] JWT (`@nestjs/jwt`) + `JwtAuthGuard` global + `RolesGuard` con decorador `@Roles()` y `@Public()` para rutas públicas.
+- [x] Creación de cuentas de personal de salud por el administrador (HU-01): `POST /users` crea user + `healthcare_worker` (licencia, especialidad, centro de salud) en transacción; listado, detalle, actualización y baja (soft delete) solo `admin`.
+- [x] Registro de cuenta de cuidador (HU-02) e inicio de sesión (HU-03). *(La creación de la cuenta del paciente por el personal de salud es HU-06 → Fase 2).*
+- [x] Restablecimiento de contraseña (HU-04): `POST /auth/forgot-password`, `POST /auth/reset-password` y `POST /auth/change-password` (token con hash SHA-256, expiración configurable; en dev se devuelve en la respuesta).
+- [x] Perfil de usuario (HU-08): `GET /auth/me`; el cierre de sesión se maneja descartando el token en el cliente.
+- [x] Seed de usuarios y catálogos: `admin` y personal de salud de ejemplo, roles, géneros, especialidades, tipos de centro, 18 departamentos y 150 municipios.
 
 **Mobile**
 - [ ] Cliente API (fetch/axios con base URL configurable) e interceptor de token.
@@ -211,6 +214,8 @@ Del total de 31 historias (127 Story Points), **23 son Must Have (imprescindible
 | 25–28 ago | Fase 6: panel web del personal de salud (HU-28 y HU-29) | v0.5.0 |
 | 29 ago – 1 sep | Fase 7: seguridad, pruebas, CI, despliegue y presentación | v1.0.0 |
 | 2 sep | Presentación oficial del proyecto | — |
+
+> **Estado al 9 de agosto:** la parte de **API de la Fase 1** está completada (autenticación JWT/RBAC, reset de contraseña y CRUD de usuarios admin). Pendientes de la Fase 1: mobile (cliente API, pantallas de login/registro/perfil y gestión de sesión) y frontend (login y registro conectados).
 
 **Correspondencia con el plan original:**
 

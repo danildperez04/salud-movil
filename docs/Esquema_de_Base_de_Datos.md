@@ -36,6 +36,7 @@ El modelo se basa en el script DDL original y lo **modifica** para cumplir los c
 - `caregiver` — perfil del cuidador o familiar (hereda de `user`).
 - `healthcare_worker` — perfil del personal de salud (hereda de `user`).
 - `patient_caregiver` — vínculo entre paciente y cuidador (relación N:M con tipo de parentesco).
+- `password_reset` — token de restablecimiento de contraseña (HU-04).
 
 ### 3.2 Dominio de centros de salud
 
@@ -88,6 +89,7 @@ El modelo se basa en el script DDL original y lo **modifica** para cumplir los c
 | `caregiver` | Perfil del cuidador o familiar |
 | `healthcare_worker` | Perfil del personal de salud |
 | `patient_caregiver` | Vínculo N:M paciente ↔ cuidador (parentesco y cuidador principal) |
+| `password_reset` | Token de restablecimiento de contraseña (hash, expiración y uso) |
 
 **Centros de salud**
 
@@ -141,7 +143,7 @@ El modelo se basa en el script DDL original y lo **modifica** para cumplir los c
 | `cat_department` | Departamentos de Nicaragua |
 | `cat_municipality` | Municipios por departamento |
 
-**Total:** 15 tablas principales + 12 catálogos = **27 tablas**.
+**Total:** 16 tablas principales + 12 catálogos = **28 tablas**.
 
 ---
 
@@ -348,6 +350,7 @@ El modelo se basa en el script DDL original y lo **modifica** para cumplir los c
 - Cada usuario tiene **un rol** (`cat_role`).
 - Cada usuario referencia **un municipio** de residencia (`cat_municipality`); el departamento se obtiene a través de la relación del municipio (modelo normalizado, sin campo duplicado).
 - Un usuario puede tener **como máximo un perfil** de tipo paciente, cuidador o personal de salud (extensión en las tablas `patient`, `caregiver` y `healthcare_worker` respectivamente).
+- Un usuario puede tener **varios tokens de restablecimiento de contraseña** (`password_reset`).
 
 **Reglas:**
 - El correo electrónico y el nombre de usuario (`username`) deben ser únicos.
@@ -675,6 +678,26 @@ El modelo se basa en el script DDL original y lo **modifica** para cumplir los c
 - Cada recordatorio pertenece a **una cita** (`appointment`).
 - Cada recordatorio tiene **un estado** (`cat_notification_state`).
 
+### 5.16 Token de restablecimiento de contraseña — `password_reset`
+
+**Propósito:** guarda el token de restablecimiento de contraseña generado en el flujo "olvidé mi contraseña" (HU-04). Solo se almacena el **hash SHA-256** del token (nunca el token en texto plano); el token en claro se devuelve al solicitante únicamente en el desarrollo para poder probar el flujo sin servidor de correo.
+
+| Campo | Tipo | Descripción |
+|---|---|---|
+| id | UUID | Identificador (generado automáticamente) |
+| user_id | UUID | Usuario que solicita el restablecimiento (FK a `user.id`) |
+| token_hash | Texto (64) | Hash SHA-256 del token, único |
+| expires_at | Fecha y hora | Fecha y hora de expiración del token |
+| used_at | Fecha y hora (nula) | Fecha y hora en que se utilizó el token (nula si no se ha usado) |
+| created_at | Fecha y hora | Fecha de creación del registro |
+
+**Relaciones:**
+- Cada token pertenece a **un usuario** (`user`).
+
+**Reglas:**
+- El `token_hash` es único.
+- Un token solo es válido si no ha expirado (`expires_at` futuro) y no ha sido utilizado (`used_at` nulo). Al usarse se marca `used_at` y el hash queda invalidado.
+
 ---
 
 ## 6. Reglas de integridad y restricciones
@@ -698,6 +721,7 @@ El modelo se basa en el script DDL original y lo **modifica** para cumplir los c
 | medication_reminder.schedule_id | medication_schedule.id | Cascada |
 | appointment.patient_id | patient.id | Cascada |
 | appointment_reminder.appointment_id | appointment.id | Cascada |
+| password_reset.user_id | user.id | Cascada |
 | patient_caregiver.relationship_type_id | cat_relationship_type.id | Restringido |
 | health_center.health_center_type_id | cat_health_center_type.id | Restringido |
 | health_indicator.type_indicator_id | cat_type_indicator.id | Restringido |
@@ -735,6 +759,7 @@ El modelo se basa en el script DDL original y lo **modifica** para cumplir los c
 | medical_record | patient_id (un expediente por paciente) |
 | patient_caregiver | Combinación (patient_id, caregiver_id) |
 | medication_schedule_day | Combinación (schedule_id, week_day) |
+| password_reset | token_hash |
 
 **Nota:** las restricciones de unicidad son **totales** (incluyen las filas con borrado lógico). Por lo tanto, un usuario con `deleted_at` definido sigue ocupando su `email`, `username` y `dni`; si se requiere reutilizar esos valores, será necesario eliminarlos físicamente o migrar a índices únicos parciales (`WHERE deleted_at IS NULL`).
 
@@ -793,6 +818,7 @@ La tabla `cat_role` alimenta el control de acceso basado en roles del backend:
 | 17 | Se añaden a `appointment`: `appointment_type_id`, `duration_minutes` y `cancelled_at`; a `patient_caregiver`: `is_primary` | Agenda con tipo y duración, trazabilidad de cancelación y cuidador principal |
 | 18 | Se añaden los catálogos `cat_appointment_type`, `cat_department` y `cat_municipality` | Tipos de cita y ubicación geográfica normalizada; el departamento se deriva del municipio (3NF) |
 | 19 | Se implementa el **borrado lógico (soft delete)** en todas las tablas principales: `deleted_at` (marca temporal) y cascada de aplicación (soft-remove) por jerarquía de agregados | Evitar la pérdida de información clínica; implementa la mejora futura prevista en la sección 10. Los catálogos y los estados de negocio (`is_active`, `active`) se conservan |
+| 20 | Se añade la tabla **`password_reset`** | Guardar el token de restablecimiento de contraseña (HU-04): se almacena el hash SHA-256 del token, con expiración y marca de uso |
 
 **No aplicados en esta versión** (mejoras futuras, ver sección 10).
 

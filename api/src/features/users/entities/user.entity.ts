@@ -5,6 +5,7 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
@@ -14,6 +15,7 @@ import { Municipality } from '../../catalogues/entities/municipality.entity';
 import { Patient } from './patient.entity';
 import { Caregiver } from './caregiver.entity';
 import { HealthcareWorker } from './healthcare-worker.entity';
+import { PasswordReset } from '../../auth/entities/password-reset.entity';
 
 @Entity('user')
 export class User {
@@ -94,4 +96,7 @@ export class User {
     cascade: ['soft-remove'],
   })
   healthcareWorker!: HealthcareWorker;
+
+  @OneToMany(() => PasswordReset, (reset) => reset.user)
+  passwordResets!: PasswordReset[];
 }

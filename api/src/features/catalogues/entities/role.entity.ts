@@ -9,6 +9,9 @@ export class Role {
   @Column({ length: 50 })
   name!: string;
 
+  @Column({ length: 20, unique: true })
+  code!: string;
+
   @OneToMany(() => User, (user) => user.role)
   users!: User[];
 }
