@@ -9,11 +9,18 @@ import { User } from '../users/entities/user.entity';
 import { Caregiver } from '../users/entities/caregiver.entity';
 import { Role } from '../catalogues/entities/role.entity';
 import { Municipality } from '../catalogues/entities/municipality.entity';
+import { PasswordReset } from './entities/password-reset.entity';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, Caregiver, Role, Municipality]),
+    TypeOrmModule.forFeature([
+      User,
+      Caregiver,
+      Role,
+      Municipality,
+      PasswordReset,
+    ]),
     JwtModule.registerAsync({
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
