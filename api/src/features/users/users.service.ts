@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
-import * as bcrypt from 'bcryptjs';
+import * as bcrypt from 'bcrypt';
 import { DataSource, Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { HealthcareWorker } from './entities/healthcare-worker.entity';

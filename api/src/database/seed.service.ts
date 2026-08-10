@@ -1,7 +1,7 @@
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { DataSource, EntityManager } from 'typeorm';
-import * as bcrypt from 'bcryptjs';
+import * as bcrypt from 'bcrypt';
 import { Role } from '../features/catalogues/entities/role.entity';
 import { Genre } from '../features/catalogues/entities/genre.entity';
 import { Major } from '../features/catalogues/entities/major.entity';
