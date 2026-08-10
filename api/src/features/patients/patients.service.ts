@@ -200,6 +200,26 @@ export class PatientsService {
     return this.toPublicPatient(patient);
   }
 
+  async findRecordForScope(
+    id: string,
+    currentUser: JwtPayload,
+  ): Promise<Patient> {
+    const patient = await this.loadPatient(id);
+    if (!patient) {
+      throw new NotFoundException('Paciente no encontrado');
+    }
+    await this.assertCanAccess(currentUser, patient);
+    return patient;
+  }
+
+  async findByUserId(userId: string): Promise<Patient> {
+    const patient = await this.loadPatient(undefined, userId);
+    if (!patient) {
+      throw new NotFoundException('Paciente no encontrado');
+    }
+    return patient;
+  }
+
   async update(
     id: string,
     currentUser: JwtPayload,

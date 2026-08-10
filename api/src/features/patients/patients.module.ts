@@ -30,5 +30,6 @@ import { MedicalRecord } from '../medical-records/entities/medical-record.entity
   ],
   controllers: [PatientsController],
   providers: [PatientsService],
+  exports: [PatientsService],
 })
 export class PatientsModule {}
