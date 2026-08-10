@@ -7,6 +7,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './features/users/users.module';
 import { AuthModule } from './features/auth/auth.module';
 import { CatalogueModule } from './features/catalogues/catalogue.module';
+import { PatientsModule } from './features/patients/patients.module';
 import { DatabaseModule } from './database/database.module';
 
 @Module({
@@ -30,6 +31,7 @@ import { DatabaseModule } from './database/database.module';
     UsersModule,
     AuthModule,
     CatalogueModule,
+    PatientsModule,
     DatabaseModule,
   ],
   controllers: [AppController],
