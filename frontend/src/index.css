@@ -1,7 +1,9 @@
 @import 'tailwindcss';
 
 @theme {
-  --color-primary: #000;
+  --color-primary: #0f766e;
+  --color-primary-dark: #115e59;
+  --color-primary-light: #99f6e4;
 }
 
 #root {
@@ -9,4 +11,10 @@
   height: 100vh;
   margin: 0;
   padding: 0;
+}
+
+@layer base {
+  body {
+    @apply bg-slate-50 text-slate-900 antialiased;
+  }
 }
