@@ -5,6 +5,7 @@ import { CatalogueService } from './catalogue.service';
 import { Genre } from './entities/genre.entity';
 import { RelationshipType } from './entities/relationship-type.entity';
 import { Major } from './entities/major.entity';
+import { Department } from './entities/department.entity';
 import { Municipality } from './entities/municipality.entity';
 import { HealthCenter } from '../health-centers/entities/health-center.entity';
 
@@ -14,6 +15,7 @@ import { HealthCenter } from '../health-centers/entities/health-center.entity';
       Genre,
       RelationshipType,
       Major,
+      Department,
       Municipality,
       HealthCenter,
     ]),

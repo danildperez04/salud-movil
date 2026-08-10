@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { Genre } from './entities/genre.entity';
 import { RelationshipType } from './entities/relationship-type.entity';
 import { Major } from './entities/major.entity';
+import { Department } from './entities/department.entity';
 import { HealthCenter } from '../health-centers/entities/health-center.entity';
 import { Municipality } from './entities/municipality.entity';
 
@@ -16,11 +17,17 @@ export class CatalogueService {
     private readonly relationshipTypeRepository: Repository<RelationshipType>,
     @InjectRepository(Major)
     private readonly majorRepository: Repository<Major>,
+    @InjectRepository(Department)
+    private readonly departmentRepository: Repository<Department>,
     @InjectRepository(HealthCenter)
     private readonly healthCenterRepository: Repository<HealthCenter>,
     @InjectRepository(Municipality)
     private readonly municipalityRepository: Repository<Municipality>,
   ) {}
+
+  async departments(): Promise<{ id: number; name: string }[]> {
+    return this.departmentRepository.find({ order: { name: 'ASC' } });
+  }
 
   async genres(): Promise<{ id: number; name: string }[]> {
     return this.genreRepository.find({ order: { id: 'ASC' } });

@@ -102,7 +102,7 @@ Del total de 31 historias (127 Story Points), **23 son Must Have (imprescindible
 - [x] Registro de cuenta de cuidador (HU-02) e inicio de sesión (HU-03). *(La creación de la cuenta del paciente por el personal de salud es HU-06 → Fase 2).*
 - [x] Restablecimiento de contraseña (HU-04): `POST /auth/forgot-password`, `POST /auth/reset-password` y `POST /auth/change-password` (token con hash SHA-256, expiración configurable; en dev se devuelve en la respuesta).
 - [x] Perfil de usuario (HU-08): `GET /auth/me`; el cierre de sesión se maneja descartando el token en el cliente.
-- [x] Seed de usuarios y catálogos: `admin` y personal de salud de ejemplo, roles, géneros, especialidades, tipos de centro, 18 departamentos y 150 municipios.
+- [x] Seed de usuarios y catálogos: `admin` y personal de salud de ejemplo, roles, géneros, especialidades, tipos de centro, 17 departamentos (15 + 2 regiones autónomas) y 150 municipios.
 
 **Mobile**
 - [ ] Cliente API (fetch/axios con base URL configurable) e interceptor de token.
