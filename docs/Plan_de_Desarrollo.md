@@ -115,13 +115,14 @@ Del total de 31 historias (127 Story Points), **23 son Must Have (imprescindible
 ### Fase 2 — Pacientes y Expediente Clínico → HU-05, HU-06, HU-07, HU-09, HU-10, HU-11, HU-12 (10–13 de agosto) — v0.3.0
 
 **API**
-- [ ] Entidad `Patient` (datos básicos, fecha de nacimiento, género, centro de salud) y relación con cuidadores.
-- [ ] Vínculo cuidador ↔ pacientes (relación N:M con parentesco) (HU-05).
-- [ ] CRUD de pacientes con búsqueda (HU-06, HU-07).
-- [ ] Entidad `MedicalRecord` (expediente maestro: diagnóstico principal, historial, alergias, grupo sanguíneo) (HU-09).
-- [ ] Entidad `MedicalVisit` (consultas: diagnóstico, observaciones, tratamiento, fecha) (HU-10).
-- [ ] Endpoints CRUD de pacientes y consultas; historial clínico cronológico por paciente (HU-11).
-- [ ] Control de acceso por rol: el paciente solo puede ver su propia información clínica (HU-12).
+- [x] Entidad `Patient` (datos básicos, fecha de nacimiento, género, centro de salud) y relación con cuidadores.
+- [x] Vínculo cuidador ↔ pacientes (relación N:M con parentesco) (HU-05): `GET /patients/linked` (cuidador), `GET/POST /patients/:id/caregivers` y `DELETE /patients/:id/caregivers/:caregiverId` (personal/admin). El vínculo se registra con `relationshipTypeId` (catálogo) y `isPrimary` (un solo principal por paciente).
+- [x] CRUD de pacientes con búsqueda (HU-06, HU-07): `POST /patients` (registro en transacción: user + patient + expediente vacío; el personal asigna siempre su centro, el admin lo indica explícitamente), `GET /patients?q=` (ILIKE por nombre/correo/usuario/DNI, con alcance por centro para el personal), `GET/PATCH/DELETE /patients/:id` (baja solo admin) y `GET /patients/me` (paciente).
+- [x] Entidad `MedicalRecord` (expediente maestro: diagnóstico principal, historial, alergias, grupo sanguíneo) (HU-09): `PUT/GET /patients/:id/medical-record` (upsert único por paciente).
+- [x] Entidad `MedicalVisit` (consultas: diagnóstico, observaciones, tratamiento, fecha) (HU-10): `POST /patients/:id/medical-visits`.
+- [x] Endpoints CRUD de pacientes y consultas; historial clínico cronológico por paciente (HU-11): `GET /patients/:id/medical-record` devuelve las consultas ordenadas por fecha.
+- [x] Control de acceso por rol: el paciente solo puede ver su propia información clínica (HU-12): `GET /patients/me/history`; además, el personal solo accede a pacientes/expedientes de su propio centro.
+- [x] Catálogos de lectura (compartidos): `GET /catalogues/genres`, `/relationship-types`, `/majors`, `/health-centers` y `/municipalities?departmentId=`. Seed idempotente por tabla (incluye `cat_relationship_type`).
 
 **Mobile**
 - [ ] Pantallas para personal de salud: listado de pacientes, ficha del paciente, alta de consulta, historial clínico.
@@ -215,7 +216,7 @@ Del total de 31 historias (127 Story Points), **23 son Must Have (imprescindible
 | 29 ago – 1 sep | Fase 7: seguridad, pruebas, CI, despliegue y presentación | v1.0.0 |
 | 2 sep | Presentación oficial del proyecto | — |
 
-> **Estado al 9 de agosto:** la parte de **API de la Fase 1** está completada (autenticación JWT/RBAC, reset de contraseña y CRUD de usuarios admin). Pendientes de la Fase 1: mobile (cliente API, pantallas de login/registro/perfil y gestión de sesión) y frontend (login y registro conectados).
+> **Estado al 10 de agosto:** la parte de **API de la Fase 1** está completada (autenticación JWT/RBAC, reset de contraseña y CRUD de usuarios admin) y la de la **API de la Fase 2** (pacientes, expediente clínico y vínculos cuidador–paciente, HU-05/06/07/09–12). Pendientes de la Fase 1: mobile (cliente API, pantallas de login/registro/perfil y gestión de sesión) y frontend (login y registro conectados). Pendientes de la Fase 2: pantallas mobile del personal (listado, ficha, alta de consulta, historial) y del paciente (su historial).
 
 **Correspondencia con el plan original:**
 
