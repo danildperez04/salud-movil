@@ -12,6 +12,14 @@ export const ROLES: RoleSeed[] = [
 
 export const GENRES = ['Masculino', 'Femenino'];
 
+export const RELATIONSHIP_TYPES = [
+  'Padre/Madre',
+  'Hijo(a)',
+  'Cónyuge',
+  'Cuidador profesional',
+  'Otro familiar',
+];
+
 export const MAJORS = [
   'Medicina General',
   'Enfermería',

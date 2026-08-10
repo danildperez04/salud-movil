@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { InjectRepository } from '@nestjs/typeorm';
-import * as bcrypt from 'bcryptjs';
+import * as bcrypt from 'bcrypt';
 import { Repository } from 'typeorm';
 import { randomBytes, createHash } from 'crypto';
 import { ConfigService } from '@nestjs/config';

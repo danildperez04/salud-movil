@@ -225,7 +225,7 @@ El modelo se basa en el script DDL original y lo **modifica** para cumplir los c
 | id | Número pequeño | Identificador |
 | name | Texto (50) | Tipo de parentesco |
 
-**Valores semilla:** Parent (1) [padre/madre], Child (2) [hijo/a], Spouse (3) [cónyuge], Professional caregiver (4) [cuidador profesional], Other family member (5) [otro familiar].
+**Valores semilla:** Padre/Madre (1), Hijo(a) (2), Cónyuge (3), Cuidador profesional (4), Otro familiar (5). *(Nota: el seed idempotente respeta las secuencias existentes; en la BD de desarrollo actual los IDs quedaron en 6–10 tras los catálogos previos.)*
 
 ### 4.8 Especialidad médica — `cat_major`
 

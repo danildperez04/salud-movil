@@ -1,11 +1,12 @@
 import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { DataSource, EntityManager } from 'typeorm';
-import * as bcrypt from 'bcryptjs';
+import * as bcrypt from 'bcrypt';
 import { Role } from '../features/catalogues/entities/role.entity';
 import { Genre } from '../features/catalogues/entities/genre.entity';
 import { Major } from '../features/catalogues/entities/major.entity';
 import { HealthCenterType } from '../features/catalogues/entities/health-center-type.entity';
+import { RelationshipType } from '../features/catalogues/entities/relationship-type.entity';
 import { Department } from '../features/catalogues/entities/department.entity';
 import { Municipality } from '../features/catalogues/entities/municipality.entity';
 import { HealthCenter } from '../features/health-centers/entities/health-center.entity';
@@ -16,6 +17,7 @@ import {
   GENRES,
   MAJORS,
   HEALTH_CENTER_TYPES,
+  RELATIONSHIP_TYPES,
   DEPARTMENTS,
 } from './seed-data';
 
@@ -33,11 +35,6 @@ export class SeedService implements OnApplicationBootstrap {
   }
 
   async seed(): Promise<void> {
-    if ((await this.dataSource.getRepository(Role).count()) > 0) {
-      this.logger.log('Semillas omitidas: los catálogos ya están poblados');
-      return;
-    }
-
     await this.dataSource.transaction(async (manager) => {
       await this.seedCatalogues(manager);
       await this.seedHealthCenter(manager);
@@ -49,35 +46,57 @@ export class SeedService implements OnApplicationBootstrap {
   }
 
   private async seedCatalogues(manager: EntityManager): Promise<void> {
-    await Promise.all([
-      manager.save(
+    if ((await manager.count(Role)) === 0) {
+      await manager.save(
         Role,
         ROLES.map((r) => ({ name: r.name, code: r.code })),
-      ),
-      manager.save(
+      );
+    }
+    if ((await manager.count(Genre)) === 0) {
+      await manager.save(
         Genre,
         GENRES.map((name) => ({ name })),
-      ),
-      manager.save(
+      );
+    }
+    if ((await manager.count(Major)) === 0) {
+      await manager.save(
         Major,
         MAJORS.map((name) => ({ name })),
-      ),
-      manager.save(
+      );
+    }
+    if ((await manager.count(HealthCenterType)) === 0) {
+      await manager.save(
         HealthCenterType,
         HEALTH_CENTER_TYPES.map((name) => ({ name })),
-      ),
-    ]);
-
-    for (const department of DEPARTMENTS) {
-      const saved = await manager.save(Department, { name: department.name });
-      await manager.save(
-        Municipality,
-        department.municipalities.map((name) => ({ name, department: saved })),
       );
+    }
+    if ((await manager.count(RelationshipType)) === 0) {
+      await manager.save(
+        RelationshipType,
+        RELATIONSHIP_TYPES.map((name) => ({ name })),
+      );
+    }
+
+    if ((await manager.count(Department)) === 0) {
+      for (const department of DEPARTMENTS) {
+        const saved = await manager.save(Department, {
+          name: department.name,
+        });
+        await manager.save(
+          Municipality,
+          department.municipalities.map((name) => ({
+            name,
+            department: saved,
+          })),
+        );
+      }
     }
   }
 
   private async seedHealthCenter(manager: EntityManager): Promise<void> {
+    if ((await manager.count(HealthCenter)) > 0) {
+      return;
+    }
     const municipality = await manager.findOne(Municipality, {
       where: { name: 'Managua' },
     });
@@ -102,13 +121,20 @@ export class SeedService implements OnApplicationBootstrap {
 
   private async seedAdmin(manager: EntityManager): Promise<void> {
     const role = await manager.findOne(Role, { where: { code: 'admin' } });
+    if (!role) {
+      throw new Error('No se encontró el rol admin para el seed');
+    }
+    const existing = await manager.findOne(User, {
+      where: { role: { id: role.id } },
+    });
+    if (existing) {
+      return;
+    }
     const municipality = await manager.findOne(Municipality, {
       where: { name: 'Managua' },
     });
-    if (!role || !municipality) {
-      throw new Error(
-        'No se encontró el rol o el municipio para el seed del admin',
-      );
+    if (!municipality) {
+      throw new Error('No se encontró el municipio para el seed del admin');
     }
     const email =
       this.configService.get<string>('SEED_ADMIN_EMAIL') ??
@@ -132,6 +158,15 @@ export class SeedService implements OnApplicationBootstrap {
     const role = await manager.findOne(Role, {
       where: { code: 'health_staff' },
     });
+    if (!role) {
+      throw new Error('No se encontró el rol health_staff para el seed');
+    }
+    const existing = await manager.findOne(User, {
+      where: { role: { id: role.id } },
+    });
+    if (existing) {
+      return;
+    }
     const municipality = await manager.findOne(Municipality, {
       where: { name: 'Managua' },
     });
@@ -143,7 +178,7 @@ export class SeedService implements OnApplicationBootstrap {
         this.configService.get<string>('SEED_HEALTH_CENTER_NAME') ??
         'Centro de Salud Carlos Núñez Téllez',
     });
-    if (!role || !municipality || !major || !healthCenter) {
+    if (!municipality || !major || !healthCenter) {
       throw new Error(
         'No se encontraron los datos de referencia para el seed del personal',
       );
