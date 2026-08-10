@@ -11,6 +11,7 @@ import {
 import { PatientsService } from './patients.service';
 import { CreatePatientDto } from './dto/create-patient.dto';
 import { UpdatePatientDto } from './dto/update-patient.dto';
+import { LinkCaregiverDto } from './dto/link-caregiver.dto';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import type { JwtPayload } from '../../common/guards/jwt-payload.interface';
@@ -38,6 +39,41 @@ export class PatientsController {
   @Roles('patient')
   findMe(@CurrentUser() currentUser: JwtPayload) {
     return this.patientsService.findMe(currentUser.sub);
+  }
+
+  @Get('linked')
+  @Roles('caregiver')
+  findLinked(@CurrentUser() currentUser: JwtPayload) {
+    return this.patientsService.getLinkedPatients(currentUser.sub);
+  }
+
+  @Get(':id/caregivers')
+  @Roles('admin', 'health_staff')
+  getPatientCaregivers(
+    @Param('id') id: string,
+    @CurrentUser() currentUser: JwtPayload,
+  ) {
+    return this.patientsService.getPatientCaregivers(id, currentUser);
+  }
+
+  @Post(':id/caregivers')
+  @Roles('admin', 'health_staff')
+  linkCaregiver(
+    @Param('id') id: string,
+    @CurrentUser() currentUser: JwtPayload,
+    @Body() dto: LinkCaregiverDto,
+  ) {
+    return this.patientsService.linkCaregiver(id, currentUser, dto);
+  }
+
+  @Delete(':id/caregivers/:caregiverId')
+  @Roles('admin', 'health_staff')
+  unlinkCaregiver(
+    @Param('id') id: string,
+    @Param('caregiverId') caregiverId: string,
+    @CurrentUser() currentUser: JwtPayload,
+  ) {
+    return this.patientsService.unlinkCaregiver(id, caregiverId, currentUser);
   }
 
   @Get(':id')

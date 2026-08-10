@@ -7,16 +7,20 @@ import {
 } from '@nestjs/common';
 import { InjectDataSource, InjectRepository } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
-import { DataSource, Repository } from 'typeorm';
+import { DataSource, IsNull, Repository } from 'typeorm';
 import { User } from '../users/entities/user.entity';
 import { Patient } from '../users/entities/patient.entity';
+import { Caregiver } from '../users/entities/caregiver.entity';
+import { PatientCaregiver } from '../users/entities/patient-caregiver.entity';
 import { Role } from '../catalogues/entities/role.entity';
 import { Municipality } from '../catalogues/entities/municipality.entity';
 import { Genre } from '../catalogues/entities/genre.entity';
+import { RelationshipType } from '../catalogues/entities/relationship-type.entity';
 import { HealthCenter } from '../health-centers/entities/health-center.entity';
 import { MedicalRecord } from '../medical-records/entities/medical-record.entity';
 import { CreatePatientDto } from './dto/create-patient.dto';
 import { UpdatePatientDto } from './dto/update-patient.dto';
+import { LinkCaregiverDto } from './dto/link-caregiver.dto';
 import type { JwtPayload } from '../../common/guards/jwt-payload.interface';
 
 export interface PublicPatient {
@@ -39,12 +43,35 @@ export interface PublicPatient {
   healthCenterName: string;
 }
 
+export interface PublicCaregiverLink {
+  caregiverId: string;
+  caregiverName: string;
+  caregiverEmail: string;
+  caregiverUsername: string;
+  caregiverPhoneNumber: string;
+  relationshipTypeId: number;
+  relationshipTypeName: string;
+  isPrimary: boolean;
+}
+
+export interface PublicLinkedPatient extends PublicPatient {
+  relationshipTypeId: number;
+  relationshipTypeName: string;
+  isPrimary: boolean;
+}
+
 @Injectable()
 export class PatientsService {
   constructor(
     @InjectRepository(Patient)
     private readonly patientRepository: Repository<Patient>,
     @InjectRepository(User) private readonly userRepository: Repository<User>,
+    @InjectRepository(PatientCaregiver)
+    private readonly patientCaregiverRepository: Repository<PatientCaregiver>,
+    @InjectRepository(Caregiver)
+    private readonly caregiverRepository: Repository<Caregiver>,
+    @InjectRepository(RelationshipType)
+    private readonly relationshipTypeRepository: Repository<RelationshipType>,
     @InjectRepository(Role) private readonly roleRepository: Repository<Role>,
     @InjectRepository(Municipality)
     private readonly municipalityRepository: Repository<Municipality>,
@@ -251,6 +278,131 @@ export class PatientsService {
     await this.userRepository.softDelete(id);
   }
 
+  async getPatientCaregivers(
+    patientId: string,
+    currentUser: JwtPayload,
+  ): Promise<PublicCaregiverLink[]> {
+    const patient = await this.loadPatient(patientId);
+    if (!patient) {
+      throw new NotFoundException('Paciente no encontrado');
+    }
+    await this.assertCanAccess(currentUser, patient);
+
+    const links = await this.patientCaregiverRepository.find({
+      where: { patientId },
+      relations: {
+        caregiver: { user: true },
+        relationshipType: true,
+      },
+    });
+    return links.map((link) => this.toPublicCaregiverLink(link));
+  }
+
+  async getLinkedPatients(caregiverId: string): Promise<PublicLinkedPatient[]> {
+    const links = await this.patientCaregiverRepository.find({
+      where: { caregiverId },
+      relations: {
+        patient: {
+          user: { municipality: true },
+          genre: true,
+          healthCenter: true,
+        },
+        relationshipType: true,
+      },
+    });
+    return links.map((link) => ({
+      ...this.toPublicPatient(link.patient),
+      relationshipTypeId: link.relationshipType.id,
+      relationshipTypeName: link.relationshipType.name,
+      isPrimary: link.isPrimary,
+    }));
+  }
+
+  async linkCaregiver(
+    patientId: string,
+    currentUser: JwtPayload,
+    dto: LinkCaregiverDto,
+  ): Promise<PublicCaregiverLink> {
+    const patient = await this.loadPatient(patientId);
+    if (!patient) {
+      throw new NotFoundException('Paciente no encontrado');
+    }
+    await this.assertCanAccess(currentUser, patient);
+
+    const caregiver = await this.caregiverRepository.findOne({
+      where: { id: dto.caregiverId },
+      relations: { user: true },
+    });
+    if (!caregiver || !caregiver.user) {
+      throw new BadRequestException('Datos de referencia no válidos');
+    }
+    const relationshipType = await this.relationshipTypeRepository.findOne({
+      where: { id: dto.relationshipTypeId },
+    });
+    if (!relationshipType) {
+      throw new BadRequestException('Datos de referencia no válidos');
+    }
+
+    const existing = await this.patientCaregiverRepository.findOne({
+      where: { patientId, caregiverId: dto.caregiverId },
+      withDeleted: true,
+    });
+    if (existing && !existing.deletedAt) {
+      throw new ConflictException('El vínculo ya existe');
+    }
+
+    if (dto.isPrimary) {
+      await this.patientCaregiverRepository.update(
+        { patientId, isPrimary: true, deletedAt: IsNull() },
+        { isPrimary: false },
+      );
+    }
+
+    const saved = await this.patientCaregiverRepository.save(
+      this.patientCaregiverRepository.create({
+        patientId,
+        caregiverId: dto.caregiverId,
+        relationshipType,
+        isPrimary: dto.isPrimary ?? false,
+        ...(existing?.deletedAt ? { deletedAt: null } : {}),
+      }),
+    );
+
+    return {
+      caregiverId: saved.caregiverId,
+      caregiverName: caregiver.user.name,
+      caregiverEmail: caregiver.user.email,
+      caregiverUsername: caregiver.user.username,
+      caregiverPhoneNumber: caregiver.user.phoneNumber,
+      relationshipTypeId: relationshipType.id,
+      relationshipTypeName: relationshipType.name,
+      isPrimary: saved.isPrimary,
+    };
+  }
+
+  async unlinkCaregiver(
+    patientId: string,
+    caregiverId: string,
+    currentUser: JwtPayload,
+  ): Promise<void> {
+    const patient = await this.loadPatient(patientId);
+    if (!patient) {
+      throw new NotFoundException('Paciente no encontrado');
+    }
+    await this.assertCanAccess(currentUser, patient);
+
+    const link = await this.patientCaregiverRepository.findOne({
+      where: { patientId, caregiverId },
+    });
+    if (!link) {
+      throw new NotFoundException('El vínculo no existe');
+    }
+    await this.patientCaregiverRepository.softDelete({
+      patientId,
+      caregiverId,
+    });
+  }
+
   private async resolveTargetHealthCenter(
     currentUser: JwtPayload,
     explicitCenterId?: string,
@@ -318,6 +470,19 @@ export class PatientsService {
         healthCenter: true,
       },
     });
+  }
+
+  private toPublicCaregiverLink(link: PatientCaregiver): PublicCaregiverLink {
+    return {
+      caregiverId: link.caregiverId,
+      caregiverName: link.caregiver.user.name,
+      caregiverEmail: link.caregiver.user.email,
+      caregiverUsername: link.caregiver.user.username,
+      caregiverPhoneNumber: link.caregiver.user.phoneNumber,
+      relationshipTypeId: link.relationshipType.id,
+      relationshipTypeName: link.relationshipType.name,
+      isPrimary: link.isPrimary,
+    };
   }
 
   private toPublicPatient(patient: Patient): PublicPatient {
