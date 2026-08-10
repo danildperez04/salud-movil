@@ -36,6 +36,14 @@ export interface PublicUser {
   address: string;
   municipalityId: number;
   role: string;
+  healthcareWorker?: {
+    licenseNumber: string;
+    employeeId: string;
+    majorId?: number;
+    majorName?: string;
+    healthCenterId?: string;
+    healthCenterName?: string;
+  } | null;
 }
 
 @Injectable()
@@ -100,7 +108,11 @@ export class AuthService {
   async login(dto: LoginDto): Promise<AuthResponse> {
     const user = await this.userRepository.findOne({
       where: [{ email: dto.email }, { username: dto.email }],
-      relations: { role: true, municipality: true },
+      relations: {
+        role: true,
+        municipality: true,
+        healthcareWorker: { major: true, healthCenter: true },
+      },
       withDeleted: true,
     });
 
@@ -120,7 +132,11 @@ export class AuthService {
   async getProfile(payload: JwtPayload): Promise<PublicUser> {
     const user = await this.userRepository.findOne({
       where: { id: payload.sub },
-      relations: { role: true, municipality: true },
+      relations: {
+        role: true,
+        municipality: true,
+        healthcareWorker: { major: true, healthCenter: true },
+      },
       withDeleted: true,
     });
     if (!user || !user.isActive) {
@@ -215,6 +231,16 @@ export class AuthService {
       address: user.address,
       municipalityId: user.municipality.id,
       role: user.role.code,
+      healthcareWorker: user.healthcareWorker
+        ? {
+            licenseNumber: user.healthcareWorker.licenseNumber,
+            employeeId: user.healthcareWorker.employeeId,
+            majorId: user.healthcareWorker.major?.id,
+            majorName: user.healthcareWorker.major?.name,
+            healthCenterId: user.healthcareWorker.healthCenter?.id,
+            healthCenterName: user.healthcareWorker.healthCenter?.name,
+          }
+        : null,
     };
   }
 }

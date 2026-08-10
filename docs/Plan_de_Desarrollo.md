@@ -1,6 +1,6 @@
 # Plan de Desarrollo — Salud Móvil (MVP)
 
-**Fecha de elaboración:** 6 de agosto de 2026 (actualizado el 9 de agosto de 2026)
+**Fecha de elaboración:** 6 de agosto de 2026 (actualizado el 10 de agosto de 2026)
 **Entrega objetivo:** v1.0.0 funcional el **1 de septiembre de 2026** · presentación oficial el **2 de septiembre de 2026**
 
 ## 1. Objetivo
@@ -12,7 +12,7 @@ Del total de 31 historias (127 Story Points), **23 son Must Have (imprescindible
 **Prioridades transversales:**
 
 1. **App móvil primero**: las funcionalidades esenciales se desarrollan y prueban en la app móvil (Expo/React Native).
-2. **Panel web para personal de salud limitado a funciones básicas**: registro de cuentas del personal de salud y asignación de pacientes a su centro de salud (HU-28 y HU-29). El resto (consulta de expediente e indicadores en web, HU-30 y HU-31) queda como **opcional (Could Have)**.
+2. **Repartición de audiencias por plataforma (decisión del 10 de agosto)**: el **panel web** es para **admin y personal de salud** (gestión de personal, pacientes, expediente, consultas y vínculos de cuidadores); la **app móvil** es para **cuidadores y pacientes** (registro de cuentas, indicadores, citas y recordatorios). Los flujos de cuidador/paciente no se duplican en web (sin registro web).
 3. **Recordatorios con notificación local** en el dispositivo para el MVP (más fiable y sin infraestructura externa). El envío remoto vía Firebase Cloud Messaging (FCM) queda como mejora futura.
 
 ## 2. Estado actual del código (diagnóstico)
@@ -40,7 +40,7 @@ Del total de 31 historias (127 Story Points), **23 son Must Have (imprescindible
 | Presente | Falta |
 |---|---|
 | Expo SDK 57, TypeScript, Uniwind + Tailwind v4 con tokens de diseño | Router activo (`expo-router` instalado pero sin carpeta `app/`) |
-| Reanimated, gesture-handler, safe-area, expo-router instalado | Pantallas de auth y de funciones |
+| Reanimated, gesture-handler, safe-area, expo-router instalado | Pantallas de auth y de funciones (cuidador y paciente; admin y personal usan el panel web) |
 | `lib/theme.ts` con colores, fuentes y tipografías | Cliente API y gestión de sesión |
 | | Almacenamiento seguro de tokens (`expo-secure-store`) |
 | | Notificaciones (`expo-notifications`) |
@@ -48,13 +48,17 @@ Del total de 31 historias (127 Story Points), **23 son Must Have (imprescindible
 **Deuda técnica a corregir en Fase 0:**
 - `metro.config.js` referencia `./src/global.css` y `./src/uniwind-types.d.ts`, pero esos archivos están en la raíz del proyecto (no existe carpeta `src/`).
 
-### 2.3 Frontend — `frontend/` (React 19 + Vite 8 + TypeScript)
+### 2.3 Frontend — `frontend/` (React 19 + Vite 8 + TypeScript + Tailwind v4)
 
 | Presente | Falta |
 |---|---|
-| Scaffold Vite + React 19 + TypeScript + React Compiler | React Router y rutas |
-| | Páginas de login y panel médico |
-| | Cliente API |
+| Scaffold Vite + React 19 + TypeScript + React Compiler + Tailwind v4 | — |
+| React Router con rutas protegidas por rol (admin y personal de salud) | — |
+| Estado con **Zustand** (`persist` en localStorage): store de auth y store de catálogos | — |
+| Cliente API (`lib/api.ts`) con inyección de token JWT y `ApiError` | — |
+| Login (sin registro web), dashboard por rol, layout con sidebar y logout | — |
+| Panel admin: gestión de personal de salud (crear, editar, desactivar) | — |
+| Pacientes: listado con búsqueda, crear/editar y detalle con pestañas (datos, expediente, consultas, cuidadores) | — |
 
 ### 2.4 Infraestructura y procesos
 
@@ -67,8 +71,8 @@ Del total de 31 historias (127 Story Points), **23 son Must Have (imprescindible
 
 | Componente | Tecnología |
 |---|---|
-| App móvil | Expo (SDK 57) + React Native + expo-router + Uniwind/Tailwind |
-| Portal web | React 19 + Vite + React Router + TypeScript |
+| App móvil | Expo (SDK 57) + React Native + expo-router + Uniwind/Tailwind — **cuidadores y pacientes** |
+| Portal web | React 19 + Vite + React Router + TypeScript + Tailwind v4 + **Zustand** — **admin y personal de salud** |
 | Backend / API | NestJS 11 + TypeORM |
 | Base de datos | PostgreSQL |
 | Autenticación | JWT con control de acceso basado en roles (RBAC) |
@@ -102,7 +106,7 @@ Del total de 31 historias (127 Story Points), **23 son Must Have (imprescindible
 - [x] Registro de cuenta de cuidador (HU-02) e inicio de sesión (HU-03). *(La creación de la cuenta del paciente por el personal de salud es HU-06 → Fase 2).*
 - [x] Restablecimiento de contraseña (HU-04): `POST /auth/forgot-password`, `POST /auth/reset-password` y `POST /auth/change-password` (token con hash SHA-256, expiración configurable; en dev se devuelve en la respuesta).
 - [x] Perfil de usuario (HU-08): `GET /auth/me`; el cierre de sesión se maneja descartando el token en el cliente.
-- [x] Seed de usuarios y catálogos: `admin` y personal de salud de ejemplo, roles, géneros, especialidades, tipos de centro, 18 departamentos y 150 municipios.
+- [x] Seed de usuarios y catálogos: `admin` y personal de salud de ejemplo, roles, géneros, especialidades, tipos de centro, 17 departamentos (15 + 2 regiones autónomas) y 150 municipios.
 
 **Mobile**
 - [ ] Cliente API (fetch/axios con base URL configurable) e interceptor de token.
@@ -110,7 +114,7 @@ Del total de 31 historias (127 Story Points), **23 son Must Have (imprescindible
 - [ ] Gestión de sesión (context + `expo-secure-store`).
 
 **Frontend**
-- [ ] Página de login y registro conectadas al API.
+- [x] Página de login conectada al API (el registro de cuentas web se elimina; cuidadores y pacientes se registran desde la app móvil).
 
 ### Fase 2 — Pacientes y Expediente Clínico → HU-05, HU-06, HU-07, HU-09, HU-10, HU-11, HU-12 (10–13 de agosto) — v0.3.0
 
@@ -122,7 +126,8 @@ Del total de 31 historias (127 Story Points), **23 son Must Have (imprescindible
 - [x] Entidad `MedicalVisit` (consultas: diagnóstico, observaciones, tratamiento, fecha) (HU-10): `POST /patients/:id/medical-visits`.
 - [x] Endpoints CRUD de pacientes y consultas; historial clínico cronológico por paciente (HU-11): `GET /patients/:id/medical-record` devuelve las consultas ordenadas por fecha.
 - [x] Control de acceso por rol: el paciente solo puede ver su propia información clínica (HU-12): `GET /patients/me/history`; además, el personal solo accede a pacientes/expedientes de su propio centro.
-- [x] Catálogos de lectura (compartidos): `GET /catalogues/genres`, `/relationship-types`, `/majors`, `/health-centers` y `/municipalities?departmentId=`. Seed idempotente por tabla (incluye `cat_relationship_type`).
+- [x] `GET /catalogues/genres`, `/relationship-types`, `/majors`, `/health-centers`, `/departments` y `/municipalities?departmentId=` (con `departmentId` en cada municipio para resolver cascadas al editar). Seed idempotente por tabla (incluye `cat_relationship_type`).
+- [x] `GET /caregivers?q=` (búsqueda de cuidadores para vincular, admin y personal de salud) y `GET /auth/me` ampliado con los datos del `healthcareWorker` (centro y especialidad) para el encabezado del panel.
 
 **Mobile**
 - [ ] Pantallas para personal de salud: listado de pacientes, ficha del paciente, alta de consulta, historial clínico.
@@ -169,21 +174,21 @@ Del total de 31 historias (127 Story Points), **23 son Must Have (imprescindible
 - [ ] Solicitud y gestión de permisos de notificación.
 - [ ] Confirmación de toma de medicamentos.
 
-### Fase 6 — Panel Web para Personal de Salud → HU-28, HU-29 (25–28 de agosto) — v0.5.0
+### Fase 6 — Panel Web para Admin y Personal de Salud → HU-28, HU-29 (25–28 de agosto) — v0.5.0
 
-**Alcance (funciones básicas):** registro de cuentas del personal de salud y asignación de pacientes a su centro de salud.
+**Alcance (adelantado al 10 de agosto):** el panel web para **admin y personal de salud** ya se construyó junto con la Fase 2 (gestión de personal, pacientes, expediente, consultas y vínculos de cuidadores). Pendiente para esta fase: el resumen de indicadores recientes (HU-31).
 
 **API**
-- [ ] Endpoint de asignación del centro de salud a un paciente (solo `admin`) (HU-28).
-- [ ] Endpoint de pacientes del centro de salud con su información principal y última consulta (HU-29).
+- [x] Endpoint de asignación del centro de salud a un paciente (solo `admin`) (HU-28). *(Cubierto por el campo `healthCenterId` en `POST /patients` y el alcance por centro del personal.)*
+- [x] Endpoint de pacientes del centro de salud con su información principal (HU-29). *(Cubierto por `GET /patients` con alcance por centro.)*
 
 **Frontend**
-- [ ] Rutas protegidas por rol.
-- [ ] Pantalla de registro de cuentas de personal de salud (admin).
-- [ ] Pantalla de asignación del centro de salud a los pacientes (admin).
-- [ ] Listado de pacientes del centro de salud para el personal de salud.
+- [x] Rutas protegidas por rol (`RequireAuth` + `RequireRole`).
+- [x] Pantalla de gestión de cuentas de personal de salud (admin): listado, crear, editar y desactivar.
+- [x] Pantalla de asignación del centro de salud a los pacientes (admin) dentro de la creación de paciente.
+- [x] Listado de pacientes del centro de salud para el personal de salud con búsqueda.
 
-**Nota de alcance:** las funcionalidades avanzadas del panel — consulta de expediente clínico (HU-30) y resumen de indicadores recientes (HU-31) — son **Could Have** y no forman parte del alcance mínimo de v0.5.0; se implementan únicamente si el avance del cronograma lo permite.
+**Nota de alcance:** el resumen de indicadores recientes (HU-31) queda pendiente para esta fase; el expediente clínico (HU-30) ya está cubierto en el detalle de paciente del panel.
 
 ### Fase 7 — Seguridad, Pruebas, CI y Entrega (29 de agosto – 1 de septiembre) — v1.0.0
 
@@ -216,7 +221,7 @@ Del total de 31 historias (127 Story Points), **23 son Must Have (imprescindible
 | 29 ago – 1 sep | Fase 7: seguridad, pruebas, CI, despliegue y presentación | v1.0.0 |
 | 2 sep | Presentación oficial del proyecto | — |
 
-> **Estado al 10 de agosto:** la parte de **API de la Fase 1** está completada (autenticación JWT/RBAC, reset de contraseña y CRUD de usuarios admin) y la de la **API de la Fase 2** (pacientes, expediente clínico y vínculos cuidador–paciente, HU-05/06/07/09–12). Pendientes de la Fase 1: mobile (cliente API, pantallas de login/registro/perfil y gestión de sesión) y frontend (login y registro conectados). Pendientes de la Fase 2: pantallas mobile del personal (listado, ficha, alta de consulta, historial) y del paciente (su historial).
+> **Estado al 10 de agosto:** completada la **API de la Fase 1** (autenticación JWT/RBAC, reset de contraseña y CRUD de usuarios admin), la **API de la Fase 2** (pacientes, expediente clínico y vínculos cuidador–paciente, HU-05/06/07/09–12) y el **panel web para admin y personal de salud** (login, gestión de personal, pacientes con expediente/consultas/cuidadores; estado con Zustand y rutas por rol; el registro de cuentas web se eliminó, cuidador y paciente se registran desde mobile). Pendientes: mobile (cliente API, pantallas de login/registro/perfil/gestión de sesión para cuidador y paciente; pantallas de personal y paciente de la Fase 2) y el dashboard de indicadores web (HU-31).
 
 **Correspondencia con el plan original:**
 
@@ -234,7 +239,7 @@ Se respeta el esquema del plan SCRUM: **MAJOR.MINOR.PATCH**, ramas `main` (estab
 - **v0.2.0** — 9 ago: autenticación y gestión de usuarios.
 - **v0.3.0** — 16 ago: pacientes, expediente clínico y monitoreo de indicadores.
 - **v0.4.0** — 24 ago: gestión de citas, recordatorios y medicación.
-- **v0.5.0** — 28 ago: panel web del personal de salud (registro de cuentas y asignación de pacientes a su centro).
+- **v0.5.0** — 28 ago: panel web de admin y personal de salud (adelantado; pendiente el dashboard de indicadores HU-31).
 - **v1.0.0** — 1 sep: MVP completo, pruebas finales y versión lista para la presentación (2 sep).
 
 ## 7. Definición de Terminado (Definition of Done)

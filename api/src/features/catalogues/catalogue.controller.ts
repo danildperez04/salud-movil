@@ -5,6 +5,11 @@ import { CatalogueService } from './catalogue.service';
 export class CatalogueController {
   constructor(private readonly catalogueService: CatalogueService) {}
 
+  @Get('departments')
+  departments() {
+    return this.catalogueService.departments();
+  }
+
   @Get('genres')
   genres() {
     return this.catalogueService.genres();

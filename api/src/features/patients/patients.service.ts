@@ -160,7 +160,7 @@ export class PatientsService {
   async findAll(currentUser: JwtPayload, q?: string): Promise<PublicPatient[]> {
     const query = this.patientRepository
       .createQueryBuilder('patient')
-      .leftJoinAndSelect('patient.user', 'user')
+      .innerJoinAndSelect('patient.user', 'user')
       .leftJoinAndSelect('user.municipality', 'municipality')
       .leftJoinAndSelect('patient.genre', 'genre')
       .leftJoinAndSelect('patient.healthCenter', 'healthCenter')
