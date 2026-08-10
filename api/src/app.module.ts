@@ -6,6 +6,7 @@ import config from './config/configuration';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './features/users/users.module';
 import { AuthModule } from './features/auth/auth.module';
+import { CatalogueModule } from './features/catalogues/catalogue.module';
 import { DatabaseModule } from './database/database.module';
 
 @Module({
@@ -28,6 +29,7 @@ import { DatabaseModule } from './database/database.module';
     }),
     UsersModule,
     AuthModule,
+    CatalogueModule,
     DatabaseModule,
   ],
   controllers: [AppController],
