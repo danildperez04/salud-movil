@@ -50,10 +50,16 @@ export class CatalogueService {
 
   async municipalities(
     departmentId?: number,
-  ): Promise<{ id: number; name: string }[]> {
-    return this.municipalityRepository.find({
+  ): Promise<{ id: number; name: string; departmentId: number }[]> {
+    const municipalities = await this.municipalityRepository.find({
       where: departmentId ? { department: { id: departmentId } } : {},
+      relations: { department: true },
       order: { name: 'ASC' },
     });
+    return municipalities.map((municipality) => ({
+      id: municipality.id,
+      name: municipality.name,
+      departmentId: municipality.department.id,
+    }));
   }
 }
