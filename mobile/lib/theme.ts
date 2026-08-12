@@ -1,53 +1,80 @@
 // lib/theme.ts
-// Espejo en TS de los tokens de tailwind.config.js, para usar en lugares
-// donde no aplican clases (StyleSheet.create, gráficos, SVG, splash screen, etc)
+import {
+  DarkTheme,
+  DefaultTheme,
+  type Theme,
+} from "expo-router/react-navigation";
 
-export const colors = {
-  primary: "#0E2A3A",
-  primaryLight: "#2DB79A",
+export const RADIUS = 12;
 
-  brandBlue: "#0E2A3A",
-  brandGreen: "#2DB79A",
-
-  secondaryGreenLight: "#77D1B5",
-  secondaryTeal: "#135E6D",
-  secondarySteel: "#2D7F8E",
-
-  neutralCarbon: "#1A2129",
-  neutralMedium: "#6B7280",
-  neutralLight: "#E5E7EB",
-  neutralWhite: "#FFFFFF",
-
-  backgroundDefault: "#FFFFFF",
-  backgroundDark: "#0E2A3A",
-  backgroundSubtle: "#E5E7EB",
-
-  textDefault: "#1A2129",
-  textInverted: "#FFFFFF",
-  textMuted: "#6B7280",
-  textAccent: "#2DB79A",
-
-  borderDefault: "#E5E7EB",
-  borderDark: "#135E6D",
+// espejo exacto de global.css
+export const COLORS = {
+  light: {
+    background: "#FFFFFF",
+    foreground: "#1A2129",
+    card: "#FFFFFF",
+    cardForeground: "#1A2129",
+    popover: "#FFFFFF",
+    popoverForeground: "#1A2129",
+    primary: "#2DB79A",
+    primaryForeground: "#0E2A3A",
+    secondary: "#135E6D",
+    secondaryForeground: "#FFFFFF",
+    muted: "#E5E7EB",
+    mutedForeground: "#6B7280",
+    accent: "#77D1B5",
+    accentForeground: "#0E2A3A",
+    destructive: "#DC2626",
+    destructiveForeground: "#FFFFFF",
+    border: "#E5E7EB",
+    input: "#E5E7EB",
+    ring: "#2DB79A",
+  },
+  dark: {
+    background: "#0E2A3A",
+    foreground: "#FFFFFF",
+    card: "#0E2A3A",
+    cardForeground: "#FFFFFF",
+    popover: "#0E2A3A",
+    popoverForeground: "#FFFFFF",
+    primary: "#2DB79A",
+    primaryForeground: "#0E2A3A",
+    secondary: "#77D1B5",
+    secondaryForeground: "#0E2A3A",
+    muted: "#135E6D",
+    mutedForeground: "#E5E7EB",
+    accent: "#2D7F8E",
+    accentForeground: "#FFFFFF",
+    destructive: "#DC2626",
+    destructiveForeground: "#FFFFFF",
+    border: "#135E6D",
+    input: "#135E6D",
+    ring: "#2DB79A",
+  },
 } as const;
 
-export const fonts = {
-  heading: "Poppins_700Bold",
-  headingSemibold: "Poppins_600SemiBold",
-  headingMedium: "Poppins_500Medium",
-  body: "Inter_400Regular",
-  bodyMedium: "Inter_500Medium",
-  bodySemibold: "Inter_600SemiBold",
-} as const;
-
-export const fontSizes = {
-  h1: 48,
-  h2: 32,
-  h3: 24,
-  body: 16,
-  small: 14,
-  button: 16,
-  caption: 12,
-} as const;
-
-export type ColorToken = keyof typeof colors;
+// Theme para el ThemeProvider de React Navigation (usa un subconjunto de COLORS)
+export const NAV_THEME: Record<"light" | "dark", Theme> = {
+  light: {
+    ...DefaultTheme,
+    colors: {
+      background: COLORS.light.background,
+      border: COLORS.light.border,
+      card: COLORS.light.card,
+      notification: COLORS.light.destructive,
+      primary: COLORS.light.primary,
+      text: COLORS.light.foreground,
+    },
+  },
+  dark: {
+    ...DarkTheme,
+    colors: {
+      background: COLORS.dark.background,
+      border: COLORS.dark.border,
+      card: COLORS.dark.card,
+      notification: COLORS.dark.destructive,
+      primary: COLORS.dark.primary,
+      text: COLORS.dark.foreground,
+    },
+  },
+};
