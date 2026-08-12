@@ -1,57 +1,113 @@
-@import 'tailwindcss';
-@import 'uniwind';
+@import "tailwindcss";
+@import "uniwind";
 
-/* ===== BASE TOKENS ===== */
 @theme {
-    /* Primarios */
-    --color-primary: #0E2A3A;
-    --color-primary-light: #2DB79A;
+  /* Tipografía */
+  --font-heading: "Poppins_700Bold";
+  --font-heading-semibold: "Poppins_600SemiBold";
+  --font-heading-medium: "Poppins_500Medium";
+  --font-body: "Inter_400Regular";
+  --font-body-medium: "Inter_500Medium";
+  --font-body-semibold: "Inter_600SemiBold";
 
-    /* Brand */
-    --color-brand-blue: #0E2A3A;
-    --color-brand-green: #2DB79A;
+  /* Tamaños de fuente + line-height pareado (jerarquía tipográfica de marca) */
+  --text-h1: 48px;
+  --text-h1--line-height: 56px;
 
-    /* Secundarios */
-    --color-secondary-green-light: #77D1B5;
-    --color-secondary-teal: #135E6D;
-    --color-secondary-steel: #2D7F8E;
+  --text-h2: 32px;
+  --text-h2--line-height: 40px;
 
-    /* Neutros */
-    --color-neutral-carbon: #1A2129;
-    --color-neutral-medium: #6B7280;
-    --color-neutral-light: #E5E7EB;
-    --color-neutral-white: #FFFFFF;
+  --text-h3: 24px;
+  --text-h3--line-height: 32px;
 
-    /* Semánticos */
-    --color-background: #FFFFFF;
-    --color-background-dark: #0E2A3A;
-    --color-background-subtle: #E5E7EB;
+  --text-body: 16px;
+  --text-body--line-height: 24px;
 
-    --color-text: #1A2129;
-    --color-text-inverted: #FFFFFF;
-    --color-text-muted: #6B7280;
-    --color-text-accent: #2DB79A;
+  --text-small: 14px;
+  --text-small--line-height: 20px;
 
-    --color-border: #E5E7EB;
-    --color-border-dark: #135E6D;
+  --text-button: 16px;
+  --text-button--line-height: 20px;
 
-    /* Tipografía */
-    --font-heading: 'Poppins_700Bold';
-    --font-heading-semibold: 'Poppins_600SemiBold';
-    --font-heading-medium: 'Poppins_500Medium';
-    --font-body: 'Inter_400Regular';
-    --font-body-medium: 'Inter_500Medium';
-    --font-body-semibold: 'Inter_600SemiBold';
+  --text-caption: 12px;
+  --text-caption--line-height: 16px;
 
-    /* Tamaños de fuente */
-    --text-h1: 48px;
-    --text-h2: 32px;
-    --text-h3: 24px;
-    --text-body: 16px;
-    --text-small: 14px;
-    --text-button: 16px;
-    --text-caption: 12px;
+  --radius: 12px;
+  --radius-brand: 20px;
 
-    /* Radius */
-    --radius-brand: 20px;
+  /* Paleta de marca completa (fuera de variantes, disponible siempre) */
+  --color-brand-blue: #0e2a3a;
+  --color-brand-green: #2db79a;
+  --color-secondary-green-light: #77d1b5;
+  --color-secondary-teal: #135e6d;
+  --color-secondary-steel: #2d7f8e;
+  --color-neutral-carbon: #1a2129;
+  --color-neutral-medium: #6b7280;
+  --color-neutral-light: #e5e7eb;
+  --color-neutral-white: #ffffff;
+}
+
+/* ===== TEMAS: cada @variant debe declarar EXACTAMENTE el mismo set de variables ===== */
+@layer theme {
+  :root {
+    @variant light {
+      --color-background: #ffffff;
+      --color-foreground: #1a2129;
+
+      --color-card: #ffffff;
+      --color-card-foreground: #1a2129;
+
+      --color-popover: #ffffff;
+      --color-popover-foreground: #1a2129;
+
+      --color-primary: #2db79a;
+      --color-primary-foreground: #0e2a3a;
+
+      --color-secondary: #135e6d;
+      --color-secondary-foreground: #ffffff;
+
+      --color-muted: #e5e7eb;
+      --color-muted-foreground: #6b7280;
+
+      --color-accent: #77d1b5;
+      --color-accent-foreground: #0e2a3a;
+
+      --color-destructive: #dc2626;
+      --color-destructive-foreground: #ffffff;
+
+      --color-border: #e5e7eb;
+      --color-input: #e5e7eb;
+      --color-ring: #2db79a;
+    }
+
+    @variant dark {
+      --color-background: #0e2a3a;
+      --color-foreground: #ffffff;
+
+      --color-card: #0e2a3a;
+      --color-card-foreground: #ffffff;
+
+      --color-popover: #0e2a3a;
+      --color-popover-foreground: #ffffff;
+
+      --color-primary: #2db79a;
+      --color-primary-foreground: #0e2a3a;
+
+      --color-secondary: #77d1b5;
+      --color-secondary-foreground: #0e2a3a;
+
+      --color-muted: #135e6d;
+      --color-muted-foreground: #e5e7eb;
+
+      --color-accent: #2d7f8e;
+      --color-accent-foreground: #ffffff;
+
+      --color-destructive: #dc2626;
+      --color-destructive-foreground: #ffffff;
+
+      --color-border: #135e6d;
+      --color-input: #135e6d;
+      --color-ring: #2db79a;
+    }
+  }
 }
