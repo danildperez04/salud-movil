@@ -3,13 +3,39 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import config from './config/configuration';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { UsersModule } from './features/users/users.module';
+import { AuthModule } from './features/auth/auth.module';
+import { CatalogueModule } from './features/catalogues/catalogue.module';
+import { PatientsModule } from './features/patients/patients.module';
+import { MedicalRecordsModule } from './features/medical-records/medical-records.module';
+import { DatabaseModule } from './database/database.module';
 
 @Module({
-  imports: [ConfigModule.forRoot({
-    isGlobal: true,
-    envFilePath: '.env',
-    load: [config],
-  })],
+  imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: '.env',
+      load: [config],
+    }),
+    TypeOrmModule.forRoot({
+      type: config().db.type,
+      host: config().db.host,
+      port: config().db.port,
+      username: config().db.user,
+      password: config().db.password,
+      database: config().db.database,
+      entities: [__dirname + '/**/*.entity{.ts,.js}'],
+      synchronize: true,
+      logging: true,
+    }),
+    UsersModule,
+    AuthModule,
+    CatalogueModule,
+    PatientsModule,
+    MedicalRecordsModule,
+    DatabaseModule,
+  ],
   controllers: [AppController],
   providers: [AppService],
 })

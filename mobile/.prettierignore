@@ -1,0 +1,10 @@
+node_modules
+.expo
+dist
+build
+android
+ios
+package-lock.json
+*.min.js
+uniwind-types.d.ts
+expo-env.d.ts
