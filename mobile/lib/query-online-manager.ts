@@ -14,7 +14,9 @@ export function setupOnlineManager() {
       .then((state) => {
         if (!initialised) setOnline(!!state.isConnected);
       })
-      .catch(() => {});
+      .catch(() => {
+        // getNetworkStateAsync can fail on some platforms/SDK versions; ignore and rely on the listener.
+      });
 
     return subscription.remove;
   });
