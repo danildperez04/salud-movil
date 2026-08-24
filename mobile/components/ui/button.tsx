@@ -110,8 +110,6 @@ function Button({ className, variant, size, ...props }: ButtonProps) {
     </TextClassContext.Provider>
   );
 }
-storageHelpers.setItem('test', { hello: 'mundo' });
-console.log(storageHelpers.getItem('test')); // { hello: 'mundo' }
 
 export { Button, buttonTextVariants, buttonVariants };
 export type { ButtonProps };
