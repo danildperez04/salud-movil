@@ -234,6 +234,7 @@ Toda la documentacion del proyecto se encuentra en la carpeta `docs/`:
 
 - `PRD_MVP_MoSCoW_ANALISIS_DE_LA_APP.md` — Documento de requisitos del producto y priorizacion MoSCoW.
 - `Plan_de_Desarrollo.md` — Plan de desarrollo por fases con cronograma.
+- `Guia_de_Despliegue.md` — Guia de despliegue: API en Render, PostgreSQL en Supabase y panel web.
 - `Esquema_de_Base_de_Datos.md` — Esquema completo de la base de datos (28 tablas).
 - `Backlog_del_Proyecto_SALUD_MOVIL.md` — Backlog de historias de usuario.
 - `Plan_SCRUM_y_estrategia_de_versionado.md` — Metodologia SCRUM y estrategia de versionado.
