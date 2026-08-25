@@ -11,7 +11,12 @@ export const storage = createMMKV({
 // de errores en cada lugar donde se usa storage.
 export const storageHelpers = {
   setItem: <T>(key: string, value: T): void => {
-    storage.set(key, JSON.stringify(value));
+    try {
+      storage.set(key, JSON.stringify(value));
+    } catch (err) {
+      const message = err instanceof Error ? err.message : String(err);
+      throw new Error(`storageHelpers.setItem: failed to serialize value for key "${key}": ${message}`);
+    }
   },
 
   getItem: <T>(key: string): T | null => {
