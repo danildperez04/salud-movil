@@ -1,6 +1,7 @@
 // lib/theme.ts
 import { DarkTheme, DefaultTheme, type Theme } from 'expo-router/react-navigation';
 
+// radius: espejo de --radius en global.css
 export const RADIUS = 12;
 
 // espejo exacto de global.css

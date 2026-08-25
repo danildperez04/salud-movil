@@ -1,9 +1,7 @@
 // types/auth.ts
 
-// Confirmado con login real: "admin". Faltan confirmar los códigos de
-// patient / caregiver / healthcare_worker (probablemente mismo patrón
-// en minúscula con guion bajo, pero no lo asumo sin verlo).
-export type Role = 'admin' | (string & {});
+// Confirmado contra cat_role en la base de datos real.
+export type Role = 'patient' | 'caregiver' | 'health_staff' | 'admin';
 
 export interface HealthcareWorkerInfo {
   licenseNumber: string;
