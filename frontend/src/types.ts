@@ -179,3 +179,46 @@ export interface CreateMedicalVisitPayload {
   treatment: string;
   nextVisitDate?: string;
 }
+
+export interface PublicCaregiverDetail {
+  id: string;
+  name: string;
+  email: string;
+  username: string;
+  phoneNumber: string;
+  address: string;
+  dni: string | null;
+  isActive: boolean;
+  municipalityId?: number;
+}
+
+export interface CreateCaregiverPayload {
+  name: string;
+  email: string;
+  username: string;
+  password: string;
+  phoneNumber: string;
+  address: string;
+  dni?: string;
+  municipalityId: number;
+}
+
+export interface UpdateCaregiverPayload {
+  name?: string;
+  email?: string;
+  username?: string;
+  phoneNumber?: string;
+  address?: string;
+  dni?: string;
+  isActive?: boolean;
+  password?: string;
+}
+
+export interface PublicPatientLink {
+  patientId: string;
+  patientName: string;
+  patientEmail: string;
+  relationshipTypeName: string;
+  isPrimary: boolean;
+  dateLink: string;
+}
