@@ -6,6 +6,7 @@ import { ROLE_LABELS } from '../lib/roles';
 const NAV_ITEMS: { to: string; label: string; roles: string[] }[] = [
   { to: '/', label: 'Inicio', roles: ['admin', 'health_staff'] },
   { to: '/staff', label: 'Personal de salud', roles: ['admin'] },
+  { to: '/caregivers', label: 'Cuidadores', roles: ['admin', 'health_staff'] },
   { to: '/patients', label: 'Pacientes', roles: ['admin', 'health_staff'] },
 ];
 

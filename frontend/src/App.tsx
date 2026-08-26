@@ -12,6 +12,9 @@ import StaffForm from './pages/staff/StaffForm';
 import PatientsList from './pages/patients/PatientsList';
 import PatientForm from './pages/patients/PatientForm';
 import PatientDetail from './pages/patients/PatientDetail';
+import CaregiversList from './pages/caregivers/CaregiversList';
+import CaregiverForm from './pages/caregivers/CaregiverForm';
+import CaregiverDetail from './pages/caregivers/CaregiverDetail';
 
 function App() {
   const bootstrap = useAuthStore((s) => s.bootstrap);
@@ -49,6 +52,16 @@ function App() {
             <Route path='/staff' element={<StaffList />} />
             <Route path='/staff/new' element={<StaffForm />} />
             <Route path='/staff/:id/edit' element={<StaffForm />} />
+          </Route>
+          <Route
+            element={
+              <RequireRole roles={['admin', 'health_staff']} children={<Outlet />} />
+            }
+          >
+            <Route path='/caregivers' element={<CaregiversList />} />
+            <Route path='/caregivers/new' element={<CaregiverForm />} />
+            <Route path='/caregivers/:id' element={<CaregiverDetail />} />
+            <Route path='/caregivers/:id/edit' element={<CaregiverForm />} />
           </Route>
           <Route
             element={
