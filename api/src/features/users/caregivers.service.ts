@@ -188,7 +188,10 @@ export class CaregiversService {
         patientEmail: l.patient.user.email,
         relationshipTypeName: l.relationshipType.name,
         isPrimary: l.isPrimary,
-        dateLink: l.dateLink.toISOString().slice(0, 10),
+        dateLink:
+          typeof l.dateLink === 'string'
+            ? l.dateLink
+            : l.dateLink.toISOString().slice(0, 10),
       }));
   }
 
