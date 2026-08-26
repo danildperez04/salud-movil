@@ -1,7 +1,19 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Delete,
+  Get,
+  Param,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
+import { CaregiversService } from './caregivers.service';
+import { CreateCaregiverDto } from './dto/create-caregiver.dto';
+import { UpdateUserDto } from './dto/update-user.dto';
 import { Roles } from '../../common/decorators/roles.decorator';
 
 export interface PublicCaregiver {
@@ -18,6 +30,7 @@ export interface PublicCaregiver {
 export class CaregiversController {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
+    private readonly caregiversService: CaregiversService,
   ) {}
 
   @Get()
@@ -46,5 +59,30 @@ export class CaregiversController {
       phoneNumber: user.phoneNumber,
       dni: user.dni ?? null,
     }));
+  }
+
+  @Get(':id')
+  findOne(@Param('id') id: string) {
+    return this.caregiversService.findOne(id);
+  }
+
+  @Get(':id/patients')
+  findPatients(@Param('id') id: string) {
+    return this.caregiversService.findPatients(id);
+  }
+
+  @Post()
+  create(@Body() dto: CreateCaregiverDto) {
+    return this.caregiversService.create(dto);
+  }
+
+  @Patch(':id')
+  update(@Param('id') id: string, @Body() dto: UpdateUserDto) {
+    return this.caregiversService.update(id, dto);
+  }
+
+  @Delete(':id')
+  remove(@Param('id') id: string) {
+    return this.caregiversService.remove(id);
   }
 }
