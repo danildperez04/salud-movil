@@ -12,7 +12,7 @@ Del total de 31 historias (127 Story Points), **23 son Must Have (imprescindible
 **Prioridades transversales:**
 
 1. **App móvil primero**: las funcionalidades esenciales se desarrollan y prueban en la app móvil (Expo/React Native).
-2. **Repartición de audiencias por plataforma (decisión del 10 de agosto)**: el **panel web** es para **admin y personal de salud** (gestión de personal, pacientes, expediente, consultas y vínculos de cuidadores); la **app móvil** es para **cuidadores y pacientes** (registro de cuentas, indicadores, citas y recordatorios). Los flujos de cuidador/paciente no se duplican en web (sin registro web).
+2. **Repartición de audiencias por plataforma (decisión del 10 de agosto)**: el **panel web** es para **admin y personal de salud** (gestión de personal, pacientes, cuidadores, expediente, consultas y vínculos de cuidadores); la **app móvil** es para **cuidadores y pacientes** (inicio de sesión, indicadores, citas y recordatorios). Las cuentas de cuidadores y pacientes se crean exclusivamente desde el panel web.
 3. **Recordatorios con notificación local** en el dispositivo para el MVP (más fiable y sin infraestructura externa). El envío remoto vía Firebase Cloud Messaging (FCM) queda como mejora futura.
 
 ## 2. Estado actual del código (diagnóstico)
@@ -24,8 +24,9 @@ Del total de 31 historias (127 Story Points), **23 son Must Have (imprescindible
 | Scaffold NestJS 11 con TypeORM y PostgreSQL conectado | Migraciones (usa `synchronize: true` en dev; pendientes las SQL para producción, Fase 7) |
 | Config de entorno tipada (`src/config/configuration.ts`) y `.env.example` completo (`DB_PORT`, `DB_NAME`, `DB_TYPE`, JWT) | Helmet y rate limiting (Fase 7) |
 | Autenticación JWT/RBAC con guards globales (`JwtAuthGuard` + `RolesGuard`) y decoradores `@Roles()` / `@Public()` | |
-| `AuthModule`: `POST /auth/register` (cuidador), `POST /auth/login`, `GET /auth/me`, `POST /auth/forgot-password`, `POST /auth/reset-password`, `POST /auth/change-password` | |
+| `AuthModule`: `POST /auth/login`, `GET /auth/me`, `POST /auth/forgot-password`, `POST /auth/reset-password`, `POST /auth/change-password` | |
 | CRUD de usuarios para el administrador (HU-01): `POST/GET/PATCH/DELETE /users` con creación de personal de salud en transacción (user + `healthcare_worker`) | |
+| `CaregiversModule`: CRUD de cuidadores (`POST/GET/PATCH/DELETE /caregivers`) y pacientes vinculados (`GET /caregivers/:id/patients`) | |
 | `UsersModule` registrado en `app.module.ts` | |
 | Entidades de dominio creadas: `user`, `patient`, `caregiver`, `healthcare_worker`, `patient_caregiver`, `health_center`, `medical_record`, `medical_visit`, `health_indicator`, `medication`, `medication_schedule`, `medication_schedule_day`, `medication_reminder`, `appointment`, `appointment_reminder`, `password_reset` y los 12 catálogos | |
 | Soft delete (`@DeleteDateColumn`) y borrados en cascada a nivel de BD | |
@@ -103,18 +104,18 @@ Del total de 31 historias (127 Story Points), **23 son Must Have (imprescindible
 - [x] `AuthModule`: `POST /auth/register`, `POST /auth/login`, `GET /auth/me`.
 - [x] JWT (`@nestjs/jwt`) + `JwtAuthGuard` global + `RolesGuard` con decorador `@Roles()` y `@Public()` para rutas públicas.
 - [x] Creación de cuentas de personal de salud por el administrador (HU-01): `POST /users` crea user + `healthcare_worker` (licencia, especialidad, centro de salud) en transacción; listado, detalle, actualización y baja (soft delete) solo `admin`.
-- [x] Registro de cuenta de cuidador (HU-02) e inicio de sesión (HU-03). *(La creación de la cuenta del paciente por el personal de salud es HU-06 → Fase 2).*
+- [x] Registro de cuenta de cuidador (HU-02) e inicio de sesión (HU-03). *(Las cuentas de cuidadores y pacientes se crean desde el panel web; la app móvil es solo para inicio de sesión).*
 - [x] Restablecimiento de contraseña (HU-04): `POST /auth/forgot-password`, `POST /auth/reset-password` y `POST /auth/change-password` (token con hash SHA-256, expiración configurable; en dev se devuelve en la respuesta).
 - [x] Perfil de usuario (HU-08): `GET /auth/me`; el cierre de sesión se maneja descartando el token en el cliente.
 - [x] Seed de usuarios y catálogos: `admin` y personal de salud de ejemplo, roles, géneros, especialidades, tipos de centro, 17 departamentos (15 + 2 regiones autónomas) y 150 municipios.
 
 **Mobile**
 - [ ] Cliente API (fetch/axios con base URL configurable) e interceptor de token.
-- [ ] Pantallas de login, registro de cuidador y perfil.
+- [ ] Pantalla de login (cuidadores y pacientes inician sesión; las cuentas se crean desde el panel web).
 - [ ] Gestión de sesión (context + `expo-secure-store`).
 
 **Frontend**
-- [x] Página de login conectada al API (el registro de cuentas web se elimina; cuidadores y pacientes se registran desde la app móvil).
+- [x] Página de login conectada al API (el registro de cuentas web se elimina; cuidadores y pacientes se crean desde el panel de admin/personal de salud).
 
 ### Fase 2 — Pacientes y Expediente Clínico → HU-05, HU-06, HU-07, HU-09, HU-10, HU-11, HU-12 (10–13 de agosto) — v0.3.0
 
@@ -221,7 +222,7 @@ Del total de 31 historias (127 Story Points), **23 son Must Have (imprescindible
 | 29 ago – 1 sep | Fase 7: seguridad, pruebas, CI, despliegue y presentación | v1.0.0 |
 | 2 sep | Presentación oficial del proyecto | — |
 
-> **Estado al 10 de agosto:** completada la **API de la Fase 1** (autenticación JWT/RBAC, reset de contraseña y CRUD de usuarios admin), la **API de la Fase 2** (pacientes, expediente clínico y vínculos cuidador–paciente, HU-05/06/07/09–12) y el **panel web para admin y personal de salud** (login, gestión de personal, pacientes con expediente/consultas/cuidadores; estado con Zustand y rutas por rol; el registro de cuentas web se eliminó, cuidador y paciente se registran desde mobile). Pendientes: mobile (cliente API, pantallas de login/registro/perfil/gestión de sesión para cuidador y paciente; pantallas de personal y paciente de la Fase 2) y el dashboard de indicadores web (HU-31).
+> **Estado al 24 de agosto:** completada la **API de la Fase 1** (autenticación JWT/RBAC, reset de contraseña y CRUD de usuarios admin), la **API de la Fase 2** (pacientes, expediente clínico y vínculos cuidador–paciente, HU-05/06/07/09–12) y el **panel web para admin y personal de salud** (login, gestión de personal, pacientes con expediente/consultas/cuidadores; CRUD de cuidadores con pacientes vinculados; estado con Zustand y rutas por rol). Las cuentas de cuidadores y pacientes se crean exclusivamente desde el panel web (sin registro web ni en móvil). Pendientes: mobile (solo login, cliente API, pantallas de sesión para cuidador/paciente; pantallas de la Fase 2), el dashboard de indicadores web (HU-31) y endpoints de citas/indicadores/medicamentos (Fases 3–5).
 
 **Correspondencia con el plan original:**
 

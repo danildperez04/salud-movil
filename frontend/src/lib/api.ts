@@ -1,6 +1,7 @@
 import type {
   AuthResponse,
   CatalogueItem,
+  CreateCaregiverPayload,
   CreateMedicalVisitPayload,
   CreatePatientPayload,
   CreateStaffPayload,
@@ -8,10 +9,13 @@ import type {
   LinkCaregiverPayload,
   MunicipalityItem,
   PublicCaregiver,
+  PublicCaregiverDetail,
   PublicCaregiverLink,
   PublicMedicalRecord,
   PublicPatient,
+  PublicPatientLink,
   PublicStaff,
+  UpdateCaregiverPayload,
   UpdateMedicalRecordPayload,
   UpdatePatientPayload,
   UpdateStaffPayload,
@@ -183,6 +187,32 @@ export const api = {
     return request<void>(`/patients/${patientId}/caregivers/${caregiverId}`, {
       method: 'DELETE',
     });
+  },
+
+  getCaregiver(id: string) {
+    return request<PublicCaregiverDetail>(`/caregivers/${id}`);
+  },
+
+  createCaregiver(payload: CreateCaregiverPayload) {
+    return request<PublicCaregiverDetail>('/caregivers', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  },
+
+  updateCaregiver(id: string, payload: UpdateCaregiverPayload) {
+    return request<PublicCaregiverDetail>(`/caregivers/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    });
+  },
+
+  deleteCaregiver(id: string) {
+    return request<void>(`/caregivers/${id}`, { method: 'DELETE' });
+  },
+
+  getCaregiverPatients(id: string) {
+    return request<PublicPatientLink[]>(`/caregivers/${id}/patients`);
   },
 
   getMedicalRecord(patientId: string) {
