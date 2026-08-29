@@ -1,34 +1,17 @@
 // app/index.tsx
-import { View } from 'react-native';
-import { Button } from '@/components/ui/button';
-import { Text } from '@/components/ui/text';
+import { Redirect } from 'expo-router';
+import { useAppStore } from '@/store';
 
-export default function HomeScreen() {
-  return (
-    <View className="bg-background flex-1 items-center justify-center gap-3 p-4">
-      <Button>
-        <Text>Default</Text>
-      </Button>
+export default function RootIndex() {
+  const hasHydrated = useAppStore((state) => state.hasHydrated);
+  const isAuthenticated = useAppStore((state) => state.isAuthenticated);
+  const hasSeenOnboarding = useAppStore((state) => state.hasSeenOnboarding);
 
-      <Button variant="secondary">
-        <Text>Secondary</Text>
-      </Button>
+  // Mientras Zustand no terminó de leer MMKV, no decidimos nada todavía.
+  // El splash nativo sigue visible en este instante (ver SplashScreenController).
+  if (!hasHydrated) return null;
 
-      <Button variant="outline">
-        <Text>Outline</Text>
-      </Button>
-
-      <Button variant="destructive">
-        <Text>Destructive</Text>
-      </Button>
-
-      <Button variant="ghost">
-        <Text>Ghost</Text>
-      </Button>
-
-      <Button size="sm">
-        <Text>Pequeño</Text>
-      </Button>
-    </View>
-  );
+  if (isAuthenticated) return <Redirect href="/(app)" />;
+  if (!hasSeenOnboarding) return <Redirect href="/(onboarding)/welcome" />;
+  return <Redirect href="/(auth)/login" />;
 }

@@ -15,7 +15,9 @@ export const storageHelpers = {
       storage.set(key, JSON.stringify(value));
     } catch (err) {
       const message = err instanceof Error ? err.message : String(err);
-      throw new Error(`storageHelpers.setItem: failed to serialize value for key "${key}": ${message}`);
+      throw new Error(
+        `storageHelpers.setItem: failed to serialize value for key "${key}":${message}`,
+      );
     }
   },
 

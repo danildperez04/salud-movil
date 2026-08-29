@@ -3,12 +3,11 @@ import { create } from 'zustand';
 import { createJSONStorage, devtools, persist } from 'zustand/middleware';
 import { zustandMMKVStorage } from '@/lib/zustand-mmkv-storage';
 import { createAuthSlice } from './slices/authSlice';
+import { createOnboardingSlice } from './slices/onboardingSlice';
 import { createUISlice } from './slices/uiSlice';
-import { AuthSlice, UISlice } from './types';
+import { AuthSlice, OnboardingSlice, UISlice } from './types';
 
-// A medida que agregues slices (settings, etc), combinalos acá:
-// type AppState = UISlice & AuthSlice & SettingsSlice;
-type AppState = UISlice & AuthSlice;
+type AppState = UISlice & AuthSlice & OnboardingSlice;
 
 export const useAppStore = create<AppState>()(
   devtools(
@@ -16,16 +15,18 @@ export const useAppStore = create<AppState>()(
       (...a) => ({
         ...createUISlice(...a),
         ...createAuthSlice(...a),
+        ...createOnboardingSlice(...a),
       }),
       {
         name: 'salud-movil-auth-storage',
         storage: createJSONStorage(() => zustandMMKVStorage),
-        // Solo persistimos la sesión. Estado de UI (ej. bottom sheet abierto)
-        // no debe sobrevivir a cerrar la app.
+        // Solo persistimos sesión y onboarding. Estado de UI (ej. bottom sheet
+        // abierto) no debe sobrevivir a cerrar la app.
         partialize: (state) => ({
           user: state.user,
           accessToken: state.accessToken,
           isAuthenticated: state.isAuthenticated,
+          hasSeenOnboarding: state.hasSeenOnboarding,
         }),
         onRehydrateStorage: () => (state) => {
           state?.setHasHydrated(true);
