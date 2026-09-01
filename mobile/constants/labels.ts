@@ -9,6 +9,9 @@ export const APPOINTMENT_STATUS_LABELS: Record<string, string> = {
   Cancelled: 'Cancelada',
   Completed: 'Completada',
   'No show': 'No asistió',
+  // ⚠️ "Pending" NO existe en cat_appointment_state real — clave usada
+  // únicamente en datos mock, hasta que el equipo confirme el estado real.
+  Pending: 'Pendiente',
 };
 
 export const APPOINTMENT_STATUS_VARIANT: Record<string, 'secondary' | 'destructive' | 'outline'> = {
@@ -16,6 +19,7 @@ export const APPOINTMENT_STATUS_VARIANT: Record<string, 'secondary' | 'destructi
   Cancelled: 'destructive',
   Completed: 'outline',
   'No show': 'destructive',
+  Pending: 'outline',
 };
 
 // cat_frequency de la BD → label en español para mostrar en ReminderCard
@@ -118,6 +122,28 @@ export const SUMMARY_TABS_LABELS = {
 export const HEALTH_INDICATORS_LABELS = {
   registerButton: 'Registrar nuevo indicador',
   historyPlaceholder: 'El historial estará disponible próximamente',
+} as const;
+
+export const APPOINTMENTS_LABELS = {
+  bookButton: 'Agendar cita',
+  formTitle: 'Agendar Cita',
+  specialtyLabel: 'Especialidad',
+  specialtyPlaceholder: 'Seleccione una especialidad',
+  professionalLabel: 'Profesional',
+  professionalPlaceholder: 'Seleccione un profesional',
+  dateLabel: 'Fecha',
+  datePlaceholder: 'Seleccione una fecha',
+  timeLabel: 'Hora',
+  timePlaceholder: 'Seleccione una hora',
+  reasonLabel: 'Motivo de la consulta',
+  reasonPlaceholder: 'Describe brevemente el motivo',
+  submit: 'Confirmar cita',
+  stepperSteps: ['Especialidad', 'Profesional', 'Fecha', 'Confirmar'],
+} as const;
+
+export const MEDICATIONS_LABELS = {
+  tipTitle: 'Toma tus medicamentos',
+  tipSubtitle: '¡No olvides tomar tus medicamentos a tiempo!',
 } as const;
 
 // Textos generales reutilizables en toda la app

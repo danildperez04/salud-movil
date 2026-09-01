@@ -78,13 +78,12 @@ export default function RegisterHealthIndicatorScreen() {
     DateTimePickerAndroid.open({
       value: dateHour,
       mode: 'date',
-      onChange: (_event, selectedDate) => {
-        if (!selectedDate) return;
+      onValueChange: (_event, selectedDate) => {
         DateTimePickerAndroid.open({
           value: selectedDate,
           mode: 'time',
-          onChange: (_event2, selectedTime) => {
-            if (selectedTime) setDateHour(selectedTime);
+          onValueChange: (_event2, selectedTime) => {
+            setDateHour(selectedTime);
           },
         });
       },
@@ -185,8 +184,8 @@ export default function RegisterHealthIndicatorScreen() {
               value={dateHour}
               mode="datetime"
               display="inline"
-              onChange={(_event, selectedDate) => {
-                if (selectedDate) setDateHour(selectedDate);
+              onValueChange={(_event, selectedDate) => {
+                setDateHour(selectedDate);
               }}
             />
           )}
