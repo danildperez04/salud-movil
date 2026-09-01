@@ -20,17 +20,16 @@ export const useAppStore = create<AppState>()(
       {
         name: 'salud-movil-auth-storage',
         storage: createJSONStorage(() => zustandMMKVStorage),
-        // Solo persistimos sesión y onboarding. Estado de UI (ej. bottom sheet
-        // abierto) no debe sobrevivir a cerrar la app.
+        // accessToken NO se persiste acá — vive en SecureStore
+        // (ver lib/secure-token-storage.ts). Solo lo "no secreto" va a MMKV.
         partialize: (state) => ({
           user: state.user,
-          accessToken: state.accessToken,
           isAuthenticated: state.isAuthenticated,
           hasSeenOnboarding: state.hasSeenOnboarding,
         }),
-        onRehydrateStorage: () => (state) => {
-          state?.setHasHydrated(true);
-        },
+        // hasHydrated NO se marca acá — se marca en el bootstrap de
+        // app/_layout.tsx, después de chequear también el token real
+        // en SecureStore. Ver useAuthBootstrap.
       },
     ),
     { name: 'AppStore', enabled: __DEV__ },

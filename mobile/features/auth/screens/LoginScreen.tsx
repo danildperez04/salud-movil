@@ -2,6 +2,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import { router } from 'expo-router';
 import { Activity } from 'lucide-react-native';
+import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { KeyboardAvoidingView, Platform, Pressable, View } from 'react-native';
 import { z } from 'zod';
@@ -12,6 +13,8 @@ import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import { Text } from '@/components/ui/text';
 import { LOGIN_LABELS } from '@/constants/labels';
+import { ApiError } from '@/lib/api-client';
+import { useAppStore } from '@/store';
 import { useLogin } from '../hooks/useLogin';
 
 const loginSchema = z.object({
@@ -23,6 +26,8 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 
 export default function LoginScreen() {
   const login = useLogin();
+  const authNotice = useAppStore((state) => state.authNotice);
+  const clearAuthNotice = useAppStore((state) => state.clearAuthNotice);
 
   const {
     control,
@@ -33,6 +38,13 @@ export default function LoginScreen() {
     defaultValues: { email: '', password: '' },
   });
 
+  // El aviso ("tu sesión expiró", "esta cuenta no tiene acceso") se muestra
+  // una sola vez, al llegar a esta pantalla — no queremos que persista
+  // después de que el usuario ya lo vio e intenta loguearse de nuevo.
+  useEffect(() => {
+    return () => clearAuthNotice();
+  }, [clearAuthNotice]);
+
   const onSubmit = (values: LoginFormValues) => {
     login.mutate(values, {
       onSuccess: () => {
@@ -40,6 +52,16 @@ export default function LoginScreen() {
       },
     });
   };
+
+  const errorMessage = (() => {
+    if (!login.error) return null;
+    if (login.error instanceof ApiError) {
+      return login.error.status === 401
+        ? LOGIN_LABELS.invalidCredentials
+        : 'No se pudo conectar. Revisá tu conexión e intentá de nuevo';
+    }
+    return login.error.message; // RoleNotAllowedError
+  })();
 
   return (
     <KeyboardAvoidingView
@@ -56,6 +78,12 @@ export default function LoginScreen() {
           </View>
           <Text className="text-small font-body text-primary">{LOGIN_LABELS.tagline}</Text>
         </View>
+
+        {authNotice && (
+          <View className="bg-destructive/10 w-full max-w-sm rounded-lg p-3">
+            <Text className="text-small text-destructive">{authNotice}</Text>
+          </View>
+        )}
 
         <Card className="w-full max-w-sm">
           <CardHeader>
@@ -76,6 +104,7 @@ export default function LoginScreen() {
                 render={({ field: { onChange, onBlur, value } }) => (
                   <Input
                     aria-labelledby="email"
+                    testID="email-input"
                     placeholder={LOGIN_LABELS.emailPlaceholder}
                     keyboardType="email-address"
                     autoCapitalize="none"
@@ -100,6 +129,7 @@ export default function LoginScreen() {
                 render={({ field: { onChange, onBlur, value } }) => (
                   <Input
                     aria-labelledby="password"
+                    testID="password-input"
                     placeholder="••••••••"
                     secureTextEntry
                     autoCapitalize="none"
@@ -122,13 +152,7 @@ export default function LoginScreen() {
               </Text>
             </Pressable>
 
-            {login.isError && (
-              <Text className="text-small text-destructive">
-                {login.error.status === 401
-                  ? LOGIN_LABELS.invalidCredentials
-                  : 'No se pudo conectar. Revisá tu conexión e intentá de nuevo'}
-              </Text>
-            )}
+            {errorMessage && <Text className="text-small text-destructive">{errorMessage}</Text>}
 
             <Button onPress={handleSubmit(onSubmit)} disabled={login.isPending} className="mt-2">
               {login.isPending ? (

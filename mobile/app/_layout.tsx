@@ -11,10 +11,9 @@ import { NAV_THEME } from '@/lib/theme';
 import { queryClient } from '@/lib/query-client';
 import { setupOnlineManager } from '@/lib/query-online-manager';
 import { useQueryAppStateSync } from '@/hooks/useQueryAppStateSync';
+import { useAuthBootstrap } from '@/hooks/useAuthBootstrap';
 import { useAppStore } from '@/store';
 
-// Evita que el splash nativo desaparezca solo, mientras Zustand
-// todavía no terminó de leer la sesión guardada en MMKV.
 SplashScreen.preventAutoHideAsync();
 
 function SplashScreenController() {
@@ -38,6 +37,7 @@ export default function RootLayout() {
   }, []);
 
   useQueryAppStateSync();
+  useAuthBootstrap(); // reconcilia MMKV + SecureStore, marca hasHydrated cuando termina
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
