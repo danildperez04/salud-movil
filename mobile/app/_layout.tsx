@@ -1,9 +1,9 @@
 // app/_layout.tsx
 import '../global.css';
-import { useEffect } from 'react';
-import { Stack } from 'expo-router';
+import { Stack, SplashScreen } from 'expo-router';
 import { ThemeProvider } from 'expo-router/react-navigation';
 import { PortalHost } from '@rn-primitives/portal';
+import { useEffect } from 'react';
 import { useColorScheme } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { QueryClientProvider } from '@tanstack/react-query';
@@ -11,6 +11,23 @@ import { NAV_THEME } from '@/lib/theme';
 import { queryClient } from '@/lib/query-client';
 import { setupOnlineManager } from '@/lib/query-online-manager';
 import { useQueryAppStateSync } from '@/hooks/useQueryAppStateSync';
+import { useAppStore } from '@/store';
+
+// Evita que el splash nativo desaparezca solo, mientras Zustand
+// todavía no terminó de leer la sesión guardada en MMKV.
+SplashScreen.preventAutoHideAsync();
+
+function SplashScreenController() {
+  const hasHydrated = useAppStore((state) => state.hasHydrated);
+
+  useEffect(() => {
+    if (hasHydrated) {
+      SplashScreen.hideAsync();
+    }
+  }, [hasHydrated]);
+
+  return null;
+}
 
 export default function RootLayout() {
   const colorScheme = useColorScheme();
@@ -26,7 +43,8 @@ export default function RootLayout() {
     <GestureHandlerRootView style={{ flex: 1 }}>
       <QueryClientProvider client={queryClient}>
         <ThemeProvider value={theme}>
-          <Stack />
+          <SplashScreenController />
+          <Stack screenOptions={{ headerShown: false }} />
           <PortalHost />
         </ThemeProvider>
       </QueryClientProvider>

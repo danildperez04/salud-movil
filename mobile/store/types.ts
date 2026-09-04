@@ -1,7 +1,4 @@
 // store/types.ts
-// Cada slice define su propio tipo. A medida que agregues features
-// (auth, appointments, notifications, etc), sumá un tipo acá y su
-// slice correspondiente en store/slices/.
 import type { AuthResponse, PublicUser } from '@/types/auth';
 
 export type UISlice = {
@@ -15,9 +12,14 @@ export type AuthSlice = {
   accessToken: string | null;
   isAuthenticated: boolean;
   // true recién después de que persist termina de leer MMKV al arrancar la app.
-  // Se usa para no redirigir a login antes de saber si hay sesión guardada.
+  // Se usa para no redirigir a login/onboarding antes de saber qué hay guardado.
   hasHydrated: boolean;
   setSession: (session: AuthResponse) => void;
   logout: () => void;
   setHasHydrated: (value: boolean) => void;
+};
+
+export type OnboardingSlice = {
+  hasSeenOnboarding: boolean;
+  markOnboardingSeen: () => void;
 };
