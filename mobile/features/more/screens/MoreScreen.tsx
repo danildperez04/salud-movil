@@ -31,7 +31,7 @@ export default function MoreScreen() {
       ))}
 
       <Pressable
-        onPress={logout}
+        onPress={() => logout()}
         className="bg-destructive/10 mt-4 flex-row items-center gap-4 rounded-2xl p-4 active:opacity-80"
       >
         <LogOut size={20} color="#DC2626" />

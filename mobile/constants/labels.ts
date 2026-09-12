@@ -5,7 +5,7 @@
 // No existe un estado "Pendiente" en el catálogo real. Mapeo tentativo abajo —
 // confirmar con el equipo antes de usar esto en la pantalla de citas real.
 export const APPOINTMENT_STATUS_LABELS: Record<string, string> = {
-  Scheduled: 'Confirmada', // ⚠️ mapeo tentativo, revisar
+  Scheduled: 'Confirmada',
   Cancelled: 'Cancelada',
   Completed: 'Completada',
   'No show': 'No asistió',

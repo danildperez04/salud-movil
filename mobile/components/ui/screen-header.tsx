@@ -7,18 +7,6 @@ import { Text } from '@/components/ui/text';
 type ScreenHeaderProps = {
   title: string;
   onBack?: () => void;
-  /**
-   * FIX: el Figma en realidad tiene DOS patrones de header distintos:
-   * - 'default' (Top Header Bar del sistema de componentes): botón de
-   *   retroceso circular + título en la misma fila. Es el usado en flujos
-   *   puntuales como "Agendar Cita". Se deja intacto para no romper esos
-   *   usos.
-   * - 'large': el usado en pantallas "landing" como "Indicadores de Salud".
-   *   Acá el botón de retroceso va SOLO en su propia fila (sin círculo/borde,
-   *   ícono simple) y el título va debajo, en un tamaño grande (H2) y con
-   *   separación generosa. Antes ScreenHeader solo tenía el patrón inline,
-   *   por eso el espacio entre botón y título no coincidía con el Figma.
-   */
   size?: 'default' | 'large';
 };
 

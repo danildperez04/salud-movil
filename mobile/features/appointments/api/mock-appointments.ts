@@ -10,7 +10,6 @@ export type AppointmentRecord = {
   specialty: string;
   doctorName: string;
   time: string;
-  // valor crudo estilo cat_appointment_state — ver nota en constants/labels.ts
   status: string;
 };
 
