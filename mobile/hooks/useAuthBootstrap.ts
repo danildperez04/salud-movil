@@ -16,8 +16,6 @@ export function useAuthBootstrap() {
       const { isAuthenticated, logout, setAccessToken } = useAppStore.getState();
 
       if (!token) {
-        // MMKV puede decir "autenticado" sin token real (instalación nueva,
-        // storage corrupto, etc) — la sesión sin token no sirve para nada.
         if (isAuthenticated) logout();
       } else if (isJwtExpired(token)) {
         logout();

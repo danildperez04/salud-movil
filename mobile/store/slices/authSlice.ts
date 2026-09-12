@@ -18,9 +18,6 @@ export const createAuthSlice: StateCreator<AuthSlice> = (set) => ({
   authNotice: null,
 
   setSession: (session: AuthResponse) => {
-    // el token va a SecureStore, NO a MMKV — fire-and-forget está bien acá:
-    // si falla el guardado seguro, el usuario simplemente va a tener que
-    // volver a loguearse la próxima vez que abra la app, no es catastrófico.
     secureTokenStorage.setToken(session.accessToken).catch(() => undefined);
     set({
       user: session.user,

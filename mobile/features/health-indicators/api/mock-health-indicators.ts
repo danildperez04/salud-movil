@@ -54,7 +54,7 @@ let mockIndicators: HealthIndicatorRecord[] = [
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export async function fetchMockHealthIndicators(): Promise<HealthIndicatorRecord[]> {
-  await delay(300); // simula latencia real, para que loading states se vean también
+  await delay(300);
   return mockIndicators;
 }
 

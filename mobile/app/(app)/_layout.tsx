@@ -12,10 +12,6 @@ export default function AppLayout() {
 
   const hasDisallowedRole = !!user && !ALLOWED_MOBILE_ROLES.includes(user.role);
 
-  // Defensa en profundidad: useLogin ya bloquea esto al momento de loguear,
-  // pero si por algún motivo una sesión con rol no permitido queda persistida
-  // (ej: se cambió esta lista después de que alguien ya tenía sesión activa),
-  // no dejamos que esa persona vea pantallas reales igual.
   useEffect(() => {
     if (hasDisallowedRole) logout('role_not_allowed');
   }, [hasDisallowedRole, logout]);

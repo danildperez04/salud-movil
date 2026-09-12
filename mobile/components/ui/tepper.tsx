@@ -10,7 +10,6 @@ export type StepperStep = {
 
 type StepperProps = {
   steps: StepperStep[];
-  /** índice del paso activo, 0-based */
   currentStep: number;
   className?: string;
 };

@@ -4,12 +4,6 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import * as React from 'react';
 import { Platform, Text as RNText, type Role } from 'react-native';
 
-// FIX: antes este componente usaba tamaños/pesos genéricos de shadcn
-// (text-4xl font-extrabold, text-2xl font-semibold, border-b, text-center,
-// etc.) que no existen en el sistema tipográfico de la marca. Ahora usa los
-// tokens definidos en global.css (--text-h1/h2/h3/body/small) junto con las
-// familias de marca (Poppins para headings, Inter para body), que es lo que
-// realmente reproduce la jerarquía del Manual de Identidad.
 const textVariants = cva(
   cn(
     'text-foreground font-body text-body',
@@ -31,8 +25,6 @@ const textVariants = cva(
           'bg-muted relative rounded px-[0.3rem] py-[0.2rem] font-mono text-small font-semibold',
         ),
         lead: 'font-body text-body text-muted-foreground',
-        // "large" se usa para CTAs / botones grandes: Poppins SemiBold 16px
-        // según la tabla de "Tamaños y pesos recomendados".
         large: 'font-heading-semibold text-button',
         small: 'font-body-medium text-small',
         muted: 'font-body text-small text-muted-foreground',

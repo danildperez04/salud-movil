@@ -55,7 +55,6 @@ export default function RootLayout() {
   useQueryAppStateSync();
   useAuthBootstrap();
 
-  // No renderizar nada hasta que las fuentes estén listas
   if (!fontsLoaded && !fontError) {
     return null;
   }

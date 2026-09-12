@@ -3,8 +3,8 @@ import { Tabs } from 'expo-router';
 import { Calendar, Home, MoreHorizontal, Pill } from 'lucide-react-native';
 import { TAB_LABELS } from '@/constants/labels';
 
-const ACTIVE_COLOR = '#2DB79A'; // --color-primary
-const INACTIVE_COLOR = '#6B7280'; // --color-muted-foreground
+const ACTIVE_COLOR = '#2DB79A';
+const INACTIVE_COLOR = '#6B7280';
 
 export default function TabsLayout() {
   return (

@@ -159,8 +159,6 @@ export default function LoginScreen() {
 
             {errorMessage && <Text className="text-small text-destructive">{errorMessage}</Text>}
 
-            {/* Sin overrides de color/forma acá — el Button ya trae el
-                estilo correcto (blanco, negrita, píldora, glow) por default */}
             <Button
               size="lg"
               onPress={handleSubmit(onSubmit)}
