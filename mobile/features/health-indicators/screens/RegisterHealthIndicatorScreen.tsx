@@ -69,11 +69,6 @@ export default function RegisterHealthIndicatorScreen() {
     if (!type) return;
     registerIndicator.mutate({ typeName: type.name, value: values.value, dateHour });
   };
-
-  // En Android, mode="datetime" NO existe en el picker nativo (solo admite
-  // 'date' | 'time' | 'countdown' por separado) — usarlo crashea con
-  // "Cannot read property 'dismiss' of undefined". Por eso acá se encadenan
-  // dos diálogos nativos: primero fecha, después hora.
   const openAndroidPicker = () => {
     DateTimePickerAndroid.open({
       value: dateHour,
@@ -108,7 +103,7 @@ export default function RegisterHealthIndicatorScreen() {
 
   return (
     <View className="bg-background flex-1">
-      <ScreenHeader title="Registrar indicador" />
+      <ScreenHeader title="Registrar indicador" size="large" />
 
       <ScrollView contentContainerClassName="gap-4 p-6">
         <View className="gap-2">

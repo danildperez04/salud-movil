@@ -31,7 +31,7 @@ export default function MedicationsScreen() {
 
   return (
     <View className="bg-background flex-1">
-      <ScreenHeader title={SCREEN_TITLES.medications} />
+      <ScreenHeader title={SCREEN_TITLES.medications} size="large" />
 
       <Tabs
         value={tab}

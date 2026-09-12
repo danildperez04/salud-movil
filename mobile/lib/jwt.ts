@@ -1,12 +1,4 @@
 // lib/jwt.ts
-//
-// Decodifica el payload de un JWT para leer su `exp` y avisarle al usuario
-// ANTES de que una request falle con 401. Esto NO es una verificación de
-// seguridad — la única validación real del token la hace el backend
-// (JwtAuthGuard) en cada request. Un cliente que mienta sobre `exp` no gana
-// nada, porque el servidor igual lo va a rechazar si está vencido o es inválido.
-//
-// No usa atob/Buffer (no siempre disponibles en Hermes) — decodifica base64 a mano.
 const BASE64_CHARS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/';
 
 function base64Decode(input: string): string {
@@ -44,6 +36,6 @@ export function decodeJwt(token: string): JwtPayload | null {
 
 export function isJwtExpired(token: string): boolean {
   const payload = decodeJwt(token);
-  if (!payload?.exp) return false; // sin campo exp legible, no afirmamos que expiró
+  if (!payload?.exp) return false;
   return Date.now() >= payload.exp * 1000;
 }

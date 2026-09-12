@@ -23,8 +23,6 @@ export function useLogin() {
     mutationFn: async (dto) => {
       const data = await apiClient.post<AuthResponse>('/auth/login', dto, { auth: false });
       if (!ALLOWED_MOBILE_ROLES.includes(data.user.role)) {
-        // Credenciales válidas, pero esta cuenta no debería tener sesión
-        // móvil — no llamamos setSession, no se guarda nada.
         throw new RoleNotAllowedError();
       }
       return data;

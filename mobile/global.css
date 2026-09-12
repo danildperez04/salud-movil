@@ -1,14 +1,14 @@
-@import "tailwindcss";
-@import "uniwind";
+@import 'tailwindcss';
+@import 'uniwind';
 
 @theme {
   /* Tipografía */
-  --font-heading: "Poppins_700Bold";
-  --font-heading-semibold: "Poppins_600SemiBold";
-  --font-heading-medium: "Poppins_500Medium";
-  --font-body: "Inter_400Regular";
-  --font-body-medium: "Inter_500Medium";
-  --font-body-semibold: "Inter_600SemiBold";
+  --font-heading: 'Poppins_700Bold';
+  --font-heading-semibold: 'Poppins_600SemiBold';
+  --font-heading-medium: 'Poppins_500Medium';
+  --font-body: 'Inter_400Regular';
+  --font-body-medium: 'Inter_500Medium';
+  --font-body-semibold: 'Inter_600SemiBold';
 
   /* Tamaños de fuente + line-height pareado (jerarquía tipográfica de marca) */
   --text-h1: 48px;
@@ -43,7 +43,9 @@
   --color-secondary-steel: #2d7f8e;
   --color-neutral-carbon: #1a2129;
   --color-neutral-medium: #6b7280;
-  --color-neutral-light: #e5e7eb;
+  /* FIX: el manual de marca define "Gris Claro #D9D9D9" explícitamente para
+     BORDERS. e5e7eb no es un color de marca, es el gris default de shadcn. */
+  --color-neutral-light: #d9d9d9;
   --color-neutral-white: #ffffff;
 }
 
@@ -61,22 +63,21 @@
       --color-popover-foreground: #1a2129;
 
       --color-primary: #2db79a;
-      --color-primary-foreground: #0e2a3a;
+      --color-primary-foreground: #ffffff;
 
       --color-secondary: #135e6d;
       --color-secondary-foreground: #ffffff;
 
-      --color-muted: #e5e7eb;
+      --color-muted: #d9d9d9;
       --color-muted-foreground: #6b7280;
 
       --color-accent: #77d1b5;
       --color-accent-foreground: #0e2a3a;
 
-      --color-destructive: #dc2626;
-      --color-destructive-foreground: #ffffff;
-
-      --color-border: #e5e7eb;
-      --color-input: #e5e7eb;
+      --color-destructive: #fecdcf;
+      --color-destructive-foreground: #ef4444;
+      --color-border: #d9d9d9;
+      --color-input: #d9d9d9;
       --color-ring: #2db79a;
     }
 
@@ -91,13 +92,13 @@
       --color-popover-foreground: #ffffff;
 
       --color-primary: #2db79a;
-      --color-primary-foreground: #0e2a3a;
+      --color-primary-foreground: #ffffff;
 
       --color-secondary: #77d1b5;
       --color-secondary-foreground: #0e2a3a;
 
       --color-muted: #135e6d;
-      --color-muted-foreground: #e5e7eb;
+      --color-muted-foreground: #d9d9d9;
 
       --color-accent: #2d7f8e;
       --color-accent-foreground: #ffffff;

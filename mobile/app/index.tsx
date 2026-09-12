@@ -8,7 +8,7 @@ export default function RootIndex() {
   const hasSeenOnboarding = useAppStore((state) => state.hasSeenOnboarding);
 
   // Mientras Zustand no terminó de leer MMKV, no decidimos nada todavía.
-  // El splash nativo sigue visible en este instante (ver SplashScreenController).
+  // El splash nativo sigue visible en este instante
   if (!hasHydrated) return null;
 
   if (isAuthenticated) return <Redirect href="/(app)" />;

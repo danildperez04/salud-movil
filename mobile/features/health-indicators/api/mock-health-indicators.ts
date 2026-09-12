@@ -1,10 +1,3 @@
-// features/health-indicators/api/mock-health-indicators.ts
-//
-// Mock temporal mientras POST/GET /health-indicators no existan en el backend
-// (README: "entidad definida, sin controlador/servicio"). Mantiene la misma
-// forma de datos que se espera del endpoint real — cuando exista, el cambio
-// es reemplazar estas dos funciones por llamadas a apiClient, sin tocar
-// componentes ni pantallas.
 import type { IndicatorStatus } from '../components/HealthIndicatorCard';
 
 export type HealthIndicatorRecord = {
@@ -37,7 +30,7 @@ let mockIndicators: HealthIndicatorRecord[] = [
     typeName: 'Glucose',
     value: '110',
     unit: 'mg/dl',
-    status: 'normal',
+    status: 'high',
     dateHour: new Date().toISOString(),
   },
   {
@@ -45,7 +38,7 @@ let mockIndicators: HealthIndicatorRecord[] = [
     typeName: 'Weight',
     value: '72.5',
     unit: 'kg',
-    status: 'normal',
+    status: 'low',
     dateHour: new Date().toISOString(),
   },
   {

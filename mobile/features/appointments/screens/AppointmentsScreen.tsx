@@ -24,7 +24,7 @@ export default function AppointmentsScreen() {
 
   return (
     <View className="bg-background flex-1">
-      <ScreenHeader title={SCREEN_TITLES.appointments} />
+      <ScreenHeader title={SCREEN_TITLES.appointments} size="large" />
 
       <Tabs
         value={tab}
@@ -61,8 +61,6 @@ export default function AppointmentsScreen() {
               ))
             )}
 
-            {/* TODO: crear pantalla /(app)/appointments/new con el Stepper
-                que ya armamos (Especialidad → Profesional → Fecha → Confirmar) */}
             <Button className="mt-2" onPress={() => router.push('/(app)/appointments/new')}>
               <Text>{APPOINTMENTS_LABELS.bookButton}</Text>
             </Button>

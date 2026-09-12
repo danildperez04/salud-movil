@@ -18,24 +18,21 @@ export default function HomeScreen() {
     .replace(/^\w/, (c) => c.toUpperCase());
 
   return (
-    <ScrollView className="bg-background flex-1" contentContainerClassName="gap-4 p-6">
-      <View className="flex-row items-start justify-between">
-        <View>
-          <Text className="text-h2 font-heading text-foreground">
+    <ScrollView className="bg-background flex-1" contentContainerClassName="gap-14 px-6 pt-4 pb-10">
+      <View className="mx-4 mt-8 flex-row items-start justify-between">
+        <View className="h-11 flex-1 gap-0.5">
+          <Text className="text-h3 font-heading">
             {HOME_LABELS.greetingPrefix} {firstName} 👋
           </Text>
-          <Text className="text-small font-body text-primary">{today}</Text>
+          <Text className="text-small text-secondary">{today}</Text>
         </View>
         {/* TODO: conectar a notificaciones reales cuando exista ese módulo */}
-        <Pressable className="border-border h-10 w-10 items-center justify-center rounded-full border">
+        <Pressable className="border-border h-11 w-11 items-center justify-center rounded-full border">
           <Bell size={18} color="#2DB79A" />
         </Pressable>
       </View>
-
-      {/* TODO: reemplazar 75% hardcodeado por cálculo real cuando el backend
-          exponga una métrica de adherencia/estado del paciente */}
-      <View className="bg-muted/40 flex-row items-center justify-between rounded-2xl p-4">
-        <View className="flex-1 gap-1 pr-4">
+      <View className="bg-card flex-row items-center justify-between rounded-3xl p-5 shadow-lg shadow-black/5">
+        <View className="flex-1 gap-1.5 pr-5">
           <Text className="text-small font-body text-muted-foreground">
             {HOME_LABELS.statusTitle}
           </Text>
@@ -49,33 +46,35 @@ export default function HomeScreen() {
         </CircularProgress>
       </View>
 
-      <View className="flex-row gap-3">
-        <QuickActionCard
-          icon={Calendar}
-          title={HOME_LABELS.quickActions.appointments.title}
-          subtitle={HOME_LABELS.quickActions.appointments.subtitle}
-          onPress={() => router.push('/(app)/(tabs)/appointments')}
-        />
-        <QuickActionCard
-          icon={Pill}
-          title={HOME_LABELS.quickActions.medications.title}
-          subtitle={HOME_LABELS.quickActions.medications.subtitle}
-          onPress={() => router.push('/(app)/(tabs)/medications')}
-        />
-      </View>
-      <View className="flex-row gap-3">
-        <QuickActionCard
-          icon={LineChart}
-          title={HOME_LABELS.quickActions.indicators.title}
-          subtitle={HOME_LABELS.quickActions.indicators.subtitle}
-          onPress={() => router.push('/(app)/health-indicators')}
-        />
-        <QuickActionCard
-          icon={FileText}
-          title={HOME_LABELS.quickActions.medicalRecord.title}
-          subtitle={HOME_LABELS.quickActions.medicalRecord.subtitle}
-          onPress={() => router.push('/(app)/medical-record')}
-        />
+      <View className="gap-4">
+        <View className="flex-row gap-4">
+          <QuickActionCard
+            icon={Calendar}
+            title={HOME_LABELS.quickActions.appointments.title}
+            subtitle={HOME_LABELS.quickActions.appointments.subtitle}
+            onPress={() => router.push('/(app)/(tabs)/appointments')}
+          />
+          <QuickActionCard
+            icon={Pill}
+            title={HOME_LABELS.quickActions.medications.title}
+            subtitle={HOME_LABELS.quickActions.medications.subtitle}
+            onPress={() => router.push('/(app)/(tabs)/medications')}
+          />
+        </View>
+        <View className="flex-row gap-4">
+          <QuickActionCard
+            icon={LineChart}
+            title={HOME_LABELS.quickActions.indicators.title}
+            subtitle={HOME_LABELS.quickActions.indicators.subtitle}
+            onPress={() => router.push('/(app)/health-indicators')}
+          />
+          <QuickActionCard
+            icon={FileText}
+            title={HOME_LABELS.quickActions.medicalRecord.title}
+            subtitle={HOME_LABELS.quickActions.medicalRecord.subtitle}
+            onPress={() => router.push('/(app)/medical-record')}
+          />
+        </View>
       </View>
 
       {/* TODO: reemplazar por el indicador más reciente real cuando

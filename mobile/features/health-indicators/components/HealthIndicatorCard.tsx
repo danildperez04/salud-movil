@@ -16,7 +16,6 @@ const INDICATOR_ICONS: Record<string, LucideIcon> = {
 export type IndicatorStatus = keyof typeof INDICATOR_STATUS_LABELS;
 
 type HealthIndicatorCardProps = {
-  /** nombre del catálogo (cat_type_indicator.name), en minúscula o no — se normaliza */
   typeName: string;
   value: string | number;
   unit: string;

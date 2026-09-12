@@ -78,8 +78,9 @@ export const SCREEN_TITLES = {
 // (no se compartió esa pantalla todavía), esto es placeholder.
 export const ONBOARDING_LABELS = {
   brand: 'Salud Móvil',
-  description: 'Seguimiento de pacientes, indicadores de salud y recordatorios de medicamentos',
+  description: 'La forma mas fácil de cuidar tu salud y la de los que amas.',
   cta: 'Comenzar',
+  welcomePrefix: 'Bienvenido a',
 } as const;
 
 // Texto exacto del Figma (pantalla "Inicio de Sesión")

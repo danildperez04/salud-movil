@@ -1,15 +1,15 @@
 // features/auth/screens/LoginScreen.tsx
 import { zodResolver } from '@hookform/resolvers/zod';
 import { router } from 'expo-router';
-import { Activity } from 'lucide-react-native';
 import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
-import { KeyboardAvoidingView, Platform, Pressable, View } from 'react-native';
+import { Image, KeyboardAvoidingView, Platform, Pressable, View } from 'react-native';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
 import { Spinner } from '@/components/ui/spinner';
 import { Text } from '@/components/ui/text';
 import { LOGIN_LABELS } from '@/constants/labels';
@@ -38,9 +38,6 @@ export default function LoginScreen() {
     defaultValues: { email: '', password: '' },
   });
 
-  // El aviso ("tu sesión expiró", "esta cuenta no tiene acceso") se muestra
-  // una sola vez, al llegar a esta pantalla — no queremos que persista
-  // después de que el usuario ya lo vio e intenta loguearse de nuevo.
   useEffect(() => {
     return () => clearAuthNotice();
   }, [clearAuthNotice]);
@@ -56,11 +53,9 @@ export default function LoginScreen() {
   const errorMessage = (() => {
     if (!login.error) return null;
     if (login.error instanceof ApiError) {
-      return login.error.status === 401
-        ? LOGIN_LABELS.invalidCredentials
-        : 'No se pudo conectar. Revisá tu conexión e intentá de nuevo';
+      return login.error.status === 401 ? LOGIN_LABELS.invalidCredentials : login.error.message;
     }
-    return login.error.message; // RoleNotAllowedError
+    return login.error.message;
   })();
 
   return (
@@ -68,36 +63,44 @@ export default function LoginScreen() {
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       className="bg-background flex-1"
     >
-      <View className="flex-1 items-center justify-center gap-6 px-6">
-        <View className="items-center gap-2">
-          <View className="flex-row items-center gap-2">
-            <Activity size={24} color="#2DB79A" />
-            <Text className="text-h2 font-heading text-foreground">
-              Salud <Text className="text-h2 font-heading text-primary">Móvil</Text>
-            </Text>
+      <View className="flex-1 items-center justify-center px-6">
+        <View className="w-full max-w-sm items-center gap-3">
+          <Image
+            source={require('@/assets/logo-mark.png')}
+            className="h-44 w-52"
+            resizeMode="contain"
+            accessibilityLabel="Salud Móvil"
+          />
+          <Text className="font-body-semibold text-secondary-steel">{LOGIN_LABELS.tagline}</Text>
+
+          <View className="mt-2 w-full flex-row items-center gap-3">
+            <Separator className="flex-1" />
+            <View className="bg-primary h-2 w-2 rounded-full" />
+            <Separator className="flex-1" />
           </View>
-          <Text className="text-small font-body text-primary">{LOGIN_LABELS.tagline}</Text>
         </View>
 
         {authNotice && (
-          <View className="bg-destructive/10 w-full max-w-sm rounded-lg p-3">
+          <View className="bg-destructive/10 w-full max-w-sm rounded-xl p-4">
             <Text className="text-small text-destructive">{authNotice}</Text>
           </View>
         )}
 
-        <Card className="w-full max-w-sm">
-          <CardHeader>
-            <CardTitle className="text-h2 font-heading text-foreground">
+        <Card className="w-full max-w-sm rounded-3xl border-0 shadow-lg shadow-black/5">
+          <CardHeader className="gap-1 px-6 pt-6 pb-2">
+            <CardTitle className="text-h3 font-heading text-foreground">
               {LOGIN_LABELS.title}
             </CardTitle>
-            <CardDescription className="text-body font-body text-muted-foreground">
+            <CardDescription className="text-body font-body text-primary">
               {LOGIN_LABELS.subtitle}
             </CardDescription>
           </CardHeader>
 
-          <CardContent className="gap-4">
+          <CardContent className="gap-5 px-6 pb-6">
             <View className="gap-2">
-              <Label nativeID="email">{LOGIN_LABELS.emailLabel}</Label>
+              <Label nativeID="email" className="text-body font-heading-medium text-foreground">
+                {LOGIN_LABELS.emailLabel}
+              </Label>
               <Controller
                 control={control}
                 name="email"
@@ -122,7 +125,9 @@ export default function LoginScreen() {
             </View>
 
             <View className="gap-2">
-              <Label nativeID="password">{LOGIN_LABELS.passwordLabel}</Label>
+              <Label nativeID="password" className="text-body font-heading-medium text-foreground">
+                {LOGIN_LABELS.passwordLabel}
+              </Label>
               <Controller
                 control={control}
                 name="password"
@@ -154,11 +159,18 @@ export default function LoginScreen() {
 
             {errorMessage && <Text className="text-small text-destructive">{errorMessage}</Text>}
 
-            <Button onPress={handleSubmit(onSubmit)} disabled={login.isPending} className="mt-2">
+            {/* Sin overrides de color/forma acá — el Button ya trae el
+                estilo correcto (blanco, negrita, píldora, glow) por default */}
+            <Button
+              size="lg"
+              onPress={handleSubmit(onSubmit)}
+              disabled={login.isPending}
+              className="mt-2 h-14"
+            >
               {login.isPending ? (
-                <Spinner size="sm" color="#0E2A3A" />
+                <Spinner size="sm" color="#FFFFFF" />
               ) : (
-                <Text>{LOGIN_LABELS.submit}</Text>
+                <Text className="text-primary-foreground">{LOGIN_LABELS.submit}</Text>
               )}
             </Button>
           </CardContent>

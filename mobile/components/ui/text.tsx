@@ -4,9 +4,15 @@ import { cva, type VariantProps } from 'class-variance-authority';
 import * as React from 'react';
 import { Platform, Text as RNText, type Role } from 'react-native';
 
+// FIX: antes este componente usaba tamaños/pesos genéricos de shadcn
+// (text-4xl font-extrabold, text-2xl font-semibold, border-b, text-center,
+// etc.) que no existen en el sistema tipográfico de la marca. Ahora usa los
+// tokens definidos en global.css (--text-h1/h2/h3/body/small) junto con las
+// familias de marca (Poppins para headings, Inter para body), que es lo que
+// realmente reproduce la jerarquía del Manual de Identidad.
 const textVariants = cva(
   cn(
-    'text-foreground text-base',
+    'text-foreground font-body text-body',
     Platform.select({
       web: 'select-text',
     }),
@@ -15,25 +21,22 @@ const textVariants = cva(
     variants: {
       variant: {
         default: '',
-        h1: cn(
-          'text-center text-4xl font-extrabold tracking-tight',
-          Platform.select({ web: 'scroll-m-20 text-balance' }),
-        ),
-        h2: cn(
-          'border-border border-b pb-2 text-3xl font-semibold tracking-tight',
-          Platform.select({ web: 'scroll-m-20 first:mt-0' }),
-        ),
-        h3: cn('text-2xl font-semibold tracking-tight', Platform.select({ web: 'scroll-m-20' })),
-        h4: cn('text-xl font-semibold tracking-tight', Platform.select({ web: 'scroll-m-20' })),
-        p: 'mt-3 leading-7 sm:mt-6',
-        blockquote: 'mt-4 border-l-2 pl-3 italic sm:mt-6 sm:pl-6',
+        h1: 'font-heading text-h1',
+        h2: 'font-heading-semibold text-h2',
+        h3: 'font-heading-medium text-h3',
+        h4: 'font-heading-medium text-body',
+        p: 'font-body text-body mt-3 sm:mt-6',
+        blockquote: 'font-body text-body mt-4 border-l-2 pl-3 italic sm:mt-6 sm:pl-6',
         code: cn(
-          'bg-muted relative rounded px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold',
+          'bg-muted relative rounded px-[0.3rem] py-[0.2rem] font-mono text-small font-semibold',
         ),
-        lead: 'text-muted-foreground text-xl',
-        large: 'text-lg font-semibold',
-        small: 'text-sm font-medium leading-none',
-        muted: 'text-muted-foreground text-sm',
+        lead: 'font-body text-body text-muted-foreground',
+        // "large" se usa para CTAs / botones grandes: Poppins SemiBold 16px
+        // según la tabla de "Tamaños y pesos recomendados".
+        large: 'font-heading-semibold text-button',
+        small: 'font-body-medium text-small',
+        muted: 'font-body text-small text-muted-foreground',
+        caption: 'font-body text-caption text-muted-foreground',
       },
     },
     defaultVariants: {

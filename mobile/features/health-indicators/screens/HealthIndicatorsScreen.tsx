@@ -14,9 +14,6 @@ import { HealthIndicatorCard } from '../components/HealthIndicatorCard';
 
 export default function HealthIndicatorsScreen() {
   const [tab, setTab] = useState<'summary' | 'history'>('summary');
-
-  // TODO: reemplazar fetchMockHealthIndicators por apiClient.get('/health-indicators')
-  // cuando el backend exponga el endpoint. El resto de la pantalla no cambia.
   const { data: indicators, isLoading } = useQuery({
     queryKey: ['health-indicators'],
     queryFn: fetchMockHealthIndicators,
@@ -24,29 +21,29 @@ export default function HealthIndicatorsScreen() {
 
   return (
     <View className="bg-background flex-1">
-      <ScreenHeader title={SCREEN_TITLES.healthIndicators} />
+      <ScreenHeader title={SCREEN_TITLES.healthIndicators} size="large" />
 
       <Tabs
         value={tab}
         onValueChange={(value) => setTab(value as 'summary' | 'history')}
         className="flex-1"
       >
-        <TabsList className="mx-6">
-          <TabsTrigger value="summary" className="flex-1">
+        <TabsList className="px-6">
+          <TabsTrigger value="summary">
             <Text>{SUMMARY_TABS_LABELS.summary}</Text>
           </TabsTrigger>
-          <TabsTrigger value="history" className="flex-1">
+          <TabsTrigger value="history">
             <Text>{SUMMARY_TABS_LABELS.history}</Text>
           </TabsTrigger>
         </TabsList>
 
         <TabsContent value="summary" className="flex-1">
-          <ScrollView contentContainerClassName="gap-3 p-6">
+          <ScrollView contentContainerClassName="gap-5 px-6 pt-6 pb-10">
             {isLoading ? (
-              <View className="gap-3">
-                <Skeleton className="h-16 w-full rounded-2xl" />
-                <Skeleton className="h-16 w-full rounded-2xl" />
-                <Skeleton className="h-16 w-full rounded-2xl" />
+              <View className="gap-5">
+                <Skeleton className="h-24 w-full rounded-3xl" />
+                <Skeleton className="h-24 w-full rounded-3xl" />
+                <Skeleton className="h-24 w-full rounded-3xl" />
               </View>
             ) : (
               indicators?.map((indicator) => (
@@ -59,8 +56,14 @@ export default function HealthIndicatorsScreen() {
                 />
               ))
             )}
-            <Button className="mt-2" onPress={() => router.push('/(app)/health-indicators/new')}>
-              <Text>{HEALTH_INDICATORS_LABELS.registerButton}</Text>
+            <Button
+              size="lg"
+              className="mt-2 h-14"
+              onPress={() => router.push('/(app)/health-indicators/new')}
+            >
+              <Text className="text-body text-primary-foreground">
+                {HEALTH_INDICATORS_LABELS.registerButton}
+              </Text>
             </Button>
           </ScrollView>
         </TabsContent>

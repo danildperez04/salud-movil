@@ -38,12 +38,6 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
     body: body !== undefined ? JSON.stringify(body) : undefined,
   });
 
-  // Token vencido/inválido en un endpoint protegido. Este es el "fallback
-  // reactivo" — la detección proactiva vive en useAuthBootstrap (chequea
-  // exp del JWT sin necesidad de esperar a que el servidor lo rechace).
-  // Ambos caminos existen porque el reloj del dispositivo puede estar
-  // desincronizado del servidor, o el token pudo invalidarse del lado
-  // del backend antes de su exp original.
   if (response.status === 401 && auth) {
     useAppStore.getState().logout();
   }
@@ -57,9 +51,7 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
         ? errorBody.message.join(', ')
         : (errorBody?.message ?? message);
       details = errorBody;
-    } catch {
-      // el body no era JSON parseable, nos quedamos con el mensaje genérico
-    }
+    } catch {}
     throw new ApiError(response.status, message, details);
   }
 
