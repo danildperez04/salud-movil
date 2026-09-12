@@ -28,7 +28,11 @@ function Label({
     >
       <LabelPrimitive.Text
         className={cn(
-          'text-foreground text-sm font-medium',
+          // FIX: "text-sm font-medium" era el default de shadcn (sistema
+          // sans genérico). Se reemplaza por la tipografía de marca: Inter
+          // (font-body-medium) en el tamaño "small" de la escala de marca,
+          // que es el usado para labels/captions en el Figma.
+          'text-foreground font-body-medium text-small',
           Platform.select({ web: 'leading-none' }),
           className,
         )}

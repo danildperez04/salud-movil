@@ -15,11 +15,11 @@ const buttonVariants = cva(
     variants: {
       variant: {
         default: cn(
-          'bg-primary active:bg-primary/90 shadow-sm shadow-black/5',
+          'bg-primary active:bg-primary/90 shadow-lg shadow-primary/30',
           Platform.select({ web: 'hover:bg-primary/90' }),
         ),
         destructive: cn(
-          'bg-destructive active:bg-destructive/90 dark:bg-destructive/60 shadow-sm shadow-black/5',
+          'bg-destructive active:bg-destructive/90 dark:bg-destructive/60 shadow-lg shadow-destructive/30',
           Platform.select({
             web: 'hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40',
           }),
@@ -31,7 +31,7 @@ const buttonVariants = cva(
           }),
         ),
         secondary: cn(
-          'bg-secondary active:bg-secondary/80 shadow-sm shadow-black/5',
+          'bg-secondary active:bg-secondary/80 shadow-lg shadow-secondary/30',
           Platform.select({ web: 'hover:bg-secondary/80' }),
         ),
         ghost: cn(
@@ -46,8 +46,8 @@ const buttonVariants = cva(
           Platform.select({ web: 'has-[>svg]:px-3' }),
         ),
         sm: cn('h-9 gap-1.5 rounded-lg px-3 sm:h-8', Platform.select({ web: 'has-[>svg]:px-2.5' })),
-        lg: cn('h-11 rounded-lg px-6 sm:h-10', Platform.select({ web: 'has-[>svg]:px-4' })),
-        icon: 'h-10 w-10 sm:h-9 sm:w-9',
+        lg: cn('h-14 rounded-2xl', Platform.select({ web: 'has-[>svg]:px-4' })),
+        icon: 'h-10 w-10 rounded-lg sm:h-9 sm:w-9',
       },
     },
     defaultVariants: {
@@ -65,13 +65,13 @@ const buttonTextVariants = cva(
   {
     variants: {
       variant: {
-        default: 'text-primary-foreground',
-        destructive: 'text-white',
+        default: 'font-bold text-white',
+        destructive: 'font-bold text-white',
         outline: cn(
           'group-active:text-accent-foreground',
           Platform.select({ web: 'group-hover:text-accent-foreground' }),
         ),
-        secondary: 'text-secondary-foreground',
+        secondary: 'font-bold text-white',
         ghost: 'group-active:text-accent-foreground',
         link: cn(
           'text-primary group-active:underline',

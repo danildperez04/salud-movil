@@ -1,0 +1,22 @@
+appId: com.jarey17.mobile
+---
+- launchApp
+- extendedWaitUntil:
+    visible: 'Salud Móvil'
+    timeout: 40000
+- assertVisible: 'Inicio de Sesión'
+
+- tapOn:
+    id: 'email-input'
+- inputText: 'test@example.test'
+
+- tapOn:
+    id: 'password-input'
+- inputText: 'Test123$'
+
+- tapOn: 'Iniciar Sesión'
+
+# Debería aterrizar en Home
+- assertVisible: 'Hola,'
+- assertVisible: 'Citas'
+- assertVisible: 'Medicamentos'

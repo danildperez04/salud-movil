@@ -1,4 +1,3 @@
-// components/ui/circular-progress.tsx
 import * as React from 'react';
 import { View } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
@@ -20,7 +19,9 @@ function CircularProgress({
   size = 88,
   strokeWidth = 8,
   color = '#2DB79A', // --color-primary
-  trackColor = '#E5E7EB', // --color-muted
+  // FIX: e5e7eb no es un color de marca (era el gris genérico de shadcn).
+  // El manual define "Gris Claro #D9D9D9" para este tipo de elemento neutro.
+  trackColor = '#D9D9D9', // --color-neutral-light / --color-muted
   className,
   children,
 }: CircularProgressProps) {
