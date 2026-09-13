@@ -102,13 +102,13 @@ export default function CaregiversList() {
       render: (row) => (
         <div className='flex gap-2'>
           <Link
-            to={`/caregivers/${row.id}`}
+            to={`/app/caregivers/${row.id}`}
             className='text-sm font-medium text-slate-600 hover:underline'
           >
             Ver
           </Link>
           <Link
-            to={`/caregivers/${row.id}/edit`}
+            to={`/app/caregivers/${row.id}/edit`}
             className='text-sm font-medium text-primary hover:underline'
           >
             Editar
@@ -128,7 +128,7 @@ export default function CaregiversList() {
     <div className='flex flex-col gap-4'>
       <div className='flex items-center justify-between gap-4'>
         <h1 className='text-2xl font-bold text-slate-900'>Cuidadores</h1>
-        <Button onClick={() => navigate('/caregivers/new')}>
+        <Button onClick={() => navigate('/app/caregivers/new')}>
           Nuevo cuidador
         </Button>
       </div>

@@ -5,6 +5,7 @@ import { useCatalogueStore } from './store/catalogues';
 import { RedirectIfAuthed, RequireAuth, RequireRole } from './auth/guards';
 import AuthLayout from './layouts/AuthLayout';
 import AppLayout from './layouts/AppLayout';
+import LandingPage from './landing/LandingPage';
 import Login from './pages/Login';
 import Home from './pages/Home';
 import StaffList from './pages/staff/StaffList';
@@ -28,6 +29,7 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path='/' element={<LandingPage />} />
         <Route element={<AuthLayout />}>
           <Route
             path='/login'
@@ -39,39 +41,40 @@ function App() {
           />
         </Route>
         <Route
+          path='/app'
           element={
             <RequireAuth>
               <AppLayout />
             </RequireAuth>
           }
         >
-          <Route path='/' element={<Home />} />
+          <Route index element={<Home />} />
           <Route
             element={<RequireRole roles={['admin']} children={<Outlet />} />}
           >
-            <Route path='/staff' element={<StaffList />} />
-            <Route path='/staff/new' element={<StaffForm />} />
-            <Route path='/staff/:id/edit' element={<StaffForm />} />
+            <Route path='staff' element={<StaffList />} />
+            <Route path='staff/new' element={<StaffForm />} />
+            <Route path='staff/:id/edit' element={<StaffForm />} />
           </Route>
           <Route
             element={
               <RequireRole roles={['admin', 'health_staff']} children={<Outlet />} />
             }
           >
-            <Route path='/caregivers' element={<CaregiversList />} />
-            <Route path='/caregivers/new' element={<CaregiverForm />} />
-            <Route path='/caregivers/:id' element={<CaregiverDetail />} />
-            <Route path='/caregivers/:id/edit' element={<CaregiverForm />} />
+            <Route path='caregivers' element={<CaregiversList />} />
+            <Route path='caregivers/new' element={<CaregiverForm />} />
+            <Route path='caregivers/:id' element={<CaregiverDetail />} />
+            <Route path='caregivers/:id/edit' element={<CaregiverForm />} />
           </Route>
           <Route
             element={
               <RequireRole roles={['admin', 'health_staff']} children={<Outlet />} />
             }
           >
-            <Route path='/patients' element={<PatientsList />} />
-            <Route path='/patients/new' element={<PatientForm />} />
-            <Route path='/patients/:id' element={<PatientDetail />} />
-            <Route path='/patients/:id/edit' element={<PatientForm />} />
+            <Route path='patients' element={<PatientsList />} />
+            <Route path='patients/new' element={<PatientForm />} />
+            <Route path='patients/:id' element={<PatientDetail />} />
+            <Route path='patients/:id/edit' element={<PatientForm />} />
           </Route>
         </Route>
         <Route path='*' element={<Navigate to='/' replace />} />

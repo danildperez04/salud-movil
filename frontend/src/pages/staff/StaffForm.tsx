@@ -154,7 +154,7 @@ export default function StaffForm() {
           healthCenterId: form.healthCenterId,
         });
       }
-      navigate('/staff', { replace: true });
+      navigate('/app/staff', { replace: true });
     } catch (err) {
       setError(
         err instanceof ApiError ? err.message : 'No se pudo guardar el personal',

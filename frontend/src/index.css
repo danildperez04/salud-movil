@@ -1,9 +1,35 @@
 @import 'tailwindcss';
 
 @theme {
-  --color-primary: #0f766e;
-  --color-primary-dark: #115e59;
-  --color-primary-light: #99f6e4;
+  /* Panel de gestión — color primario alineado a la identidad (mint) */
+  --color-primary: #35bfa6;
+  --color-primary-dark: #229a86;
+  --color-primary-light: #eaf8f4;
+
+  /* Marca — identidad visual real (fuente: index(3) (1).html) */
+  --color-navy: #173447;
+  --color-navy-2: #274b5f;
+  --color-mint: #35bfa6;
+  --color-mint-dark: #229a86;
+  --color-mint-light: #7de0c9;
+  --color-mint-soft: #eaf8f4;
+  --color-mint-soft-2: #f4fbf9;
+  --color-text: #1b3342;
+  --color-muted: #81919a;
+  --color-line: #e3eaed;
+  --color-surface: #f2f6f7;
+
+  /* Tipografía de marca */
+  --font-display: 'Poppins', ui-sans-serif, system-ui, sans-serif;
+  --font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
+
+  /* Sombras de la landing */
+  --shadow-soft: 0 16px 50px rgba(23, 52, 71, 0.1);
+  --shadow-strong: 0 28px 80px rgba(23, 52, 71, 0.18);
+
+  /* Breakpoints exactos de la landing (980px / 680px) */
+  --breakpoint-landing-md: 980px;
+  --breakpoint-landing-sm: 680px;
 }
 
 #root {
@@ -13,8 +39,86 @@
   padding: 0;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 @layer base {
   body {
     @apply bg-slate-50 text-slate-900 antialiased;
+  }
+}
+
+/* ------------------------------------------------------------------------
+   Landing — estilos base y CSS residual (keyframes / decoración pseudo-elemento)
+   Todo lo demás usa utilities de Tailwind. Estados scoped a .landing para
+   no filtrar tipografía ni estilos al panel de gestión.
+------------------------------------------------------------------------- */
+
+.container-x {
+  width: min(100% - 28px, 1180px);
+  margin-inline: auto;
+}
+
+@media (min-width: 680px) {
+  .container-x {
+    width: min(1180px, calc(100% - 40px));
+  }
+}
+
+.landing {
+  font-family: var(--font-body);
+  color: #1b3342;
+  background: #fff;
+  overflow-x: clip;
+}
+
+.landing h1,
+.landing h2,
+.landing h3 {
+  font-family: var(--font-display);
+}
+
+.landing .reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: 0.65s ease;
+}
+
+.landing .reveal.visible {
+  opacity: 1;
+  transform: none;
+}
+
+.steps-connector {
+  position: relative;
+}
+
+.steps-connector::after {
+  content: '';
+  position: absolute;
+  right: -22px;
+  top: 58px;
+  width: 22px;
+  border-top: 1px dashed rgba(53, 191, 166, 0.5);
+}
+
+.steps-connector:last-child::after {
+  display: none;
+}
+
+@media (max-width: 980px) {
+  .steps-connector::after {
+    display: none;
+  }
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
   }
 }

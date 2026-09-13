@@ -58,7 +58,7 @@ export default function CaregiverDetail() {
       render: (row) => (
         <div>
           <Link
-            to={`/patients/${row.patientId}`}
+            to={`/app/patients/${row.patientId}`}
             className='font-medium text-primary hover:underline'
           >
             {row.patientName}
@@ -114,7 +114,7 @@ export default function CaregiverDetail() {
           <p className='text-sm text-slate-500'>{caregiver.email}</p>
         </div>
         <Link
-          to={`/caregivers/${caregiver.id}/edit`}
+          to={`/app/caregivers/${caregiver.id}/edit`}
           className='rounded-lg bg-primary px-4 py-2 text-sm font-medium text-white hover:bg-primary/90'
         >
           Editar
