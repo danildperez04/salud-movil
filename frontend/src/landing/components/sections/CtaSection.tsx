@@ -6,14 +6,14 @@ export function CtaSection() {
     <section className='relative overflow-hidden bg-navy py-[95px]'>
       <div
         aria-hidden='true'
-        className='absolute -right-[120px] -top-[170px] h-[480px] w-[480px] rounded-full bg-[rgba(53,191,166,0.13)]'
+        className='absolute -right-[120px] -top-[170px] h-[480px] w-[480px] rounded-full bg-mint/13'
       />
       <div
         aria-hidden='true'
         className='absolute -bottom-[130px] -left-[80px] h-[300px] w-[300px] rounded-full border border-dashed border-[rgba(255,255,255,0.16)]'
       />
       <FadeInOnScroll className='container-x relative z-[2] mx-auto max-w-[800px] text-center'>
-        <span className='inline-flex items-center gap-2 rounded-full bg-[rgba(53,191,166,0.13)] px-3 py-2 text-xs font-[850] tracking-[0.02em] text-[#78d9c3]'>
+        <span className='inline-flex items-center gap-2 rounded-full bg-mint/13 px-3 py-2 text-xs font-[850] tracking-[0.02em] text-mint-light'>
           <span className='h-[7px] w-[7px] rounded-full bg-mint' />
           Salud Móvil
         </span>

@@ -27,7 +27,7 @@ export function AboutTeamSection() {
             e inclusiva.
           </p>
 
-          <span className='mt-2 inline-flex items-center rounded-full border border-[#d8eee8] bg-mint-soft-2 px-[13px] py-[9px] text-xs font-black tracking-[0.03em] text-mint-dark'>
+          <span className='mt-2 inline-flex items-center rounded-full border border-mint-line bg-mint-soft-2 px-[13px] py-[9px] text-xs font-black tracking-[0.03em] text-mint-dark'>
             RUBBER DUCKIES
           </span>
 
@@ -35,7 +35,7 @@ export function AboutTeamSection() {
             {values.map((value) => (
               <div
                 key={value.title}
-                className='rounded-[18px] border border-[#d8eee8] bg-mint-soft-2 p-[18px]'
+                className='rounded-[18px] border border-mint-line bg-mint-soft-2 p-[18px]'
               >
                 <strong className='mb-[5px] block text-[13px] font-bold text-navy'>
                   {value.title}
@@ -54,7 +54,7 @@ export function AboutTeamSection() {
               key={member.name}
               className='rounded-[22px] border border-line bg-white p-[22px] shadow-soft'
             >
-              <div className='mb-4 grid aspect-[4/3] w-full place-items-center rounded-[18px] border-[1.5px] border-dashed border-[#bfe7dd] bg-[linear-gradient(145deg,#f4fbf9,#eaf8f4)] p-4 text-center text-[11px] font-[850] text-mint-dark'>
+              <div className='mb-4 grid aspect-[4/3] w-full place-items-center rounded-[18px] border-[1.5px] border-dashed border-mint-line-strong bg-[linear-gradient(145deg,var(--color-mint-soft-2),var(--color-mint-soft))] p-4 text-center text-[11px] font-[850] text-mint-dark'>
                 {member.photoLabel}
               </div>
               <span className='mb-3 inline-flex items-center rounded-full bg-mint-soft px-[10px] py-[7px] text-[10px] font-black uppercase tracking-[0.04em] text-mint-dark'>
@@ -72,8 +72,8 @@ export function AboutTeamSection() {
             </article>
           ))}
 
-          <article className='rounded-[22px] border border-line bg-[linear-gradient(145deg,#ffffff,#f4fbf9)] p-[22px] shadow-soft'>
-            <div className='mb-4 grid aspect-[4/3] w-full place-items-center rounded-[18px] border-[1.5px] border-dashed border-[#bfe7dd] bg-[linear-gradient(145deg,#eaf8f4,#f8fcfb)] p-4 text-center text-[11px] font-[850] text-mint-dark'>
+          <article className='rounded-[22px] border border-line bg-[linear-gradient(145deg,#ffffff,var(--color-mint-soft-2))] p-[22px] shadow-soft'>
+            <div className='mb-4 grid aspect-[4/3] w-full place-items-center rounded-[18px] border-[1.5px] border-dashed border-mint-line-strong bg-[linear-gradient(145deg,var(--color-mint-soft),#f8fcfb)] p-4 text-center text-[11px] font-[850] text-mint-dark'>
               Espacio para foto grupal de Rubber Duckies
             </div>
             <span className='mb-3 inline-flex items-center rounded-full bg-mint-soft px-[10px] py-[7px] text-[10px] font-black uppercase tracking-[0.04em] text-mint-dark'>

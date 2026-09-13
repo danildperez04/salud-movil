@@ -14,7 +14,7 @@ export function ShowcaseSection() {
   return (
     <section id='descubre' className='bg-white py-[78px] landing-sm:py-[110px]'>
       <div className='container-x'>
-        <FadeInOnScroll className='overflow-hidden rounded-[25px] bg-[linear-gradient(145deg,#173447,#244c60)] p-[18px] shadow-strong landing-sm:rounded-[34px] landing-sm:p-7'>
+        <FadeInOnScroll className='overflow-hidden rounded-[25px] bg-[linear-gradient(145deg,var(--color-navy),var(--color-navy-2))] p-[18px] shadow-strong landing-sm:rounded-[34px] landing-sm:p-7'>
           <div className='mb-6 flex flex-col items-start justify-between gap-5 landing-md:flex-row landing-md:items-center'>
             <h2 className='m-0 text-[27px] tracking-[-1px] text-white landing-sm:text-[33px]'>
               Conoce Salud Móvil por dentro.
@@ -43,7 +43,7 @@ export function ShowcaseSection() {
 
           <div className='grid grid-cols-1 items-center gap-[26px] landing-md:min-h-[550px] landing-md:grid-cols-[0.9fr_1.1fr]'>
             <div className='p-[10px] landing-md:p-[34px]'>
-              <span className='text-[12px] font-black tracking-[0.1em] text-[#78d9c3]'>
+              <span className='text-[12px] font-black tracking-[0.1em] text-mint-light'>
                 {screen.num}
               </span>
               <h3 className='my-3 text-[34px] leading-[1.04] tracking-[-1.4px] text-white landing-sm:text-[42px]'>
@@ -58,7 +58,7 @@ export function ShowcaseSection() {
                     key={item}
                     className='flex items-start gap-[10px] text-[12px] text-[#dfe8ec]'
                   >
-                    <i className='grid h-[19px] w-[19px] flex-none place-items-center rounded-full bg-[rgba(53,191,166,0.18)] text-mint-light not-italic'>
+                    <i className='grid h-[19px] w-[19px] flex-none place-items-center rounded-full bg-mint/18 text-mint-light not-italic'>
                       ✓
                     </i>
                     {item}
