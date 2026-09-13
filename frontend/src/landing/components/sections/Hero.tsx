@@ -52,7 +52,7 @@ export function Hero() {
         </FadeInOnScroll>
 
         <FadeInOnScroll className='relative grid min-h-[520px] place-items-center landing-sm:min-h-[610px] landing-md:min-h-[650px]'>
-          <div className="relative h-[400px] w-[400px] rounded-full border border-dashed border-[rgba(53,191,166,0.28)] after:absolute after:inset-[55px] after:rounded-full after:border after:border-dashed after:border-[rgba(42,155,181,0.18)] after:content-[''] landing-sm:h-[520px] landing-sm:w-[520px]" />
+          <div className="absolute left-1/2 top-1/2 h-[400px] w-[400px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-dashed border-[rgba(53,191,166,0.28)] after:absolute after:inset-[55px] after:rounded-full after:border after:border-dashed after:border-[rgba(42,155,181,0.18)] after:content-[''] landing-sm:h-[520px] landing-sm:w-[520px]" />
           <div className="relative z-[4] w-[252px] rotate-[2.2deg] rounded-[45px] bg-navy p-[9px] shadow-[0_40px_90px_rgba(23,52,71,0.28)] before:absolute before:left-1/2 before:top-[7px] before:z-[3] before:h-[22px] before:w-[90px] before:-translate-x-1/2 before:rounded-b-[13px] before:bg-navy before:content-[''] landing-sm:w-[306px]">
             <img
               src='/assets/mockups/hero-main.webp'
