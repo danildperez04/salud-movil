@@ -26,7 +26,7 @@ export default function Home() {
       </Card>
       <div className='grid gap-4 sm:grid-cols-2'>
         {isAdmin ? (
-          <Link to='/staff'>
+          <Link to='/app/staff'>
             <Card className='transition hover:border-primary hover:shadow-md'>
               <h2 className='font-semibold text-slate-900'>Personal de salud</h2>
               <p className='mt-1 text-sm text-slate-600'>
@@ -35,7 +35,7 @@ export default function Home() {
             </Card>
           </Link>
         ) : null}
-        <Link to='/patients'>
+        <Link to='/app/patients'>
           <Card className='transition hover:border-primary hover:shadow-md'>
             <h2 className='font-semibold text-slate-900'>Pacientes</h2>
             <p className='mt-1 text-sm text-slate-600'>

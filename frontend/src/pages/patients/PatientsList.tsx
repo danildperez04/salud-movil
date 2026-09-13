@@ -125,13 +125,13 @@ export default function PatientsList() {
       render: (row) => (
         <div className='flex gap-2'>
           <Link
-            to={`/patients/${row.id}`}
+            to={`/app/patients/${row.id}`}
             className='text-sm font-medium text-primary hover:underline'
           >
             Ver
           </Link>
           <Link
-            to={`/patients/${row.id}/edit`}
+            to={`/app/patients/${row.id}/edit`}
             className='text-sm font-medium text-primary hover:underline'
           >
             Editar
@@ -153,7 +153,7 @@ export default function PatientsList() {
     <div className='flex flex-col gap-4'>
       <div className='flex items-center justify-between gap-4'>
         <h1 className='text-2xl font-bold text-slate-900'>Pacientes</h1>
-        <Button onClick={() => navigate('/patients/new')}>Nuevo paciente</Button>
+        <Button onClick={() => navigate('/app/patients/new')}>Nuevo paciente</Button>
       </div>
       <form onSubmit={handleSearch} className='flex gap-2'>
         <input

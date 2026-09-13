@@ -166,7 +166,7 @@ export default function PatientForm() {
             : undefined,
         });
       }
-      navigate('/patients', { replace: true });
+      navigate('/app/patients', { replace: true });
     } catch (err) {
       setError(
         err instanceof ApiError ? err.message : 'No se pudo guardar el paciente',

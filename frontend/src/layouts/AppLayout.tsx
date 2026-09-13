@@ -4,10 +4,10 @@ import { Badge } from '../components/ui/Badge';
 import { ROLE_LABELS } from '../lib/roles';
 
 const NAV_ITEMS: { to: string; label: string; roles: string[] }[] = [
-  { to: '/', label: 'Inicio', roles: ['admin', 'health_staff'] },
-  { to: '/staff', label: 'Personal de salud', roles: ['admin'] },
-  { to: '/caregivers', label: 'Cuidadores', roles: ['admin', 'health_staff'] },
-  { to: '/patients', label: 'Pacientes', roles: ['admin', 'health_staff'] },
+  { to: '/app', label: 'Inicio', roles: ['admin', 'health_staff'] },
+  { to: '/app/staff', label: 'Personal de salud', roles: ['admin'] },
+  { to: '/app/caregivers', label: 'Cuidadores', roles: ['admin', 'health_staff'] },
+  { to: '/app/patients', label: 'Pacientes', roles: ['admin', 'health_staff'] },
 ];
 
 export default function AppLayout() {
@@ -28,7 +28,7 @@ export default function AppLayout() {
             <NavLink
               key={item.to}
               to={item.to}
-              end={item.to === '/'}
+              end={item.to === '/app'}
               className={({ isActive }) =>
                 `rounded-lg px-3 py-2 text-sm font-medium transition ${
                   isActive
