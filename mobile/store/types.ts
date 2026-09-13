@@ -7,15 +7,18 @@ export type UISlice = {
   closeBottomSheet: () => void;
 };
 
+export type LogoutReason = 'user' | 'expired' | 'role_not_allowed';
+
 export type AuthSlice = {
   user: PublicUser | null;
-  accessToken: string | null;
+  accessToken: string | null; // NO persistido vía MMKV — ver lib/secure-token-storage.ts
   isAuthenticated: boolean;
-  // true recién después de que persist termina de leer MMKV al arrancar la app.
-  // Se usa para no redirigir a login/onboarding antes de saber qué hay guardado.
   hasHydrated: boolean;
+  authNotice: string | null;
   setSession: (session: AuthResponse) => void;
-  logout: () => void;
+  setAccessToken: (token: string | null) => void;
+  logout: (reason?: LogoutReason) => void;
+  clearAuthNotice: () => void;
   setHasHydrated: (value: boolean) => void;
 };
 

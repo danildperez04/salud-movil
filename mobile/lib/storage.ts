@@ -1,14 +1,10 @@
 // lib/storage.ts
 import { createMMKV } from 'react-native-mmkv';
 
-// Una sola instancia para toda la app. MMKV es sincrónico y muchísimo
-// más rápido que AsyncStorage (no usa un puente async por operación).
 export const storage = createMMKV({
   id: 'salud-movil-storage',
 });
 
-// Helpers tipados: evitan repetir JSON.parse/stringify y el manejo
-// de errores en cada lugar donde se usa storage.
 export const storageHelpers = {
   setItem: <T>(key: string, value: T): void => {
     try {

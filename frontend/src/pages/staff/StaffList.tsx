@@ -124,7 +124,7 @@ export default function StaffList() {
       render: (row) => (
         <div className='flex gap-2'>
           <Link
-            to={`/staff/${row.id}/edit`}
+            to={`/app/staff/${row.id}/edit`}
             className='text-sm font-medium text-primary hover:underline'
           >
             Editar
@@ -144,7 +144,7 @@ export default function StaffList() {
     <div className='flex flex-col gap-4'>
       <div className='flex items-center justify-between gap-4'>
         <h1 className='text-2xl font-bold text-slate-900'>Personal de salud</h1>
-        <Button onClick={() => navigate('/staff/new')}>Nuevo personal</Button>
+        <Button onClick={() => navigate('/app/staff/new')}>Nuevo personal</Button>
       </div>
       <input
         type='search'

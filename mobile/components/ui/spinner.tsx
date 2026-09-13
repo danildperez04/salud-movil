@@ -17,8 +17,6 @@ const spinnerVariants = cva('items-center justify-center', {
   },
 });
 
-// Mapeo aparte porque ActivityIndicator no acepta tamaños vía className/Tailwind,
-// solo via prop `size` ('small' | 'large') o un número puntual en iOS.
 const sizeMap = {
   sm: 'small',
   default: 'small',
@@ -27,7 +25,6 @@ const sizeMap = {
 
 type SpinnerProps = ViewProps &
   VariantProps<typeof spinnerVariants> & {
-    /** Color del spinner. Por defecto usa --color-primary de tu tema. */
     color?: string;
   };
 

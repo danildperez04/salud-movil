@@ -2,6 +2,8 @@
 
 # Salud Movil
 
+[![Netlify Status](https://api.netlify.com/api/v1/badges/d81d4de3-9685-44da-978b-0f08c91cde0b/deploy-status)](https://app.netlify.com/projects/salud-movil/deploys)
+
 ## Descripción
 
 Salud Móvil es una plataforma para el seguimiento de pacientes con enfermedades crónicas y discapacidades en Nicaragua. Permite registrar y consultar el expediente clínico, monitorear indicadores de salud, gestionar citas médicas y recordatorios de medicamentos.

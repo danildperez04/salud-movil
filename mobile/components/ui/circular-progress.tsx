@@ -1,4 +1,3 @@
-// components/ui/circular-progress.tsx
 import * as React from 'react';
 import { View } from 'react-native';
 import Svg, { Circle } from 'react-native-svg';
@@ -19,8 +18,8 @@ function CircularProgress({
   value,
   size = 88,
   strokeWidth = 8,
-  color = '#2DB79A', // --color-primary
-  trackColor = '#E5E7EB', // --color-muted
+  color = '#2DB79A',
+  trackColor = '#D9D9D9',
   className,
   children,
 }: CircularProgressProps) {
@@ -44,7 +43,7 @@ function CircularProgress({
           strokeWidth={strokeWidth}
           fill="none"
         />
-        {/* progreso real, rotado -90° para que arranque arriba, no a la derecha */}
+        {/* Rotado -90° para que arranque arriba, no a la derecha */}
         <Circle
           cx={size / 2}
           cy={size / 2}

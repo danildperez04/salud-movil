@@ -136,7 +136,7 @@ export default function CaregiverForm() {
           municipalityId: Number(form.municipalityId),
         });
       }
-      navigate('/caregivers', { replace: true });
+      navigate('/app/caregivers', { replace: true });
     } catch (err) {
       setError(
         err instanceof ApiError

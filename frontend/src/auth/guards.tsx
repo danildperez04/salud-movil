@@ -27,7 +27,7 @@ export function RequireRole({
     return <Navigate to='/login' replace />;
   }
   if (!roles.includes(role)) {
-    return <Navigate to='/' replace />;
+    return <Navigate to='/app' replace />;
   }
   return <>{children}</>;
 }
@@ -39,7 +39,7 @@ export function RedirectIfAuthed({ children }: { children: ReactNode }) {
     return null;
   }
   if (token) {
-    return <Navigate to='/' replace />;
+    return <Navigate to='/app' replace />;
   }
   return <>{children}</>;
 }
