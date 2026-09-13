@@ -1,3 +1,4 @@
+import { Link } from 'react-router';
 import { Logo } from '../ui/Logo';
 import {
   footerProductLinks,
@@ -39,15 +40,25 @@ export function Footer() {
 
           <div>
             <h4 className='text-xs font-bold text-navy'>Explorar</h4>
-            {footerExploreLinks.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                className='my-[9px] block text-[11px] text-muted transition duration-200 hover:text-mint-dark'
-              >
-                {link.label}
-              </a>
-            ))}
+            {footerExploreLinks.map((link) =>
+              link.href.startsWith('/') ? (
+                <Link
+                  key={link.href}
+                  to={link.href}
+                  className='my-[9px] block text-[11px] text-muted transition duration-200 hover:text-mint-dark'
+                >
+                  {link.label}
+                </Link>
+              ) : (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  className='my-[9px] block text-[11px] text-muted transition duration-200 hover:text-mint-dark'
+                >
+                  {link.label}
+                </a>
+              ),
+            )}
           </div>
 
           <div>
@@ -60,13 +71,13 @@ export function Footer() {
                 <a
                   key={link.label}
                   href={link.href}
-                  className='inline-flex items-center justify-center gap-[7px] rounded-xl border border-line bg-white px-[11px] py-[9px] text-[10px] font-bold text-navy transition duration-200 hover:border-[#c9ede4] hover:bg-mint-soft-2'
+                  className='inline-flex items-center justify-center gap-[7px] rounded-xl border border-line bg-white px-[11px] py-[9px] text-[10px] font-bold text-navy transition duration-200 hover:border-mint-line hover:bg-mint-soft-2'
                 >
                   {link.label}
                 </a>
               ))}
             </div>
-            <div className='mt-[10px] text-[10px] leading-[1.6] text-[#9aa8af]'>
+            <div className='mt-[10px] text-[10px] leading-[1.6] text-muted'>
               Instagram: <strong>agregar usuario</strong>
               <br />
               Facebook: <strong>agregar página</strong>
@@ -76,7 +87,7 @@ export function Footer() {
           </div>
         </div>
 
-        <div className='mt-[30px] flex flex-wrap justify-between gap-[18px] border-t border-line pt-5 text-[10px] text-[#95a4ac]'>
+        <div className='mt-[30px] flex flex-wrap justify-between gap-[18px] border-t border-line pt-5 text-[10px] text-muted'>
           <span>© 2026 Salud Móvil. Prototipo de demostración.</span>
           <span>Tu salud, en tus manos.</span>
         </div>

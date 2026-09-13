@@ -23,7 +23,7 @@ export function SolutionSection() {
               key={feature.title}
               className={`min-h-[220px] rounded-3xl border p-6 shadow-soft ${
                 feature.highlight
-                  ? 'border-transparent bg-[linear-gradient(145deg,#173447,#234a5e)] text-white'
+                  ? 'border-transparent bg-[linear-gradient(145deg,var(--color-navy),var(--color-navy-2))] text-white'
                   : 'border-line bg-white'
               }`}
             >

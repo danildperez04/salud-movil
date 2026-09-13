@@ -17,7 +17,7 @@ export function MiniPhone({
 
   return (
     <div
-      className={`${width} flex-none rounded-[35px] bg-[#102a39] p-[7px] shadow-[0_25px_60px_rgba(0,0,0,0.28)] ${className}`}
+      className={`${width} flex-none rounded-[35px] bg-navy p-[7px] shadow-[0_25px_60px_rgba(0,0,0,0.28)] ${className}`}
     >
       <img src={src} alt={alt} className='block w-full rounded-[29px]' />
     </div>

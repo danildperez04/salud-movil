@@ -277,6 +277,7 @@ export const footerExploreLinks = [
   { href: '#beneficios', label: 'Beneficios' },
   { href: '#faq', label: 'Preguntas frecuentes' },
   { href: '#sobre-nosotros', label: 'Nuestro equipo' },
+  { href: '/login', label: 'Acceso personal de salud' },
 ];
 
 export const socialLinks = [

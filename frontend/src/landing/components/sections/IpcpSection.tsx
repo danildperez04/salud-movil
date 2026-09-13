@@ -33,7 +33,7 @@ export function IpcpSection() {
             Además, Salud Móvil presenta indicadores con rangos fáciles de
             interpretar y acceso al historial de mediciones.
           </p>
-          <div className='mt-[22px] rounded-[18px] border border-[#d8eee8] bg-mint-soft-2 p-[16px_18px] text-xs leading-[1.6] text-[#5e7581]'>
+          <div className='mt-[22px] rounded-[18px] border border-mint-line bg-mint-soft-2 p-[16px_18px] text-xs leading-[1.6] text-muted'>
             <strong className='text-navy'>Importante:</strong> Salud Móvil es
             una herramienta de apoyo y organización. No sustituye la evaluación,
             el diagnóstico ni la atención de un profesional de la salud.

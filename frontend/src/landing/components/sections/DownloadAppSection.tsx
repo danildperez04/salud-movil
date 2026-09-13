@@ -6,7 +6,7 @@ export function DownloadAppSection() {
   return (
     <section
       id='descargar'
-      className='py-[78px] bg-[linear-gradient(180deg,#ffffff_0%,#f4fbf9_100%)] landing-sm:py-[110px]'
+      className='py-[78px] bg-[linear-gradient(180deg,#ffffff_0%,var(--color-mint-soft-2)_100%)] landing-sm:py-[110px]'
     >
       <div className='container-x grid grid-cols-1 items-center gap-16 landing-md:grid-cols-[0.92fr_1.08fr]'>
         <FadeInOnScroll>
@@ -34,13 +34,13 @@ export function DownloadAppSection() {
             <Button href='/SaludMovil.apk' className='mt-4' download>
               Descargar para Android ↓
             </Button>
-            <p className='mt-[14px] text-[11px] text-[#9aa8af]'>
+            <p className='mt-[14px] text-[11px] text-muted'>
               El botón quedará activo cuando agregues el archivo{' '}
               <strong>SaludMovil.apk</strong> a la misma carpeta del sitio.
             </p>
           </article>
 
-          <article className='rounded-3xl border border-transparent bg-[linear-gradient(145deg,#173447,#244c60)] p-[26px]'>
+          <article className='rounded-3xl border border-transparent bg-[linear-gradient(145deg,var(--color-navy),var(--color-navy-2))] p-[26px]'>
             <div className='mb-5 grid h-[54px] w-[54px] place-items-center rounded-[18px] bg-[rgba(255,255,255,0.1)] text-[25px] text-mint-light'>
               
             </div>
@@ -48,7 +48,7 @@ export function DownloadAppSection() {
             <p className='min-h-[64px] text-[13px] leading-[1.65] text-[#c2d1d8]'>
               Estamos preparando la experiencia de Salud Móvil para iPhone.
             </p>
-            <span className='mt-3 inline-flex items-center gap-2 rounded-full bg-[rgba(53,191,166,0.12)] px-3 py-[10px] text-[11px] font-[850] text-[#78d9c3]'>
+            <span className='mt-3 inline-flex items-center gap-2 rounded-full bg-mint/12 px-3 py-[10px] text-[11px] font-[850] text-mint-light'>
               ● Disponible pronto
             </span>
           </article>
