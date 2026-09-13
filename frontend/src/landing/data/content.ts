@@ -4,6 +4,15 @@
 // sin tocar la lógica de los componentes.
 // -----------------------------------------------------------------------
 
+// Fotos del equipo (Vite las procesa como assets con hash de caché)
+import danildPhoto from "../../assets/Danild.jpeg";
+import elivaPhoto from "../../assets/Eli.png";
+import freddyPhoto from "../../assets/Freddy.jpeg";
+import julioPhoto from "../../assets/jarey.jpeg";
+import joshuaPhoto from "../../assets/Joshua.jpeg";
+import groupPhoto from "../../assets/Grupo.jpeg";
+import hackathonMemoryPhoto from "../../assets/grupo_Hk_2025.jpeg";
+
 export const navLinks = [
   { href: "#beneficios", label: "Beneficios" },
   { href: "#funciones", label: "Funciones" },
@@ -32,7 +41,7 @@ export const heroFloatCards = [
     className: "fc2",
   },
   {
-    icon: "",
+    icon: "♡",
     title: "Indicadores",
     text: "Visualiza tu evolución.",
     className: "fc3",
@@ -200,7 +209,7 @@ export const faqItems = [
       "Diagnósticos, antecedentes, alergias, resultados de laboratorio, recetas, constancias, estudios, notas y documentos médicos.",
   },
   {
-    question: "¿“Mi prioridad” reemplaza una consulta médica?",
+    question: "¿\u201CMi prioridad\u201D reemplaza una consulta médica?",
     answer:
       "No. Es una herramienta de orientación y apoyo. No sustituye la evaluación ni el diagnóstico de un profesional de la salud.",
   },
@@ -225,43 +234,130 @@ export const values = [
   },
 ];
 
-export const teamMembers = [
+export type SocialIconKey =
+  | "instagram"
+  | "facebook"
+  | "whatsapp"
+  | "tiktok"
+  | "github"
+  | "linkedin";
+
+export interface TeamSocialLink {
+  icon: SocialIconKey;
+  href: string;
+  label: string;
+}
+
+export interface TeamMember {
+  duck: string;
+  name: string;
+  role: string;
+  bio: string;
+  photo: string;
+  socials: TeamSocialLink[];
+}
+
+export const teamMembers: TeamMember[] = [
   {
     duck: "Product Duck",
     name: "Freddy Mairena",
     role: "Product Owner y Comunicador",
     bio: "Lidera la visión del producto, organiza prioridades y comunica el propósito y avance de Salud Móvil.",
-    photoLabel: "Espacio para foto de Freddy",
+    photo: freddyPhoto,
+    socials: [
+      {
+        icon: "instagram",
+        href: "https://www.instagram.com/freddyenmg?utm_source=ig_web_button_share_sheet&stkn=ZDNlZDc0MzIxNw==",
+        label: "Instagram de Freddy",
+      },
+    ],
   },
   {
     duck: "Marketing Duck",
     name: "Eliva Lovo",
     role: "Mercadóloga",
     bio: "Desarrolla el enfoque de marketing, posicionamiento, comunicación y conexión de la marca con sus públicos.",
-    photoLabel: "Espacio para foto de Eliva",
+    photo: elivaPhoto,
+    socials: [
+      {
+        icon: "instagram",
+        href: "https://www.instagram.com/eli_xolanch?utm_source=ig_web_button_share_sheet&stkn=ZDNlZDc0MzIxNw==",
+        label: "Instagram de Eliva",
+      },
+    ],
   },
   {
     duck: "Design Duck",
     name: "Joshua Ochoa",
     role: "Diseñador UI y Diseñador de Marca",
     bio: "Construye la identidad visual y las interfaces de Salud Móvil para lograr una experiencia clara, coherente y reconocible.",
-    photoLabel: "Espacio para foto de Joshua",
+    photo: joshuaPhoto,
+    socials: [
+      {
+        icon: "instagram",
+        href: "https://www.instagram.com/joshua_ocm?utm_source=ig_web_button_share_sheet&stkn=ZDNlZDc0MzIxNw==",
+        label: "Instagram de Joshua",
+      },
+    ],
   },
   {
     duck: "Backend Duck",
     name: "Danild Pérez",
     role: "Scrum Master y Desarrollador Full Stack",
     bio: "Coordina el trabajo ágil del equipo y desarrolla la lógica, estructura y servicios que sostienen el funcionamiento de la plataforma.",
-    photoLabel: "Espacio para foto de Danild",
+    photo: danildPhoto,
+    socials: [
+      {
+        icon: "github",
+        href: "https://github.com/danildperez04",
+        label: "GitHub de Danild",
+      },
+      {
+        icon: "linkedin",
+        href: "https://www.linkedin.com/in/danild-perez2/",
+        label: "LinkedIn de Danild",
+      },
+    ],
   },
   {
     duck: "Frontend & Data Duck",
     name: "Julio Reyes",
     role: "Desarrollador Mobile, Diseñador UX",
     bio: "Desarrolla la experiencia visible de la plataforma, diseña flujos centrados en el usuario y transforma datos en información útil.",
-    photoLabel: "Espacio para foto de Julio",
+    photo: julioPhoto,
+    socials: [
+      {
+        icon: "github",
+        href: "https://github.com/Jarey-17",
+        label: "GitHub de Julio",
+      },
+      {
+        icon: "linkedin",
+        href: "https://www.linkedin.com/in/julio-antonio-reyes-gonz%C3%A1lez-b1216426b/",
+        label: "LinkedIn de Julio",
+      },
+    ],
   },
 ];
+
+// Foto grupal del equipo, mostrada como tarjeta propia debajo del bloque
+// "Conecta con nosotros" en la sección Sobre Nosotros.
+export const teamGroupPhoto = {
+  photo: groupPhoto,
+  title: "Rubber Duckies",
+  description:
+    "Los cinco integrantes de Rubber Duckies, el equipo detrás de Salud Móvil.",
+};
+
+// Recuerdo del Hackathon Disruptivo 2025, mostrado como una tarjeta más
+// dentro del grid de miembros del equipo (junto a Julio Reyes).
+export const hackathonMemory = {
+  photo: hackathonMemoryPhoto,
+  badge: "Rubber Duckies",
+  title: "Hackathon Disruptivo 2025",
+  description:
+    "Un recuerdo de nuestra participación en el Hackathon Disruptivo 2025, el punto de partida del equipo antes de Salud Móvil.",
+};
 
 export const footerProductLinks = [
   { href: "#funciones", label: "Funcionalidades" },
@@ -278,8 +374,30 @@ export const footerExploreLinks = [
   { href: "/login", label: "Acceso personal de salud" },
 ];
 
-export const socialLinks = [
-  { label: "Instagram", href: "#" },
-  { label: "Facebook", href: "#" },
-  { label: "WhatsApp", href: "#" },
+export const socialLinks: {
+  label: string;
+  href: string;
+  icon: SocialIconKey;
+}[] = [
+  {
+    label: "Instagram",
+    href: "https://www.instagram.com/salud.movil_app?stkn=MTk4ajBvdzI3b216bA==",
+    icon: "instagram",
+  },
+  {
+    label: "Facebook",
+    href: "https://www.facebook.com/share/1BZMmmTKnR/",
+    icon: "facebook",
+  },
+  {
+    label: "WhatsApp",
+    href: "https://wa.me/50584315249",
+    icon: "whatsapp",
+  },
+  {
+    label: "TikTok",
+    // TODO: reemplazar por el enlace real en cuanto el equipo lo comparta.
+    href: "#",
+    icon: "tiktok",
+  },
 ];
