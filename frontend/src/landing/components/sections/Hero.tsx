@@ -19,7 +19,7 @@ export function Hero() {
   return (
     <section
       id='inicio'
-      className='relative pb-[68px] pt-[108px] bg-[radial-gradient(circle_at_82%_20%,rgba(53,191,166,0.18),transparent_24%),radial-gradient(circle_at_8%_72%,rgba(42,155,181,0.08),transparent_22%),linear-gradient(180deg,#fff_0%,#f8fcfb_100%)] landing-sm:pb-[88px] landing-sm:pt-[115px] landing-md:pt-[142px]'
+      className='relative pb-[68px] pt-[108px] bg-[radial-gradient(circle_at_82%_20%,color-mix(in_oklab,var(--color-mint)_18%,transparent),transparent_24%),radial-gradient(circle_at_8%_72%,color-mix(in_oklab,var(--color-navy-2)_8%,transparent),transparent_22%),linear-gradient(180deg,#fff_0%,#f8fcfb_100%)] landing-sm:pb-[88px] landing-sm:pt-[115px] landing-md:pt-[142px]'
     >
       <div className='container-x grid grid-cols-1 items-center gap-16 landing-md:grid-cols-[1.02fr_0.98fr]'>
         <FadeInOnScroll>
@@ -28,7 +28,7 @@ export function Hero() {
             Tu salud. Más clara. Más cerca.{' '}
             <em className='not-italic text-mint'>Siempre contigo.</em>
           </h1>
-          <p className='mb-[30px] max-w-[640px] text-[16px] leading-[1.7] text-[#667c89] landing-sm:text-[18px]'>
+          <p className='mb-[30px] max-w-[640px] text-[16px] leading-[1.7] text-muted landing-sm:text-[18px]'>
             Salud Móvil reúne tus citas, medicamentos, indicadores y expediente
             clínico para que cuidar de ti sea más simple, organizado y accesible
             desde tu celular.
@@ -39,7 +39,7 @@ export function Hero() {
               Ver funcionalidades
             </Button>
           </div>
-          <div className='flex flex-wrap gap-[20px] text-xs font-bold text-[#6c808c]'>
+          <div className='flex flex-wrap gap-[20px] text-xs font-bold text-muted'>
             {heroPoints.map((point) => (
               <span key={point} className='flex items-center gap-[7px]'>
                 <b className='grid h-[19px] w-[19px] place-items-center rounded-full bg-mint-soft text-[11px] font-black text-mint-dark'>
@@ -52,8 +52,8 @@ export function Hero() {
         </FadeInOnScroll>
 
         <FadeInOnScroll className='relative grid min-h-[520px] place-items-center landing-sm:min-h-[610px] landing-md:min-h-[650px]'>
-          <div className="absolute left-1/2 top-1/2 h-[400px] w-[400px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-dashed border-[rgba(53,191,166,0.28)] after:absolute after:inset-[55px] after:rounded-full after:border after:border-dashed after:border-[rgba(42,155,181,0.18)] after:content-[''] landing-sm:h-[520px] landing-sm:w-[520px]" />
-          <div className="relative z-[4] w-[252px] rotate-[2.2deg] rounded-[45px] bg-navy p-[9px] shadow-[0_40px_90px_rgba(23,52,71,0.28)] before:absolute before:left-1/2 before:top-[7px] before:z-[3] before:h-[22px] before:w-[90px] before:-translate-x-1/2 before:rounded-b-[13px] before:bg-navy before:content-[''] landing-sm:w-[306px]">
+          <div className="absolute left-1/2 top-1/2 h-[400px] w-[400px] -translate-x-1/2 -translate-y-1/2 rounded-full border border-dashed border-mint/28 after:absolute after:inset-[55px] after:rounded-full after:border after:border-dashed after:border-navy-2/18 after:content-[''] landing-sm:h-[520px] landing-sm:w-[520px]" />
+          <div className="relative z-[4] w-[252px] rotate-[2.2deg] rounded-[45px] bg-navy p-[9px] shadow-phone before:absolute before:left-1/2 before:top-[7px] before:z-[3] before:h-[22px] before:w-[90px] before:-translate-x-1/2 before:rounded-b-[13px] before:bg-navy before:content-[''] landing-sm:w-[306px]">
             <img
               src='/assets/mockups/hero-main.webp'
               alt='Pantalla principal de Salud Móvil'

@@ -14,9 +14,9 @@ const baseClasses =
 
 const variantClasses: Record<'primary' | 'secondary', string> = {
   primary:
-    'bg-mint text-white shadow-[0_10px_26px_rgba(53,191,166,0.23)] hover:-translate-y-0.5 hover:bg-mint-dark',
+    'bg-mint text-white shadow-brand hover:-translate-y-0.5 hover:bg-mint-dark',
   secondary:
-    'border border-line bg-white text-navy hover:border-[#caede4] hover:bg-mint-soft-2',
+    'border border-line bg-white text-navy hover:border-mint-line hover:bg-mint-soft-2',
 };
 
 export function Button({

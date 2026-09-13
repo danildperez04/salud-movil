@@ -1,31 +1,36 @@
 @import 'tailwindcss';
 
 @theme {
-  /* Panel de gestión — color primario alineado a la identidad (mint) */
-  --color-primary: #35bfa6;
-  --color-primary-dark: #229a86;
-  --color-primary-light: #eaf8f4;
+  /* Panel de gestión — primario alineado a la paleta de marca */
+  --color-primary: #2db79a;
+  --color-primary-dark: #135e6d;
+  --color-primary-light: #77d1b5;
 
-  /* Marca — identidad visual real (fuente: index(3) (1).html) */
-  --color-navy: #173447;
-  --color-navy-2: #274b5f;
-  --color-mint: #35bfa6;
-  --color-mint-dark: #229a86;
-  --color-mint-light: #7de0c9;
-  --color-mint-soft: #eaf8f4;
-  --color-mint-soft-2: #f4fbf9;
-  --color-text: #1b3342;
-  --color-muted: #81919a;
-  --color-line: #e3eaed;
+  /* Marca — paleta real (fuente: /downloads/Paleta de colores.png) */
+  --color-navy: #0e2a3a;
+  --color-navy-2: #1b4253;
+  --color-teal: #2d7f8e;
+  --color-mint: #2db79a;
+  --color-mint-dark: #135e6d;
+  --color-mint-light: #77d1b5;
+  --color-mint-soft: #e6f5f1;
+  --color-mint-soft-2: #f3faf8;
+  --color-mint-line: #cfece2;
+  --color-mint-line-strong: #bfddce;
+  --color-text: #1a2129;
+  --color-muted: #6b7280;
+  --color-line: #d9d9d9;
   --color-surface: #f2f6f7;
 
   /* Tipografía de marca */
   --font-display: 'Poppins', ui-sans-serif, system-ui, sans-serif;
   --font-body: 'Inter', ui-sans-serif, system-ui, sans-serif;
 
-  /* Sombras de la landing */
-  --shadow-soft: 0 16px 50px rgba(23, 52, 71, 0.1);
-  --shadow-strong: 0 28px 80px rgba(23, 52, 71, 0.18);
+  /* Sombras de la landing (derivadas de los colores de marca) */
+  --shadow-soft: 0 16px 50px 0 color-mix(in oklab, var(--color-navy) 10%, transparent);
+  --shadow-strong: 0 28px 80px 0 color-mix(in oklab, var(--color-navy) 18%, transparent);
+  --shadow-brand: 0 10px 26px 0 color-mix(in oklab, var(--color-mint) 23%, transparent);
+  --shadow-phone: 0 40px 90px 0 color-mix(in oklab, var(--color-navy) 28%, transparent);
 
   /* Breakpoints exactos de la landing (980px / 680px) */
   --breakpoint-landing-md: 980px;
@@ -68,7 +73,7 @@ html {
 
 .landing {
   font-family: var(--font-body);
-  color: #1b3342;
+  color: var(--color-text);
   background: #fff;
   overflow-x: clip;
 }
@@ -100,7 +105,7 @@ html {
   right: -22px;
   top: 58px;
   width: 22px;
-  border-top: 1px dashed rgba(53, 191, 166, 0.5);
+  border-top: 1px dashed color-mix(in oklab, var(--color-mint) 50%, transparent);
 }
 
 .steps-connector:last-child::after {
