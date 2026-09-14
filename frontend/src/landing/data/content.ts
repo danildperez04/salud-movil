@@ -345,8 +345,6 @@ export const teamMembers: TeamMember[] = [
   },
 ];
 
-// Foto grupal del equipo, mostrada como tarjeta propia debajo del bloque
-// "Conecta con nosotros" en la sección Sobre Nosotros.
 export const teamGroupPhoto = {
   photo: groupPhoto,
   title: "Rubber Duckies",
@@ -391,7 +389,7 @@ export const socialLinks: {
   },
   {
     label: "Facebook",
-    href: "https://www.facebook.com/share/1BZMmmTKnR/",
+    href: "https://www.facebook.com/share/1DimtuBcaY/",
     icon: "facebook",
   },
   {
