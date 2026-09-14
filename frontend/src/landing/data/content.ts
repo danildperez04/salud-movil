@@ -336,12 +336,15 @@ export const teamMembers: TeamMember[] = [
         href: "https://www.linkedin.com/in/julio-antonio-reyes-gonz%C3%A1lez-b1216426b/",
         label: "LinkedIn de Julio",
       },
+      {
+        icon: "instagram",
+        href: "https://www.instagram.com/jarey_gz/",
+        label: "Instagram de Julio",
+      },
     ],
   },
 ];
 
-// Foto grupal del equipo, mostrada como tarjeta propia debajo del bloque
-// "Conecta con nosotros" en la sección Sobre Nosotros.
 export const teamGroupPhoto = {
   photo: groupPhoto,
   title: "Rubber Duckies",
@@ -350,7 +353,7 @@ export const teamGroupPhoto = {
 };
 
 // Recuerdo del Hackathon Disruptivo 2025, mostrado como una tarjeta más
-// dentro del grid de miembros del equipo (junto a Julio Reyes).
+// dentro del grid de miembros del equipo.
 export const hackathonMemory = {
   photo: hackathonMemoryPhoto,
   badge: "Rubber Duckies",
@@ -386,7 +389,7 @@ export const socialLinks: {
   },
   {
     label: "Facebook",
-    href: "https://www.facebook.com/share/1BZMmmTKnR/",
+    href: "https://www.facebook.com/share/1DimtuBcaY/",
     icon: "facebook",
   },
   {
@@ -396,8 +399,7 @@ export const socialLinks: {
   },
   {
     label: "TikTok",
-    // TODO: reemplazar por el enlace real en cuanto el equipo lo comparta.
-    href: "#",
+    href: "https://www.tiktok.com/@salud.movil.app?_r=1&_t=ZS-99jcPox9i42",
     icon: "tiktok",
   },
 ];
