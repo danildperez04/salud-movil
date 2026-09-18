@@ -1,67 +1,59 @@
-import { NavLink, Outlet } from 'react-router';
-import { useAuthStore } from '../store/auth';
-import { Badge } from '../components/ui/Badge';
-import { ROLE_LABELS } from '../lib/roles';
+import { Bell, LogOut } from "lucide-react";
+import { Link, Outlet } from "react-router";
+import { useAuthStore } from "../store/auth";
+import { ROLE_LABELS } from "../lib/roles";
+import { Sidebar } from "./Sidebar";
 
-const NAV_ITEMS: { to: string; label: string; roles: string[] }[] = [
-  { to: '/app', label: 'Inicio', roles: ['admin', 'health_staff'] },
-  { to: '/app/staff', label: 'Personal de salud', roles: ['admin'] },
-  { to: '/app/caregivers', label: 'Cuidadores', roles: ['admin', 'health_staff'] },
-  { to: '/app/patients', label: 'Pacientes', roles: ['admin', 'health_staff'] },
-];
+function getInitials(name?: string) {
+  if (!name) return "";
+  const parts = name.trim().split(/\s+/);
+  const first = parts[0]?.[0] ?? "";
+  const last = parts.length > 1 ? parts[parts.length - 1][0] : "";
+  return (first + last).toUpperCase();
+}
 
 export default function AppLayout() {
   const user = useAuthStore((s) => s.user);
   const logout = useAuthStore((s) => s.logout);
-
-  const items = NAV_ITEMS.filter((item) => user && item.roles.includes(user.role));
+  const roleLabel = user ? (ROLE_LABELS[user.role] ?? user.role) : "";
 
   return (
-    <div className='flex min-h-screen w-full bg-slate-50'>
-      <aside className='flex w-64 flex-col border-r border-slate-200 bg-white'>
-        <div className='px-6 py-5'>
-          <h1 className='text-xl font-bold text-primary'>Salud Móvil</h1>
-          <p className='text-xs text-slate-500'>Panel de gestión</p>
-        </div>
-        <nav className='flex flex-1 flex-col gap-1 px-3'>
-          {items.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              end={item.to === '/app'}
-              className={({ isActive }) =>
-                `rounded-lg px-3 py-2 text-sm font-medium transition ${
-                  isActive
-                    ? 'bg-primary text-white'
-                    : 'text-slate-700 hover:bg-slate-100'
-                }`
-              }
-            >
-              {item.label}
-            </NavLink>
-          ))}
-        </nav>
-      </aside>
-      <div className='flex min-w-0 flex-1 flex-col'>
-        <header className='flex items-center justify-between border-b border-slate-200 bg-white px-6 py-3'>
-          <div className='flex items-center gap-3'>
-            <span className='text-sm font-semibold text-slate-900'>
-              {user?.name}
+    <div className="flex min-h-screen w-full bg-surface">
+      <Sidebar />
+      <div className="flex min-w-0 flex-1 flex-col">
+        <header className="flex items-center justify-between border-b border-line bg-white px-6 py-3">
+          <div className="flex items-center gap-3">
+            <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-mint-soft font-display text-sm font-semibold text-primary-dark">
+              {getInitials(user?.name)}
             </span>
-            {user ? (
-              <Badge variant='primary'>
-                {ROLE_LABELS[user.role] ?? user.role}
-              </Badge>
-            ) : null}
+            <div className="leading-tight">
+              <p className="font-body text-sm font-semibold text-navy">
+                {user?.name}
+              </p>
+              <p className="font-body text-xs text-muted">
+                {roleLabel} · Salud Móvil
+              </p>
+            </div>
           </div>
-          <button
-            onClick={logout}
-            className='rounded-lg px-3 py-1.5 text-sm font-medium text-slate-600 transition hover:bg-slate-100'
-          >
-            Cerrar sesión
-          </button>
+
+          <div className="flex items-center gap-2">
+            <Link
+              to="/app/notifications"
+              aria-label="Notificaciones"
+              className="flex h-9 w-9 items-center justify-center rounded-full text-muted transition hover:bg-surface hover:text-primary"
+            >
+              <Bell size={18} aria-hidden="true" />
+            </Link>
+            <button
+              onClick={logout}
+              className="flex items-center gap-1.5 rounded-lg px-3 py-1.5 font-body text-sm font-medium text-muted transition hover:bg-red-50 hover:text-red-600"
+            >
+              <LogOut size={16} aria-hidden="true" />
+              Cerrar sesión
+            </button>
+          </div>
         </header>
-        <main className='flex-1 overflow-y-auto p-6'>
+        <main className="flex-1 overflow-y-auto p-6">
           <Outlet />
         </main>
       </div>

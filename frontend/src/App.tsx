@@ -1,21 +1,24 @@
-import { BrowserRouter, Navigate, Outlet, Route, Routes } from 'react-router';
-import { useEffect } from 'react';
-import { useAuthStore } from './store/auth';
-import { useCatalogueStore } from './store/catalogues';
-import { RedirectIfAuthed, RequireAuth, RequireRole } from './auth/guards';
-import AuthLayout from './layouts/AuthLayout';
-import AppLayout from './layouts/AppLayout';
-import LandingPage from './landing/LandingPage';
-import Login from './pages/Login';
-import Home from './pages/Home';
-import StaffList from './pages/staff/StaffList';
-import StaffForm from './pages/staff/StaffForm';
-import PatientsList from './pages/patients/PatientsList';
-import PatientForm from './pages/patients/PatientForm';
-import PatientDetail from './pages/patients/PatientDetail';
-import CaregiversList from './pages/caregivers/CaregiversList';
-import CaregiverForm from './pages/caregivers/CaregiverForm';
-import CaregiverDetail from './pages/caregivers/CaregiverDetail';
+import { BrowserRouter, Navigate, Outlet, Route, Routes } from "react-router";
+import { useEffect } from "react";
+import { useAuthStore } from "./store/auth";
+import { useCatalogueStore } from "./store/catalogues";
+import { RedirectIfAuthed, RequireAuth, RequireRole } from "./auth/guards";
+import AuthLayout from "./layouts/AuthLayout";
+import AppLayout from "./layouts/AppLayout";
+import LandingPage from "./landing/LandingPage";
+import Login from "./pages/Login";
+import RecoverPassword from "./pages/RecoverPassword";
+import Home from "./pages/Home";
+import ComingSoon from "./pages/ComingSoon";
+import StaffList from "./pages/staff/StaffList";
+import StaffForm from "./pages/staff/StaffForm";
+import PatientsList from "./pages/patients/PatientsList";
+import PatientForm from "./pages/patients/PatientForm";
+import PatientDetail from "./pages/patients/PatientDetail";
+import CaregiversList from "./pages/caregivers/CaregiversList";
+import CaregiverForm from "./pages/caregivers/CaregiverForm";
+import CaregiverDetail from "./pages/caregivers/CaregiverDetail";
+import PatientRecord from "./pages/patients/PatientRecord"; // ← nuevo
 
 function App() {
   const bootstrap = useAuthStore((s) => s.bootstrap);
@@ -29,19 +32,27 @@ function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path='/' element={<LandingPage />} />
+        <Route path="/" element={<LandingPage />} />
         <Route element={<AuthLayout />}>
           <Route
-            path='/login'
+            path="/login"
             element={
               <RedirectIfAuthed>
                 <Login />
               </RedirectIfAuthed>
             }
           />
+          <Route
+            path="/recuperar"
+            element={
+              <RedirectIfAuthed>
+                <RecoverPassword />
+              </RedirectIfAuthed>
+            }
+          />
         </Route>
         <Route
-          path='/app'
+          path="/app"
           element={
             <RequireAuth>
               <AppLayout />
@@ -50,34 +61,66 @@ function App() {
         >
           <Route index element={<Home />} />
           <Route
-            element={<RequireRole roles={['admin']} children={<Outlet />} />}
+            element={<RequireRole roles={["admin"]} children={<Outlet />} />}
           >
-            <Route path='staff' element={<StaffList />} />
-            <Route path='staff/new' element={<StaffForm />} />
-            <Route path='staff/:id/edit' element={<StaffForm />} />
+            <Route path="staff" element={<StaffList />} />
+            <Route path="staff/new" element={<StaffForm />} />
+            <Route path="staff/:id/edit" element={<StaffForm />} />
+            {/* TODO: reemplazar por la página real de Reportes */}
+            <Route path="reports" element={<ComingSoon title="Reportes" />} />
           </Route>
           <Route
             element={
-              <RequireRole roles={['admin', 'health_staff']} children={<Outlet />} />
+              <RequireRole
+                roles={["admin", "health_staff"]}
+                children={<Outlet />}
+              />
             }
           >
-            <Route path='caregivers' element={<CaregiversList />} />
-            <Route path='caregivers/new' element={<CaregiverForm />} />
-            <Route path='caregivers/:id' element={<CaregiverDetail />} />
-            <Route path='caregivers/:id/edit' element={<CaregiverForm />} />
+            <Route path="caregivers" element={<CaregiversList />} />
+            <Route path="caregivers/new" element={<CaregiverForm />} />
+            <Route path="caregivers/:id" element={<CaregiverDetail />} />
+            <Route path="caregivers/:id/edit" element={<CaregiverForm />} />
           </Route>
           <Route
             element={
-              <RequireRole roles={['admin', 'health_staff']} children={<Outlet />} />
+              <RequireRole
+                roles={["admin", "health_staff"]}
+                children={<Outlet />}
+              />
             }
           >
-            <Route path='patients' element={<PatientsList />} />
-            <Route path='patients/new' element={<PatientForm />} />
-            <Route path='patients/:id' element={<PatientDetail />} />
-            <Route path='patients/:id/edit' element={<PatientForm />} />
+            <Route path="patients" element={<PatientsList />} />
+            <Route path="patients/new" element={<PatientForm />} />
+            <Route path="patients/:id" element={<PatientDetail />} />
+            <Route path="patients/:id/edit" element={<PatientForm />} />
+            <Route path="patients/:id/record" element={<PatientRecord />} />
+          </Route>
+          <Route
+            element={
+              <RequireRole
+                roles={["admin", "health_staff"]}
+                children={<Outlet />}
+              />
+            }
+          >
+            {/* TODO: reemplazar cada ComingSoon por la página real cuando exista */}
+            <Route
+              path="priority"
+              element={<ComingSoon title="Prioridad IPCP" />}
+            />
+            <Route
+              path="priority-map"
+              element={<ComingSoon title="Mapa de prioridad" />}
+            />
+            <Route path="alerts" element={<ComingSoon title="Alertas" />} />
+            <Route
+              path="notifications"
+              element={<ComingSoon title="Notificaciones" />}
+            />
           </Route>
         </Route>
-        <Route path='*' element={<Navigate to='/' replace />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>
   );
