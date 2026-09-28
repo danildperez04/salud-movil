@@ -7,6 +7,11 @@ import { Major } from './entities/major.entity';
 import { Department } from './entities/department.entity';
 import { HealthCenter } from '../health-centers/entities/health-center.entity';
 import { Municipality } from './entities/municipality.entity';
+import { TypeIndicator } from './entities/type-indicator.entity';
+import { AppointmentState } from './entities/appointment-state.entity';
+import { AppointmentType } from './entities/appointment-type.entity';
+import { NotificationState } from './entities/notification-state.entity';
+import { RouteAdministration } from './entities/route-administration.entity';
 
 @Injectable()
 export class CatalogueService {
@@ -23,6 +28,16 @@ export class CatalogueService {
     private readonly healthCenterRepository: Repository<HealthCenter>,
     @InjectRepository(Municipality)
     private readonly municipalityRepository: Repository<Municipality>,
+    @InjectRepository(TypeIndicator)
+    private readonly typeIndicatorRepository: Repository<TypeIndicator>,
+    @InjectRepository(AppointmentState)
+    private readonly appointmentStateRepository: Repository<AppointmentState>,
+    @InjectRepository(AppointmentType)
+    private readonly appointmentTypeRepository: Repository<AppointmentType>,
+    @InjectRepository(NotificationState)
+    private readonly notificationStateRepository: Repository<NotificationState>,
+    @InjectRepository(RouteAdministration)
+    private readonly routeAdministrationRepository: Repository<RouteAdministration>,
   ) {}
 
   async departments(): Promise<{ id: number; name: string }[]> {
@@ -61,5 +76,27 @@ export class CatalogueService {
       name: municipality.name,
       departmentId: municipality.department.id,
     }));
+  }
+
+  async typeIndicators(): Promise<
+    { id: number; name: string; measurementUnit: string }[]
+  > {
+    return this.typeIndicatorRepository.find({ order: { id: 'ASC' } });
+  }
+
+  async appointmentStates(): Promise<{ id: number; name: string }[]> {
+    return this.appointmentStateRepository.find({ order: { id: 'ASC' } });
+  }
+
+  async appointmentTypes(): Promise<{ id: number; name: string }[]> {
+    return this.appointmentTypeRepository.find({ order: { id: 'ASC' } });
+  }
+
+  async notificationStates(): Promise<{ id: number; name: string }[]> {
+    return this.notificationStateRepository.find({ order: { id: 'ASC' } });
+  }
+
+  async routeAdministrations(): Promise<{ id: number; name: string }[]> {
+    return this.routeAdministrationRepository.find({ order: { id: 'ASC' } });
   }
 }

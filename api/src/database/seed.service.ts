@@ -9,6 +9,11 @@ import { HealthCenterType } from '../features/catalogues/entities/health-center-
 import { RelationshipType } from '../features/catalogues/entities/relationship-type.entity';
 import { Department } from '../features/catalogues/entities/department.entity';
 import { Municipality } from '../features/catalogues/entities/municipality.entity';
+import { TypeIndicator } from '../features/catalogues/entities/type-indicator.entity';
+import { AppointmentState } from '../features/catalogues/entities/appointment-state.entity';
+import { AppointmentType } from '../features/catalogues/entities/appointment-type.entity';
+import { NotificationState } from '../features/catalogues/entities/notification-state.entity';
+import { RouteAdministration } from '../features/catalogues/entities/route-administration.entity';
 import { HealthCenter } from '../features/health-centers/entities/health-center.entity';
 import { User } from '../features/users/entities/user.entity';
 import { HealthcareWorker } from '../features/users/entities/healthcare-worker.entity';
@@ -19,6 +24,11 @@ import {
   HEALTH_CENTER_TYPES,
   RELATIONSHIP_TYPES,
   DEPARTMENTS,
+  TYPE_INDICATORS,
+  APPOINTMENT_STATES,
+  APPOINTMENT_TYPES,
+  NOTIFICATION_STATES,
+  ROUTE_ADMINISTRATIONS,
 } from './seed-data';
 
 @Injectable()
@@ -74,6 +84,39 @@ export class SeedService implements OnApplicationBootstrap {
       await manager.save(
         RelationshipType,
         RELATIONSHIP_TYPES.map((name) => ({ name })),
+      );
+    }
+    if ((await manager.count(TypeIndicator)) === 0) {
+      await manager.save(
+        TypeIndicator,
+        TYPE_INDICATORS.map((typeIndicator) => ({
+          name: typeIndicator.name,
+          measurementUnit: typeIndicator.measurementUnit,
+        })),
+      );
+    }
+    if ((await manager.count(AppointmentState)) === 0) {
+      await manager.save(
+        AppointmentState,
+        APPOINTMENT_STATES.map((name) => ({ name })),
+      );
+    }
+    if ((await manager.count(AppointmentType)) === 0) {
+      await manager.save(
+        AppointmentType,
+        APPOINTMENT_TYPES.map((name) => ({ name })),
+      );
+    }
+    if ((await manager.count(NotificationState)) === 0) {
+      await manager.save(
+        NotificationState,
+        NOTIFICATION_STATES.map((name) => ({ name })),
+      );
+    }
+    if ((await manager.count(RouteAdministration)) === 0) {
+      await manager.save(
+        RouteAdministration,
+        ROUTE_ADMINISTRATIONS.map((name) => ({ name })),
       );
     }
 

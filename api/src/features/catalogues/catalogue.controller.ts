@@ -36,4 +36,29 @@ export class CatalogueController {
       departmentId ? parseInt(departmentId, 10) : undefined,
     );
   }
+
+  @Get('type-indicators')
+  typeIndicators() {
+    return this.catalogueService.typeIndicators();
+  }
+
+  @Get('appointment-states')
+  appointmentStates() {
+    return this.catalogueService.appointmentStates();
+  }
+
+  @Get('appointment-types')
+  appointmentTypes() {
+    return this.catalogueService.appointmentTypes();
+  }
+
+  @Get('notification-states')
+  notificationStates() {
+    return this.catalogueService.notificationStates();
+  }
+
+  @Get('route-administrations')
+  routeAdministrations() {
+    return this.catalogueService.routeAdministrations();
+  }
 }

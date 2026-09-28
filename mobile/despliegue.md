@@ -7,6 +7,17 @@
 | App móvil (Expo / React Native) | EAS Build (Expo Application Services)       |
 | API backend                     | Render — `https://salud-movil.onrender.com` |
 
+## Expo Go no es compatible
+
+**No usar Expo Go** (la app de la store). El proyecto depende de `react-native-mmkv` (v4) y `react-native-nitro-modules`, que son **módulos nativos** y no existen en el runtime de Expo Go. `npx expo start` y escanear el QR con Expo Go **fallará al cargar la app**.
+
+Para desarrollo local, dos caminos:
+
+1. `npx expo run:android` — compila el APK de desarrollo con gradle y lo instala en un emulador o dispositivo (requiere Android SDK / Android Studio).
+2. `eas build --profile development --platform android` — build en la nube de EAS; instalar el APK de desarrollo y conectarse con Metro.
+
+En ambos casos el APK instalado tiene que ser un "development build" firmado con las mismas credenciales que el proyecto (`developmentClient: true` en `eas.json`), no un build normal.
+
 ## Requisitos previos
 
 - Cuenta de Expo/EAS.

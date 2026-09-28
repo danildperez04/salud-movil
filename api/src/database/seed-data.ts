@@ -34,6 +34,42 @@ export const HEALTH_CENTER_TYPES = [
   'Puesto de Salud',
 ];
 
+export interface TypeIndicatorSeed {
+  name: string;
+  measurementUnit: string;
+}
+
+export const TYPE_INDICATORS: TypeIndicatorSeed[] = [
+  { name: 'Blood pressure', measurementUnit: 'mmHg' },
+  { name: 'Glucose', measurementUnit: 'mg/dL' },
+  { name: 'Weight', measurementUnit: 'kg' },
+  { name: 'Temperature', measurementUnit: '°C' },
+];
+
+export const APPOINTMENT_STATES = [
+  'Scheduled',
+  'Cancelled',
+  'Completed',
+  'No show',
+];
+
+export const APPOINTMENT_TYPES = [
+  'First visit',
+  'Follow-up',
+  'Check-up',
+  'Other',
+];
+
+export const NOTIFICATION_STATES = ['Pending', 'Sent', 'Confirmed', 'Failed'];
+
+export const ROUTE_ADMINISTRATIONS = [
+  'Oral',
+  'Intravenous',
+  'Subcutaneous',
+  'Topical',
+  'Inhaled',
+];
+
 export interface DepartmentSeed {
   name: string;
   municipalities: string[];
