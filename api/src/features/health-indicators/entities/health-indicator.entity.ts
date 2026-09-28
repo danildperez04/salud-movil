@@ -3,6 +3,7 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  Index,
   JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
@@ -11,6 +12,7 @@ import { Patient } from '../../users/entities/patient.entity';
 import { TypeIndicator } from '../../catalogues/entities/type-indicator.entity';
 import { User } from '../../users/entities/user.entity';
 
+@Index(['patient', 'typeIndicator', 'dateHour'])
 @Entity('health_indicator')
 export class HealthIndicator {
   @PrimaryGeneratedColumn('uuid')

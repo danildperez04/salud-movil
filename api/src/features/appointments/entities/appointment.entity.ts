@@ -3,6 +3,7 @@ import {
   CreateDateColumn,
   DeleteDateColumn,
   Entity,
+  Index,
   JoinColumn,
   ManyToOne,
   OneToMany,
@@ -16,6 +17,8 @@ import { AppointmentType } from '../../catalogues/entities/appointment-type.enti
 import { User } from '../../users/entities/user.entity';
 import { AppointmentReminder } from './appointment-reminder.entity';
 
+@Index(['patient', 'dateHour'])
+@Index(['healthcareWorker', 'dateHour'])
 @Entity('appointment')
 export class Appointment {
   @PrimaryGeneratedColumn('uuid')

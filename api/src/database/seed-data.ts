@@ -70,6 +70,40 @@ export const ROUTE_ADMINISTRATIONS = [
   'Inhaled',
 ];
 
+export interface ClinicalRangeSeed {
+  typeIndicatorName: string;
+  minValue: number | null;
+  maxValue: number | null;
+  minValueSecondary: number | null;
+  maxValueSecondary: number | null;
+}
+
+// Valores iniciales ESTÁNDAR. Pendientes de validación del equipo médico (ver
+// docs/Plan_Cierre_MVP.md, Fase 1.D). Se consumen para clasificar normal/alto/bajo.
+export const CLINICAL_RANGES: ClinicalRangeSeed[] = [
+  {
+    typeIndicatorName: 'Blood pressure',
+    minValue: 90,
+    maxValue: 139,
+    minValueSecondary: 60,
+    maxValueSecondary: 89,
+  },
+  {
+    typeIndicatorName: 'Glucose',
+    minValue: 70,
+    maxValue: 126,
+    minValueSecondary: null,
+    maxValueSecondary: null,
+  },
+  {
+    typeIndicatorName: 'Temperature',
+    minValue: 35.5,
+    maxValue: 37.5,
+    minValueSecondary: null,
+    maxValueSecondary: null,
+  },
+];
+
 export interface DepartmentSeed {
   name: string;
   municipalities: string[];

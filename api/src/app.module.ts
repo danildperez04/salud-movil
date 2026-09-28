@@ -9,6 +9,9 @@ import { AuthModule } from './features/auth/auth.module';
 import { CatalogueModule } from './features/catalogues/catalogue.module';
 import { PatientsModule } from './features/patients/patients.module';
 import { MedicalRecordsModule } from './features/medical-records/medical-records.module';
+import { HealthIndicatorsModule } from './features/health-indicators/health-indicators.module';
+import { AppointmentsModule } from './features/appointments/appointments.module';
+import { MedicationsModule } from './features/medications/medications.module';
 import { DatabaseModule } from './database/database.module';
 
 @Module({
@@ -34,6 +37,9 @@ import { DatabaseModule } from './database/database.module';
     CatalogueModule,
     PatientsModule,
     MedicalRecordsModule,
+    HealthIndicatorsModule,
+    AppointmentsModule,
+    MedicationsModule,
     DatabaseModule,
   ],
   controllers: [AppController],

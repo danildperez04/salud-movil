@@ -72,9 +72,9 @@ salud-móvil/
 │       │   ├── patients/     # CRUD de pacientes, vinculación de cuidadores
 │       │   ├── medical-records/  # Expediente clínico y consultas médicas
 │       │   ├── catalogues/   # 12 entidades de catálogo
-│       │   ├── appointments/ # Entidades (controlador/servicio pendientes)
-│       │   ├── health-indicators/  # Entidad (controlador/servicio pendientes)
-│       │   ├── medications/  # Entidades (controlador/servicio pendientes)
+│       │   ├── appointments/ # Citas: CRUD, cancelación, estados, próximo
+│       │   ├── health-indicators/  # Indicadores: CRUD, último, resumen+rangos
+│       │   ├── medications/  # Medicamentos: CRUD, horarios, recordatorios
 │       │   └── health-centers/    # Entidad (usada por otros módulos)
 │       └── main.ts
 ├── mobile/
@@ -159,11 +159,50 @@ salud-móvil/
 | `POST` | `/patients/:id/medical-visits` | Registrar consulta médica | Admin, Personal de salud |
 | `GET` | `/patients/me/history` | Ver propio historial clínico | Paciente |
 
+### Indicadores de salud (montado bajo `/patients`)
+
+| Método | Ruta | Descripción | Acceso |
+| --- | --- | --- | --- |
+| `POST` | `/patients/me/health-indicators` | Registrar indicador propio | Paciente |
+| `GET` | `/patients/me/health-indicators?typeIndicatorId=&from=&to=` | Listar propios indicadores | Paciente |
+| `PATCH` | `/patients/me/health-indicators/:indicatorId` | Editar indicador propio | Paciente |
+| `DELETE` | `/patients/me/health-indicators/:indicatorId` | Eliminar indicador propio | Paciente |
+| `POST` | `/patients/:id/health-indicators` | Registrar indicador de un paciente | Admin, Personal de salud |
+| `GET` | `/patients/:id/health-indicators?typeIndicatorId=&from=&to=` | Listar indicadores de un paciente | Admin, Personal de salud |
+| `GET` | `/patients/:id/health-indicators/latest` | Último valor por tipo de indicador | Admin, Personal de salud |
+| `GET` | `/patients/:id/health-indicators/summary` | Resumen con rangos clínicos y estado (normal/bajo/alto) | Admin, Personal de salud |
+| `PATCH` | `/patients/:id/health-indicators/:indicatorId` | Editar indicador | Admin, Personal de salud |
+| `DELETE` | `/patients/:id/health-indicators/:indicatorId` | Eliminar indicador | Admin, Personal de salud |
+
+### Citas (montado bajo `/patients`)
+
+| Método | Ruta | Descripción | Acceso |
+| --- | --- | --- | --- |
+| `GET` | `/patients/me/appointments/upcoming` | Próximas citas propias | Paciente |
+| `POST` | `/patients/:id/appointments` | Crear cita (genera recordatorio 30 min antes) | Admin, Personal de salud |
+| `GET` | `/patients/:id/appointments` | Listar citas del paciente | Admin, Personal de salud |
+| `GET` | `/patients/:id/appointments/upcoming` | Próximas citas (estado Scheduled, ordenadas por fecha) | Admin, Personal de salud |
+| `PATCH` | `/patients/:id/appointments/:appointmentId` | Modificar cita programada | Admin, Personal de salud |
+| `DELETE` | `/patients/:id/appointments/:appointmentId` | Eliminar cita programada | Admin, Personal de salud |
+| `POST` | `/patients/:id/appointments/:appointmentId/cancel` | Cancelar cita (motivo + marca temporal) | Admin, Personal de salud |
+| `PATCH` | `/patients/:id/appointments/:appointmentId/state` | Cambiar estado (Completed / No show) | Admin, Personal de salud |
+
+### Medicamentos (montado bajo `/patients`)
+
+| Método | Ruta | Descripción | Acceso |
+| --- | --- | --- | --- |
+| `GET` | `/patients/me/medications` | Listar propios medicamentos con horarios | Paciente |
+| `POST` | `/patients/me/medications/:medicationId/reminders/:reminderId/confirm` | Confirmar toma (HU-26) | Paciente |
+| `POST` | `/patients/:id/medications` | Prescribir medicamento (genera recordatorios) | Admin, Personal de salud |
+| `GET` | `/patients/:id/medications` | Listar medicamentos del paciente | Admin, Personal de salud |
+| `PATCH` | `/patients/:id/medications/:medicationId` | Editar (activo, horarios, datos) | Admin, Personal de salud |
+| `DELETE` | `/patients/:id/medications/:medicationId` | Eliminar medicamento (soft delete) | Admin, Personal de salud |
+
 ## Estado de desarrollo
 
 | Aplicación | Estado | Detalle |
 | --- | --- | --- |
-| **API** | ~70% | 5 módulos funcionales (auth, users, patients, catalogues, medical-records). 3 módulos con entidades definidas sin lógica (appointments, health-indicators, medications). Pendientes: migraciones SQL, rate limiting, tests. |
+| **API** | ~85% | 8 módulos funcionales (auth, users, patients, catalogues, medical-records, health-indicators, appointments, medications). Pendientes: migraciones SQL, rate limiting, más tests. |
 | **Frontend** | ~60% | Login, dashboard, gestión de personal de salud y pacientes completa. Pendiente: módulo de indicadores de salud en panel web. |
 | **Mobile** | ~5% | Scaffold con Expo SDK 57, tokens de diseño y layout base. Sin pantallas funcionales ni cliente API. |
 
