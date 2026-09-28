@@ -337,3 +337,8 @@ Actualizar esta tabla en cada PR mergeado a `develop`.
 | Fecha | Fase | Tarea | Autor | PR |
 |---|---|---|---|---|
 | 27-sep-2026 | — | Documento creado. Diagnóstico y línea de base verificados | — | — |
+| 27-sep-2026 | Fase 0 | Seed de los 5 catálogos + endpoints `GET /catalogues/*`. `GET /` público. `typecheck` en mobile (requirió declaración `css.d.ts` y quitar `index.ts` muerto). Docs: pnpm canónico, Expo Go no compatible. Verificado: builds ✅, seed en BD (4/4/4/4/5), endpoints vía HTTP ✅, unit+e2e ✅ | — | — |
+
+### Pendientes detectados al verificar la Fase 0
+
+- Lint de `frontend/` falla en `frontend/src/components/ui/Button.tsx:22` (`react-refresh/only-export-components`). Pre-existente (no tocado en esta fase); resolver en Fase 4.8.

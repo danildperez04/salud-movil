@@ -129,6 +129,11 @@ salud-móvil/
 | `GET` | `/catalogues/majors` | Listar especialidades |
 | `GET` | `/catalogues/health-centers` | Listar centros de salud |
 | `GET` | `/catalogues/municipalities?departmentId=` | Listar municipios por departamento |
+| `GET` | `/catalogues/type-indicators` | Listar tipos de indicador con su unidad |
+| `GET` | `/catalogues/appointment-states` | Listar estados de cita |
+| `GET` | `/catalogues/appointment-types` | Listar tipos de cita |
+| `GET` | `/catalogues/notification-states` | Listar estados de notificación |
+| `GET` | `/catalogues/route-administrations` | Listar vías de administración |
 
 ### Pacientes (`/patients`)
 
@@ -186,6 +191,8 @@ git clone https://github.com/danildperez04/salud-móvil.git
 
 - [Node.js](https://nodejs.org) y [pnpm](https://pnpm.io) para `api` y `frontend`.
 - npm para `mobile` (proyecto Expo / React Native).
+
+> **Importante (`frontend/`):** el gestor canónico es **pnpm**. El repo conserva un `package-lock.json` obsoleto que provoca errores de dependencias faltantes si alguien usa `npm install`; ignorarlo y usar siempre `pnpm install`.
 
 ### Backend
 

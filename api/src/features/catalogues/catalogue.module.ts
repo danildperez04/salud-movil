@@ -8,6 +8,11 @@ import { Major } from './entities/major.entity';
 import { Department } from './entities/department.entity';
 import { Municipality } from './entities/municipality.entity';
 import { HealthCenter } from '../health-centers/entities/health-center.entity';
+import { TypeIndicator } from './entities/type-indicator.entity';
+import { AppointmentState } from './entities/appointment-state.entity';
+import { AppointmentType } from './entities/appointment-type.entity';
+import { NotificationState } from './entities/notification-state.entity';
+import { RouteAdministration } from './entities/route-administration.entity';
 
 @Module({
   imports: [
@@ -18,6 +23,11 @@ import { HealthCenter } from '../health-centers/entities/health-center.entity';
       Department,
       Municipality,
       HealthCenter,
+      TypeIndicator,
+      AppointmentState,
+      AppointmentType,
+      NotificationState,
+      RouteAdministration,
     ]),
   ],
   controllers: [CatalogueController],
