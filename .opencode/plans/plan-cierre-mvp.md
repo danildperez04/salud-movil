@@ -107,27 +107,27 @@ Estado al 27-sep-2026. ✅ implementado · ⚠️ parcial · ❌ pendiente
 | HU-10 | Must | Personal registra consulta | ⚠️ | API existe; falta UI (4.4) |
 | HU-11 | Must | Historial clínico cronológico | ⚠️ | La API devuelve `visits`; el panel no las renderiza (4.4) |
 | HU-12 | Must | Paciente consulta su historial | ⚠️ | API `/patients/me/history`; falta pantalla en móvil (3.3) |
-| HU-13 | Must | Registrar indicadores con fecha y hora | ❌ | 1.A + 3.2 |
-| HU-14 | Must | Historial de indicadores en lista | ❌ | 1.A + 3.2 |
+| HU-13 | Must | Registrar indicadores con fecha y hora | ⚠️ | API ✅ (1.A); falta móvil (3.2) |
+| HU-14 | Must | Historial de indicadores en lista | ⚠️ | API ✅ (1.A); falta móvil (3.2 y filtros) |
 | HU-15 | Should | Evolución mediante gráficas | ❌ | 3.4 (falta librería) |
-| HU-16 | Must | Personal ve indicadores recientes | ❌ | 1.A (`/summary`) + 4.1 |
-| HU-17 | Should | Corregir un registro propio | ❌ | 1.A (`PATCH`/`DELETE`) |
-| HU-18 | Must | Personal programa citas | ❌ | 1.B |
-| HU-19 | Must | Personal modifica una cita | ❌ | 1.B |
-| HU-20 | Must | Personal cancela cita con motivo | ❌ | 1.B + 3.4 |
-| HU-21 | Must | Paciente ve próximas citas | ❌ | 1.B (`/upcoming`) + 3.2 |
-| HU-22 | Should | Marcar completada / inasistencia | ❌ | 1.B (`/state`) |
-| HU-23 | Must | Paciente registra medicamento | ❌ | 1.C |
-| HU-24 | Must | Configurar horarios y días de toma | ❌ | 1.C |
+| HU-16 | Must | Personal ve indicadores recientes | ⚠️ | API ✅ (`/summary` con rangos); falta panel (4.1) |
+| HU-17 | Should | Corregir un registro propio | ⚠️ | API ✅ (`PATCH`/`DELETE`); falta móvil (3.2) |
+| HU-18 | Must | Personal programa citas | ⚠️ | API ✅ (1.B); falta móvil/web (3.2/4) |
+| HU-19 | Must | Personal modifica una cita | ⚠️ | API ✅ (1.B); falta UI |
+| HU-20 | Must | Personal cancela cita con motivo | ⚠️ | API ✅ (1.B); falta UI |
+| HU-21 | Must | Paciente ve próximas citas | ⚠️ | API ✅ (`/upcoming`); falta móvil (3.2) |
+| HU-22 | Should | Marcar completada / inasistencia | ⚠️ | API ✅ (`/state`); falta UI |
+| HU-23 | Must | Paciente registra medicamento | ⚠️ | API ✅ (1.C); falta móvil (3.2) |
+| HU-24 | Must | Configurar horarios y días de toma | ⚠️ | API ✅ (1.C); falta móvil |
 | HU-25 | Must | Notificación local en hora de toma | ❌ | 3.4 (falta `expo-notifications`) |
-| HU-26 | Should | Confirmación de toma | ❌ | 1.C |
+| HU-26 | Should | Confirmación de toma | ⚠️ | API ✅ (1.C); falta móvil |
 | HU-27 | Must | Notificación local antes de la cita | ❌ | 3.4 |
 | HU-28 | Must | Admin asigna centro de salud | ⚠️ | Asignación en alta ✅; **reasignación no permitida** por el backend |
 | HU-29 | Must | Personal ve pacientes de su centro | ⚠️ | Listado con alcance por centro ✅; falta "última consulta" |
 | HU-30 | Could | Expediente desde el panel | ✅ | — |
-| HU-31 | Could | Resumen de indicadores en el panel | ❌ | 1.A + 4.1 |
+| HU-31 | Could | Resumen de indicadores en el panel | ⚠️ | API ✅ (`/summary`); falta panel (4.1) |
 
-**Resumen:** 9 completas · 9 parciales · 13 pendientes. De las 13 pendientes, **8 dependen de la Fase 1**.
+**Resumen:** 9 completas · 18 parciales · 4 pendientes. Las pendientes dependen de las Fases 2-3 (UI/notificaciones).
 
 ---
 
@@ -167,45 +167,46 @@ Convenciones que ya usa el proyecto y hay que respetar:
 - Nunca devolver la entidad cruda: mappers a interfaces `Public*` exportadas desde el service
 - Scoping por centro: reutilizar `patientsService.findRecordForScope()` inyectando `PatientsModule` (no duplicar la lógica)
 
-#### 1.A — Health indicators (HU-13, 14, 16, 17)
+#### 1.A — Health indicators (HU-13, 14, 16, 17) ✅
 
 El más simple de los tres. Empezar aquí.
 
-- Endpoints: `POST/GET/PATCH/DELETE /patients/:id/health-indicators`, `GET /latest`, `GET /summary` (HU-16)
-- ⚠️ `value` es `decimal(8,2)`: **TypeORM lo devuelve como `string`**. Convertir con `Number()` en el mapper
-- ⚠️ Regla del ERD §5.9: si el tipo es presión arterial, `valueSecondary` es **obligatorio**
-- `registered_by` es NOT NULL: llenarlo siempre, incluso para admin
-- Añadir `@Index(['patientId','typeIndicatorId','dateHour'])` — el ERD §7 lo pide y no existe
+- ✅ Endpoints: `POST/GET/PATCH/DELETE /patients/:id/health-indicators`, `GET /latest`, `GET /summary` (HU-16) + rutas `me/*`
+- ✅ `value` es `decimal(8,2)`: **TypeORM lo devuelve como `string`**. Convertir con `Number()` en el mapper
+- ✅ Regla del ERD §5.9: si el tipo es presión arterial, `valueSecondary` es **obligatorio**
+- ✅ `registered_by` es NOT NULL: llenarlo siempre, incluso para admin
+- ✅ `@Index(['patient','typeIndicator','dateHour'])` — el ERD §7 lo pide y no existía
 
-#### 1.B — Appointments (HU-18 a HU-22)
+#### 1.B — Appointments (HU-18 a HU-22) ✅
 
-- CRUD + `POST /:id/cancel` con `cancel_reason` y `cancelled_at` (HU-20)
-- `GET /upcoming` ascendente (HU-21) + `PATCH /:id/state` (HU-22)
-- Índices `(patient_id, date_hour)` y `(healthcare_worker_id, date_hour)` según ERD §7
+- ✅ CRUD + `POST /:id/appointments/:appointmentId/cancel` con `cancel_reason` y `cancelled_at` (HU-20)
+- ✅ `GET /upcoming` ascendente (HU-21) + `PATCH /:id/appointments/:appointmentId/state` (HU-22), restricción `Scheduled` → `Completed/No show`
+- ✅ Índices `(patient_id, date_hour)` y `(healthcare_worker_id, date_hour)` según ERD §7
 
-#### 1.C — Medications (HU-23, 24, 26)
+#### 1.C — Medications (HU-23, 24, 26) ✅
 
 **Requiere transacción:** un solo `POST` crea medicamento + N horarios + M días.
 
-- ⚠️ `medication_schedule_day` tiene **PK compuesta** `(schedule_id, week_day)` **más `deleted_at`**. Reinsertar el mismo par viola unicidad. Aplicar el patrón de revivir que ya existe en `patients.service.ts:366-389` (buscar con `withDeleted: true`, revivir con `deletedAt: null`)
-- ⚠️ La columna se llama `medicine_id`, no `medication_id`. **No "corregirla"**: coincide con el ERD
-- Validar `endDate >= startDate`
-- La propiedad TS es `prescribedByUser` (no `prescribedBy`)
+- ✅ `medication_schedule_day` con **PK compuesta** `(schedule_id, week_day)` **más `deleted_at`**: al reemplazar horarios se hace `softDelete` de los schedules antiguos y se recrean (nuevos UUID), evitando conflictos de unicidad
+- ✅ La columna se llama `medicine_id`, no `medication_id`. Se respeta (coincide con el ERD)
+- ✅ Validar `endDate >= startDate`
+- ✅ Propiedad TS `prescribedByUser` (no `prescribedBy`)
+- ✅ Recordatorios por horario+día en ventana de 21 días + confirmación de toma (HU-26)
 
-#### 1.D — Catálogo de rangos clínicos *(nuevo)*
+#### 1.D — Catálogo de rangos clínicos ✅ *(decisión tomada)*
 
 Decisión tomada: los rangos viven en la base de datos.
 
-- Tabla de rangos por tipo de indicador (mínimo, máximo, óptimo) con la unidad del catálogo
-- Alimenta la clasificación `normal` / `alto` / `bajo` y al IPCP
-- **Actualizar `docs/Esquema_de_Base_de_Datos.md` §9** (cambios aplicados respecto al DDL original)
-- Los valores iniciales son estándar, pero **deben validarlos el equipo médico**
+- ✅ Tabla `clinical_range` por tipo de indicador (min/max primario y secundario)
+- ✅ Alimenta la clasificación `normal` / `alto` / `bajo` y el `GET /summary`
+- ✅ `docs/Esquema_de_Base_de_Datos.md` §9 actualizado (filas 21-23)
+- ⚠️ Los valores iniciales son estándar, pero **deben validarlos el equipo médico**
 
-#### 1.E — Pruebas (junto al código)
+#### 1.E — Pruebas (junto al código) ✅
 
 Por módulo: auth y RBAC, scoping por centro de salud, y las reglas de negocio críticas — PA exige valor secundario, revivir días de horario, `endDate >= startDate`.
 
-**Criterio de salida:** los tres módulos exponen endpoints funcionales, `pnpm test` en verde, y se puede crear un paciente → registrar indicador → agendar cita → recetar medicamento.
+**Criterio de salida:** ✅ los tres módulos exponen endpoints funcionales, `pnpm test` en verde, y se puede crear un paciente → registrar indicador → agendar cita → recetar medicamento.
 
 ---
 
@@ -338,6 +339,7 @@ Actualizar esta tabla en cada PR mergeado a `develop`.
 |---|---|---|---|---|
 | 27-sep-2026 | — | Documento creado. Diagnóstico y línea de base verificados | — | — |
 | 27-sep-2026 | Fase 0 | Seed de los 5 catálogos + endpoints `GET /catalogues/*`. `GET /` público. `typecheck` en mobile (requirió declaración `css.d.ts` y quitar `index.ts` muerto). Docs: pnpm canónico, Expo Go no compatible. Verificado: builds ✅, seed en BD (4/4/4/4/5), endpoints vía HTTP ✅, unit+e2e ✅ | — | — |
+| 27-sep-2026 | Fase 1 | Módulos `health-indicators`, `appointments` y `medications` completos (controller/service/module/DTOs) bajo `@Controller('patients')` con Rutas `me/*` para paciente. Rangos clínicos: entidad `clinical_range` + seed + clasificación low/normal/high y `GET summary` con rangos. Cancelación/estado de citas solo en `Scheduled` (409 en otro estado). Medicamentos con transacción, horarios, recordatorios (ventana 21 días) y confirmación de toma (HU-26). Tests unitarios (12), e2e ✅, build ✅, lint ✅. Smoke real vía HTTP (3001): BP alta→high, 400 sin valueSecondary, cita futura→upcoming, 409 cancelar completada, recordatorio generado+confirmado, scoping de centro 404, admin sin personal→400. README + ERD §9 (filas 21-23) actualizados | — | — |
 
 ### Pendientes detectados al verificar la Fase 0
 

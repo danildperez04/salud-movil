@@ -14,6 +14,7 @@ import { AppointmentState } from '../features/catalogues/entities/appointment-st
 import { AppointmentType } from '../features/catalogues/entities/appointment-type.entity';
 import { NotificationState } from '../features/catalogues/entities/notification-state.entity';
 import { RouteAdministration } from '../features/catalogues/entities/route-administration.entity';
+import { ClinicalRange } from '../features/catalogues/entities/clinical-range.entity';
 import { HealthCenter } from '../features/health-centers/entities/health-center.entity';
 import { User } from '../features/users/entities/user.entity';
 import { HealthcareWorker } from '../features/users/entities/healthcare-worker.entity';
@@ -29,6 +30,7 @@ import {
   APPOINTMENT_TYPES,
   NOTIFICATION_STATES,
   ROUTE_ADMINISTRATIONS,
+  CLINICAL_RANGES,
 } from './seed-data';
 
 @Injectable()
@@ -117,6 +119,35 @@ export class SeedService implements OnApplicationBootstrap {
       await manager.save(
         RouteAdministration,
         ROUTE_ADMINISTRATIONS.map((name) => ({ name })),
+      );
+    }
+    if ((await manager.count(ClinicalRange)) === 0) {
+      const typeIndicators = await manager.find(TypeIndicator);
+      await manager.save(
+        ClinicalRange,
+        CLINICAL_RANGES.map((range) => {
+          const typeIndicator = typeIndicators.find(
+            (indicator) => indicator.name === range.typeIndicatorName,
+          );
+          if (!typeIndicator) {
+            throw new Error(
+              `No se encontró el tipo de indicador para el rango: ${range.typeIndicatorName}`,
+            );
+          }
+          return {
+            typeIndicatorId: typeIndicator.id,
+            minValue: range.minValue !== null ? String(range.minValue) : null,
+            maxValue: range.maxValue !== null ? String(range.maxValue) : null,
+            minValueSecondary:
+              range.minValueSecondary !== null
+                ? String(range.minValueSecondary)
+                : null,
+            maxValueSecondary:
+              range.maxValueSecondary !== null
+                ? String(range.maxValueSecondary)
+                : null,
+          };
+        }),
       );
     }
 
