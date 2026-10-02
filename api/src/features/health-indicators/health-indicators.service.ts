@@ -8,6 +8,10 @@ import { Repository } from 'typeorm';
 import { HealthIndicator } from './entities/health-indicator.entity';
 import { TypeIndicator } from '../catalogues/entities/type-indicator.entity';
 import { ClinicalRange } from '../catalogues/entities/clinical-range.entity';
+import {
+  ClinicalRangeBandsService,
+  RangeBands,
+} from '../catalogues/clinical-range-bands.service';
 import { User } from '../users/entities/user.entity';
 import { PatientsService } from '../patients/patients.service';
 import { CreateHealthIndicatorDto } from './dto/create-health-indicator.dto';
@@ -15,6 +19,7 @@ import { UpdateHealthIndicatorDto } from './dto/update-health-indicator.dto';
 import type { JwtPayload } from '../../common/guards/jwt-payload.interface';
 
 export type IndicatorStatus = 'low' | 'normal' | 'high' | null;
+export type IndicatorSeverity = 'normal' | 'alert' | 'critical' | null;
 
 export interface PublicHealthIndicator {
   id: string;
@@ -27,7 +32,12 @@ export interface PublicHealthIndicator {
   notes: string | null;
   registeredById: string;
   registeredByName: string;
+  /** Clasificación binaria. Se conserva por compatibilidad con el cliente móvil. */
   status: IndicatorStatus;
+  /** Gravedad según las bandas. Es la que consume el índice de prioridad. */
+  severity: IndicatorSeverity;
+  /** Etiqueta legible de la banda coincidente, ej. "Sistólica elevada". */
+  band: string | null;
 }
 
 export interface PublicIndicatorSummary {
@@ -38,6 +48,8 @@ export interface PublicIndicatorSummary {
   valueSecondary: number | null;
   dateHour: string;
   status: IndicatorStatus;
+  severity: IndicatorSeverity;
+  band: string | null;
   minValue: number | null;
   maxValue: number | null;
   minValueSecondary: number | null;
@@ -61,6 +73,7 @@ export class HealthIndicatorsService {
     private readonly clinicalRangeRepository: Repository<ClinicalRange>,
     @InjectRepository(User) private readonly userRepository: Repository<User>,
     private readonly patientsService: PatientsService,
+    private readonly bandsService: ClinicalRangeBandsService,
   ) {}
 
   async create(
@@ -126,6 +139,8 @@ export class HealthIndicatorsService {
         valueSecondary: indicator.valueSecondary,
         dateHour: indicator.dateHour,
         status: indicator.status,
+        severity: indicator.severity,
+        band: indicator.band,
         minValue: range ? Number(range.minValue) : null,
         maxValue: range ? Number(range.maxValue) : null,
         minValueSecondary:
@@ -233,7 +248,8 @@ export class HealthIndicatorsService {
       throw new NotFoundException('Indicador no encontrado');
     }
     const rangesById = await this.loadRangesById();
-    return this.toPublicIndicator(loaded, rangesById);
+    const bandsById = await this.loadBandsById();
+    return this.toPublicIndicator(loaded, rangesById, bandsById);
   }
 
   private async loadIndicators(
@@ -263,7 +279,8 @@ export class HealthIndicatorsService {
 
     const indicators = await query.getMany();
     const rangesById = await this.loadRangesById();
-    return this.toPublicIndicators(indicators, rangesById);
+    const bandsById = await this.loadBandsById();
+    return this.toPublicIndicators(indicators, rangesById, bandsById);
   }
 
   private async loadLatestIndicators(
@@ -275,7 +292,8 @@ export class HealthIndicatorsService {
       order: { dateHour: 'DESC', createdAt: 'DESC' },
     });
     const rangesById = await this.loadRangesById();
-    return this.toPublicIndicators(indicators, rangesById, {
+    const bandsById = await this.loadBandsById();
+    return this.toPublicIndicators(indicators, rangesById, bandsById, {
       latestByType: true,
     });
   }
@@ -327,7 +345,8 @@ export class HealthIndicatorsService {
       throw new NotFoundException('Indicador no encontrado');
     }
     const rangesById = await this.loadRangesById();
-    return this.toPublicIndicator(loaded, rangesById);
+    const bandsById = await this.loadBandsById();
+    return this.toPublicIndicator(loaded, rangesById, bandsById);
   }
 
   private async removeIndicator(
@@ -363,6 +382,7 @@ export class HealthIndicatorsService {
   private toPublicIndicators(
     indicators: HealthIndicator[],
     rangesById: Map<number, ClinicalRange>,
+    bandsById: Map<number, RangeBands>,
     options: { latestByType?: boolean } = {},
   ): PublicHealthIndicator[] {
     if (options.latestByType && indicators.length > 0) {
@@ -373,20 +393,21 @@ export class HealthIndicatorsService {
         }
       }
       return [...latest.values()].map((indicator) =>
-        this.toPublicIndicator(indicator, rangesById),
+        this.toPublicIndicator(indicator, rangesById, bandsById),
       );
     }
     return indicators.map((indicator) =>
-      this.toPublicIndicator(indicator, rangesById),
+      this.toPublicIndicator(indicator, rangesById, bandsById),
     );
   }
 
   private toPublicIndicator(
     indicator: HealthIndicator,
     rangesById: Map<number, ClinicalRange>,
+    bandsById: Map<number, RangeBands>,
   ): PublicHealthIndicator {
     const range = rangesById.get(indicator.typeIndicator.id) ?? null;
-    const status = this.classify(indicator, range);
+    const classification = this.classify(indicator, range, bandsById);
     return {
       id: indicator.id,
       typeIndicatorId: indicator.typeIndicator.id,
@@ -401,7 +422,9 @@ export class HealthIndicatorsService {
       notes: indicator.notes ?? null,
       registeredById: indicator.registeredBy.id,
       registeredByName: indicator.registeredBy.name,
-      status,
+      status: classification.status,
+      severity: classification.severity,
+      band: classification.band,
     };
   }
 
@@ -410,13 +433,97 @@ export class HealthIndicatorsService {
     return new Map(ranges.map((range) => [range.typeIndicatorId, range]));
   }
 
+  private async loadBandsById(): Promise<Map<number, RangeBands>> {
+    return this.bandsService.loadAll();
+  }
+
+  /**
+   * Resuelve la banda de gravedad del indicador.
+   *
+   * `status` conserva la clasificación binaria (min/max) por compatibilidad con
+   * el cliente móvil. `severity` y `band` añaden la gradación de tres niveles.
+   *
+   * La diastólica se evalúa contra las bandas secundarias y, si alguna coincide,
+   * su severidad prevalece sobre la de la sistólica: en una presión arterial lo
+   * grave es lo que peor está entre las dos.
+   */
   private classify(
     indicator: HealthIndicator,
     range: ClinicalRange | null,
-  ): IndicatorStatus {
+    bandsById: Map<number, RangeBands>,
+  ): {
+    status: IndicatorStatus;
+    severity: IndicatorSeverity;
+    band: string | null;
+  } {
     if (!range) {
-      return null;
+      return { status: null, severity: null, band: null };
     }
+
+    const status = this.classifyByRange(indicator, range);
+    const bands = bandsById.get(indicator.typeIndicator.id) ?? null;
+    if (!bands) {
+      return { status, severity: null, band: null };
+    }
+
+    const primaryMatch = this.bandsService.match(
+      bands.primary,
+      Number(indicator.value),
+    );
+    const secondaryMatch =
+      indicator.valueSecondary !== null
+        ? this.bandsService.match(
+            bands.secondary,
+            Number(indicator.valueSecondary),
+          )
+        : null;
+
+    if (!primaryMatch && !secondaryMatch) {
+      return { status, severity: null, band: null };
+    }
+
+    const severity = this.strongerSeverity(
+      primaryMatch?.severity ?? null,
+      secondaryMatch?.severity ?? null,
+    );
+    const labels = [primaryMatch?.label, secondaryMatch?.label].filter(
+      (label): label is string => Boolean(label),
+    );
+
+    return {
+      status,
+      severity,
+      band: labels.length > 0 ? labels.join(' / ') : null,
+    };
+  }
+
+  /** De dos severidades devuelve la más grave: normal < alert < critical. */
+  private strongerSeverity(
+    a: IndicatorSeverity,
+    b: IndicatorSeverity,
+  ): IndicatorSeverity {
+    const rank: Record<NonNullable<IndicatorSeverity>, number> = {
+      normal: 0,
+      alert: 1,
+      critical: 2,
+    };
+    if (a === null) {
+      return b;
+    }
+    if (b === null) {
+      return a;
+    }
+    return rank[a] >= rank[b] ? a : b;
+  }
+
+  /**
+   * Clasificación binaria con los min/max del rango. Se mantiene tal cual para
+   * no romper el contrato que ya consume el cliente móvil.
+   */
+  private classifyByRange(
+    indicator: HealthIndicator,
+    range: ClinicalRange,
+  ): IndicatorStatus {
     let hasHigh = false;
     let hasLow = false;
 
