@@ -1,6 +1,6 @@
 import type { PublicCaregiverLink } from "../../../types";
 import { Card } from "../../../components/ui/Card";
-import { getButtonClassName } from "../../../components/ui/Button";
+import { getButtonClassName } from "../../../components/ui/buttonStyles";
 
 export function CaregiverSummaryCard({
   caregivers,
