@@ -79,7 +79,9 @@ export interface ClinicalRangeSeed {
 }
 
 // Valores iniciales ESTÁNDAR. Pendientes de validación del equipo médico (ver
-// docs/Plan_Cierre_MVP.md, Fase 1.D). Se consumen para clasificar normal/alto/bajo.
+// docs/00-ipcp-definition.md y el plan de cierre, §2.6). Se consumen para
+// clasificar normal/alto/bajo. La Fase 2 los rediseña como bandas
+// normal/alert/critical, porque un único umbral no gradúa gravedad.
 export const CLINICAL_RANGES: ClinicalRangeSeed[] = [
   {
     typeIndicatorName: 'Blood pressure',

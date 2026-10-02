@@ -104,7 +104,7 @@ salud-móvil/
 | `POST` | `/auth/register` | Registrar cuenta de cuidador | Público |
 | `POST` | `/auth/login` | Iniciar sesión (devuelve JWT) | Público |
 | `GET` | `/auth/me` | Obtener perfil del usuario actual | Autenticado |
-| `POST` | `/auth/forgot-password` | Solicitar token de recuperación | Público |
+| `POST` | `/auth/forgot-password` | Solicitar recuperación (siempre responde 200, sin revelar si el correo existe) | Público |
 | `POST` | `/auth/reset-password` | Restablecer contraseña con token | Público |
 | `POST` | `/auth/change-password` | Cambiar contraseña | Autenticado |
 
@@ -140,11 +140,11 @@ salud-móvil/
 | Método | Ruta | Descripción | Acceso |
 | --- | --- | --- | --- |
 | `POST` | `/patients` | Crear paciente (crea user + patient) | Admin, Personal de salud |
-| `GET` | `/patients?q=` | Listar/buscar pacientes (filtrado por centro) | Admin, Personal de salud |
+| `GET` | `/patients?q=` | Listar/buscar pacientes (filtrado por centro, con última consulta) | Admin, Personal de salud |
 | `GET` | `/patients/me` | Obtener perfil propio del paciente | Paciente |
 | `GET` | `/patients/linked` | Obtener pacientes vinculados | Cuidador |
 | `GET` | `/patients/:id` | Obtener detalle de paciente | Admin, Personal de salud |
-| `PATCH` | `/patients/:id` | Actualizar paciente | Admin, Personal de salud |
+| `PATCH` | `/patients/:id` | Actualizar paciente (admin puede reasignar el centro de salud) | Admin, Personal de salud |
 | `DELETE` | `/patients/:id` | Eliminar paciente (soft delete) | Admin |
 | `GET` | `/patients/:id/caregivers` | Listar cuidadores vinculados | Admin, Personal de salud |
 | `POST` | `/patients/:id/caregivers` | Vincular cuidador a paciente | Admin, Personal de salud |
@@ -179,6 +179,8 @@ salud-móvil/
 | Método | Ruta | Descripción | Acceso |
 | --- | --- | --- | --- |
 | `GET` | `/patients/me/appointments/upcoming` | Próximas citas propias | Paciente |
+| `GET` | `/patients/me/reminders?windowDays=` | Feed de recordatorios: tomas y citas (por defecto 7 días) | Paciente |
+| `GET` | `/patients/:id/reminders?windowDays=` | Feed de recordatorios de un paciente | Admin, Personal de salud |
 | `POST` | `/patients/:id/appointments` | Crear cita (genera recordatorio 30 min antes) | Admin, Personal de salud |
 | `GET` | `/patients/:id/appointments` | Listar citas del paciente | Admin, Personal de salud |
 | `GET` | `/patients/:id/appointments/upcoming` | Próximas citas (estado Scheduled, ordenadas por fecha) | Admin, Personal de salud |
@@ -202,7 +204,7 @@ salud-móvil/
 
 | Aplicación | Estado | Detalle |
 | --- | --- | --- |
-| **API** | ~85% | 8 módulos funcionales (auth, users, patients, catalogues, medical-records, health-indicators, appointments, medications). Pendientes: migraciones SQL, rate limiting, más tests. |
+| **API** | ~88% | 9 módulos funcionales (auth, users, patients, catalogues, medical-records, health-indicators, appointments, medications, reminders). Con Helmet, rate limiting global y 39 pruebas (unitarias + e2e de RBAC y scoping). Pendientes: migraciones SQL (`synchronize: false`) e IPCP. |
 | **Frontend** | ~60% | Login, dashboard, gestión de personal de salud y pacientes completa. Pendiente: módulo de indicadores de salud en panel web. |
 | **Mobile** | ~5% | Scaffold con Expo SDK 57, tokens de diseño y layout base. Sin pantallas funcionales ni cliente API. |
 

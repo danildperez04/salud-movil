@@ -3,6 +3,7 @@ import {
   IsEmail,
   IsOptional,
   IsString,
+  IsUUID,
   Length,
   Matches,
   MinLength,
@@ -59,4 +60,9 @@ export class UpdatePatientDto {
   @IsOptional()
   @IsString()
   emergencyContactPhoneNumber?: string;
+
+  /** Reasignar centro de salud. Solo el administrador; el personal no puede. */
+  @IsOptional()
+  @IsUUID()
+  healthCenterId?: string;
 }
