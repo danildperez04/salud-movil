@@ -44,6 +44,9 @@ describe('PatientsService', () => {
     userSave?: jest.Mock;
     patientSave?: jest.Mock;
     healthCenterFindOne?: jest.Mock;
+    medicalRecordQuery?: jest.Mock;
+    createQueryBuilder?: jest.Mock;
+    patientCreateQueryBuilder?: jest.Mock;
   }) => {
     const {
       patientFindOne = jest.fn(),
@@ -52,6 +55,9 @@ describe('PatientsService', () => {
       userSave = jest.fn(),
       patientSave = jest.fn(),
       healthCenterFindOne = jest.fn(),
+      medicalRecordQuery = jest.fn().mockResolvedValue([]),
+      createQueryBuilder = jest.fn(),
+      patientCreateQueryBuilder = jest.fn(),
     } = overrides;
 
     const module: TestingModule = await Test.createTestingModule({
@@ -63,6 +69,7 @@ describe('PatientsService', () => {
             findOne: patientFindOne,
             softDelete: patientSoftDelete,
             save: patientSave,
+            createQueryBuilder: patientCreateQueryBuilder,
           },
         },
         {
@@ -83,7 +90,10 @@ describe('PatientsService', () => {
           provide: getRepositoryToken(HealthCenter),
           useValue: { findOne: healthCenterFindOne },
         },
-        { provide: getRepositoryToken(MedicalRecord), useValue: {} },
+        {
+          provide: getRepositoryToken(MedicalRecord),
+          useValue: { query: medicalRecordQuery, createQueryBuilder },
+        },
         { provide: getDataSourceToken(), useValue: {} },
       ],
     }).compile();
@@ -93,6 +103,43 @@ describe('PatientsService', () => {
 
   const admin = { sub: 'u-admin', email: 'admin@test', role: 'admin' };
   const staff = { sub: 'u-staff', email: 'staff@test', role: 'health_staff' };
+
+  /** Monta el servicio con los dos query builders encadenados que usa `findAll`. */
+  const listAllWithLastVisit = async (
+    lastVisitRows: { patientId: string; visitDate: string }[],
+  ) => {
+    const chained = <T extends object>(extra: T) => {
+      const qb: Record<string, jest.Mock> = {};
+      for (const method of [
+        'select',
+        'addSelect',
+        'innerJoin',
+        'where',
+        'andWhere',
+        'groupBy',
+        'innerJoinAndSelect',
+        'leftJoinAndSelect',
+        'orderBy',
+      ]) {
+        qb[method] = jest.fn().mockReturnValue(qb);
+      }
+      return Object.assign(qb, extra);
+    };
+
+    const lastVisitQuery = chained({
+      getRawMany: jest.fn().mockResolvedValue(lastVisitRows),
+    });
+    const patientQuery = chained({
+      getMany: jest.fn().mockResolvedValue([patientWithUser]),
+    });
+
+    service = await buildModule({
+      createQueryBuilder: jest.fn().mockReturnValue(lastVisitQuery),
+      patientCreateQueryBuilder: jest.fn().mockReturnValue(patientQuery),
+    });
+
+    return service.findAll(admin);
+  };
 
   it('debería estar definido', async () => {
     service = await buildModule({});
@@ -157,5 +204,19 @@ describe('PatientsService', () => {
     });
 
     expect(result.healthCenterName).toBe('Centro B');
+  });
+
+  it('debería exponer la fecha de la última consulta en el listado', async () => {
+    const [patient] = await listAllWithLastVisit([
+      { patientId: 'pat-1', visitDate: '2026-03-05T09:00:00Z' },
+    ]);
+
+    expect(patient.lastVisitAt).toBe('2026-03-05T09:00:00.000Z');
+  });
+
+  it('debería devolver null en lastVisitAt cuando no hay consultas', async () => {
+    const [patient] = await listAllWithLastVisit([]);
+
+    expect(patient.lastVisitAt).toBeNull();
   });
 });
