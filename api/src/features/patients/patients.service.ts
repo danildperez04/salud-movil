@@ -296,6 +296,7 @@ export class PatientsService {
       throw new NotFoundException('Paciente no encontrado');
     }
     await this.userRepository.softDelete(id);
+    await this.patientRepository.softDelete(id);
   }
 
   async getPatientCaregivers(
@@ -482,7 +483,7 @@ export class PatientsService {
     id?: string,
     userId?: string,
   ): Promise<Patient | null> {
-    return this.patientRepository.findOne({
+    const patient = await this.patientRepository.findOne({
       where: id ? { id } : { user: { id: userId } },
       relations: {
         user: { municipality: true },
@@ -490,6 +491,14 @@ export class PatientsService {
         healthCenter: true,
       },
     });
+    // La relación con `user` es un LEFT JOIN filtrado por `deleted_at IS NULL`.
+    // Si el usuario está borrado lógicamente, la fila `patient` queda huérfana y
+    // los mappers la desreferenciarían. Se trata como paciente inexistente (404)
+    // en vez de dejar que reviente con un 500.
+    if (!patient?.user) {
+      return null;
+    }
+    return patient;
   }
 
   private toPublicCaregiverLink(link: PatientCaregiver): PublicCaregiverLink {
