@@ -225,7 +225,9 @@ export class SeedService implements OnApplicationBootstrap {
       role,
       municipality,
     });
-    this.logger.log(`Usuario admin creado: ${email} (contraseña: ${password})`);
+    this.logger.log(
+      `Usuario admin creado: ${email}${this.suffixPassword(password)}`,
+    );
   }
 
   private async seedPersonnel(manager: EntityManager): Promise<void> {
@@ -282,7 +284,17 @@ export class SeedService implements OnApplicationBootstrap {
       user,
     });
     this.logger.log(
-      `Personal de salud de ejemplo creado: ${email} (contraseña: ${password})`,
+      `Personal de salud de ejemplo creado: ${email}${this.suffixPassword(password)}`,
     );
+  }
+
+  /**
+   * La contraseña de seed solo se escribe en los logs fuera de producción:
+   * en Render los logs son públicos para el despliegue y la cuenta seed es real.
+   */
+  private suffixPassword(password: string): string {
+    return process.env.NODE_ENV === 'production'
+      ? ''
+      : ` (contraseña: ${password})`;
   }
 }

@@ -2,6 +2,8 @@ import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
+import { APP_GUARD } from '@nestjs/core';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
 import config from './config/configuration';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './features/users/users.module';
@@ -22,6 +24,14 @@ import { DatabaseModule } from './database/database.module';
       envFilePath: '.env',
       load: [config],
     }),
+    ThrottlerModule.forRoot([
+      {
+        // Límite por IP para todo el API. Afecta sobre todo a login y
+        // recuperación de contraseña, que son los que se atacan por fuerza bruta.
+        ttl: parseInt(process.env.THROTTLE_TTL_MS ?? '60000', 10),
+        limit: parseInt(process.env.THROTTLE_LIMIT ?? '100', 10),
+      },
+    ]),
     TypeOrmModule.forRoot({
       type: config().db.type,
       host: config().db.host,
@@ -31,7 +41,8 @@ import { DatabaseModule } from './database/database.module';
       database: config().db.database,
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
       synchronize: true,
-      logging: true,
+      // El log de SQL imprime valores de pacientes. Solo en desarrollo.
+      logging: config().db.logging,
     }),
     UsersModule,
     AuthModule,
@@ -45,6 +56,11 @@ import { DatabaseModule } from './database/database.module';
     DatabaseModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [
+    AppService,
+    // Se registra antes que JwtAuthGuard (que vive en AuthModule) para que el
+    // límite por IP se aplique también a las rutas públicas, como /auth/login.
+    { provide: APP_GUARD, useClass: ThrottlerGuard },
+  ],
 })
 export class AppModule {}
