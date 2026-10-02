@@ -41,6 +41,8 @@ export interface PublicPatient {
   emergencyContactPhoneNumber: string;
   healthCenterId: string;
   healthCenterName: string;
+  /** Criterio de aceptación de HU-29: cuándo fue la última consulta registrada. */
+  lastVisitAt: string | null;
 }
 
 export interface PublicCaregiverLink {
@@ -79,6 +81,8 @@ export class PatientsService {
     private readonly genreRepository: Repository<Genre>,
     @InjectRepository(HealthCenter)
     private readonly healthCenterRepository: Repository<HealthCenter>,
+    @InjectRepository(MedicalRecord)
+    private readonly medicalRecordRepository: Repository<MedicalRecord>,
     @InjectDataSource() private readonly dataSource: DataSource,
   ) {}
 
@@ -158,6 +162,8 @@ export class PatientsService {
   }
 
   async findAll(currentUser: JwtPayload, q?: string): Promise<PublicPatient[]> {
+    const lastVisits = await this.loadLastVisitByPatient();
+
     const query = this.patientRepository
       .createQueryBuilder('patient')
       .innerJoinAndSelect('patient.user', 'user')
@@ -180,7 +186,37 @@ export class PatientsService {
     }
 
     const patients = await query.getMany();
-    return patients.map((patient) => this.toPublicPatient(patient));
+    return patients.map((patient) =>
+      this.toPublicPatient(patient, lastVisits.get(patient.id) ?? null),
+    );
+  }
+
+  /**
+   * Fecha de la última consulta por paciente, para el listado. Una sola consulta
+   * agregada en vez de una por paciente. Se usa `visit_date` (cuándo ocurrió la
+   * consulta), no la fecha de alta del registro, y se excluyen las visitas con
+   * borrado lógico.
+   */
+  private async loadLastVisitByPatient(): Promise<Map<string, Date>> {
+    const rows = await this.medicalRecordRepository
+      .createQueryBuilder('record')
+      .select('record.patient_id', 'patientId')
+      .addSelect('MAX(visit.visit_date)', 'visitDate')
+      .innerJoin(
+        'medical_visit',
+        'visit',
+        'visit.medical_record_id = record.id',
+      )
+      .where('visit.deleted_at IS NULL')
+      .andWhere('record.deleted_at IS NULL')
+      .groupBy('record.patient_id')
+      .getRawMany<{ patientId: string; visitDate: Date }>();
+
+    const result = new Map<string, Date>();
+    for (const row of rows) {
+      result.set(row.patientId, new Date(row.visitDate));
+    }
+    return result;
   }
 
   async findOne(id: string, currentUser: JwtPayload): Promise<PublicPatient> {
@@ -528,7 +564,10 @@ export class PatientsService {
     };
   }
 
-  private toPublicPatient(patient: Patient): PublicPatient {
+  private toPublicPatient(
+    patient: Patient,
+    lastVisitAt: Date | null = null,
+  ): PublicPatient {
     return {
       id: patient.id,
       name: patient.user.name,
@@ -547,6 +586,7 @@ export class PatientsService {
       emergencyContactPhoneNumber: patient.emergencyContactPhoneNumber,
       healthCenterId: patient.healthCenter.id,
       healthCenterName: patient.healthCenter.name,
+      lastVisitAt: lastVisitAt ? lastVisitAt.toISOString() : null,
     };
   }
 }
