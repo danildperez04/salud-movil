@@ -12,6 +12,7 @@ import { MedicalRecordsModule } from './features/medical-records/medical-records
 import { HealthIndicatorsModule } from './features/health-indicators/health-indicators.module';
 import { AppointmentsModule } from './features/appointments/appointments.module';
 import { MedicationsModule } from './features/medications/medications.module';
+import { RemindersModule } from './features/reminders/reminders.module';
 import { DatabaseModule } from './database/database.module';
 
 @Module({
@@ -40,6 +41,7 @@ import { DatabaseModule } from './database/database.module';
     HealthIndicatorsModule,
     AppointmentsModule,
     MedicationsModule,
+    RemindersModule,
     DatabaseModule,
   ],
   controllers: [AppController],
