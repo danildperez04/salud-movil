@@ -15,6 +15,7 @@ import { AppointmentType } from '../features/catalogues/entities/appointment-typ
 import { NotificationState } from '../features/catalogues/entities/notification-state.entity';
 import { RouteAdministration } from '../features/catalogues/entities/route-administration.entity';
 import { ClinicalRange } from '../features/catalogues/entities/clinical-range.entity';
+import { ClinicalRangeBand } from '../features/catalogues/entities/clinical-range-band.entity';
 import { HealthCenter } from '../features/health-centers/entities/health-center.entity';
 import { User } from '../features/users/entities/user.entity';
 import { HealthcareWorker } from '../features/users/entities/healthcare-worker.entity';
@@ -31,6 +32,7 @@ import {
   NOTIFICATION_STATES,
   ROUTE_ADMINISTRATIONS,
   CLINICAL_RANGES,
+  CLINICAL_RANGE_BANDS,
 } from './seed-data';
 
 @Injectable()
@@ -149,6 +151,43 @@ export class SeedService implements OnApplicationBootstrap {
           };
         }),
       );
+    }
+
+    if ((await manager.count(ClinicalRangeBand)) === 0) {
+      const typeIndicators = await manager.find(TypeIndicator);
+      const ranges = await manager.find(ClinicalRange);
+      const findRange = (typeIndicatorName: string): ClinicalRange => {
+        const typeIndicator = typeIndicators.find(
+          (indicator) => indicator.name === typeIndicatorName,
+        );
+        const range = ranges.find(
+          (item) => item.typeIndicatorId === typeIndicator?.id,
+        );
+        if (!range) {
+          throw new Error(
+            `No se encontró el rango clínico para: ${typeIndicatorName}`,
+          );
+        }
+        return range;
+      };
+
+      // `sequence` ordena la evaluación: 1 = extremo más bajo, y así sucesivamente.
+      const lastSequenceByKind = new Map<string, number>();
+      const bandRows = CLINICAL_RANGE_BANDS.map((band) => {
+        const key = `${band.typeIndicatorName}:${band.valueKind}`;
+        const sequence = (lastSequenceByKind.get(key) ?? 0) + 1;
+        lastSequenceByKind.set(key, sequence);
+        return {
+          clinicalRangeId: findRange(band.typeIndicatorName).id,
+          sequence,
+          severity: band.severity,
+          valueKind: band.valueKind,
+          minValue: band.minValue !== null ? String(band.minValue) : null,
+          maxValue: band.maxValue !== null ? String(band.maxValue) : null,
+          label: band.label,
+        };
+      });
+      await manager.save(ClinicalRangeBand, bandRows);
     }
 
     if ((await manager.count(Department)) === 0) {

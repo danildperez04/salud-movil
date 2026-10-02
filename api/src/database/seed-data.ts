@@ -106,6 +106,168 @@ export const CLINICAL_RANGES: ClinicalRangeSeed[] = [
   },
 ];
 
+export interface ClinicalRangeBandSeed {
+  typeIndicatorName: string;
+  valueKind: 'primary' | 'secondary';
+  severity: 'normal' | 'alert' | 'critical';
+  minValue: number | null;
+  maxValue: number | null;
+  label: string;
+}
+
+// ⚠️ PROVISIONALES — pendientes de validación del equipo médico.
+//
+// El índice de prioridad (IPCP) necesita distinguir "levemente fuera de rango" de
+// "en crisis", cosa que un único par min/max no permite: con el seed anterior una
+// glucosa de 150 y otra de 400 producían la misma señal. Estas bandas gradúan esa
+// diferencia, pero los cortes son valores estándar de referencia, NO umbrales
+// validados clínicamente. El equipo médico debe confirmarlos antes de usar el
+// índice para priorizar pacientes reales.
+//
+// `minValue` o `maxValue` en null significan extremo abierto.
+export const CLINICAL_RANGE_BANDS: ClinicalRangeBandSeed[] = [
+  // --- Presión arterial: sistólica ---
+  {
+    typeIndicatorName: 'Blood pressure',
+    valueKind: 'primary',
+    severity: 'critical',
+    minValue: 160,
+    maxValue: null,
+    label: 'Sistólica crítica',
+  },
+  {
+    typeIndicatorName: 'Blood pressure',
+    valueKind: 'primary',
+    severity: 'alert',
+    minValue: 140,
+    maxValue: 159.99,
+    label: 'Sistólica elevada',
+  },
+  {
+    typeIndicatorName: 'Blood pressure',
+    valueKind: 'primary',
+    severity: 'normal',
+    minValue: 90,
+    maxValue: 139.99,
+    label: 'Sistólica normal',
+  },
+  {
+    typeIndicatorName: 'Blood pressure',
+    valueKind: 'primary',
+    severity: 'alert',
+    minValue: null,
+    maxValue: 89.99,
+    label: 'Sistólica baja',
+  },
+  // --- Presión arterial: diastólica ---
+  {
+    typeIndicatorName: 'Blood pressure',
+    valueKind: 'secondary',
+    severity: 'critical',
+    minValue: 110,
+    maxValue: null,
+    label: 'Diastólica crítica',
+  },
+  {
+    typeIndicatorName: 'Blood pressure',
+    valueKind: 'secondary',
+    severity: 'alert',
+    minValue: 90,
+    maxValue: 109.99,
+    label: 'Diastólica elevada',
+  },
+  {
+    typeIndicatorName: 'Blood pressure',
+    valueKind: 'secondary',
+    severity: 'normal',
+    minValue: 60,
+    maxValue: 89.99,
+    label: 'Diastólica normal',
+  },
+  {
+    typeIndicatorName: 'Blood pressure',
+    valueKind: 'secondary',
+    severity: 'alert',
+    minValue: null,
+    maxValue: 59.99,
+    label: 'Diastólica baja',
+  },
+  // --- Glucosa ---
+  {
+    typeIndicatorName: 'Glucose',
+    valueKind: 'primary',
+    severity: 'critical',
+    minValue: 200,
+    maxValue: null,
+    label: 'Glucosa crítica',
+  },
+  {
+    typeIndicatorName: 'Glucose',
+    valueKind: 'primary',
+    severity: 'alert',
+    minValue: 126,
+    maxValue: 199.99,
+    label: 'Glucosa elevada',
+  },
+  {
+    typeIndicatorName: 'Glucose',
+    valueKind: 'primary',
+    severity: 'normal',
+    minValue: 70,
+    maxValue: 125.99,
+    label: 'Glucosa normal',
+  },
+  {
+    typeIndicatorName: 'Glucose',
+    valueKind: 'primary',
+    severity: 'alert',
+    minValue: null,
+    maxValue: 69.99,
+    label: 'Glucosa baja',
+  },
+  // --- Temperatura ---
+  {
+    typeIndicatorName: 'Temperature',
+    valueKind: 'primary',
+    severity: 'critical',
+    minValue: 39,
+    maxValue: null,
+    label: 'Fiebre alta',
+  },
+  {
+    typeIndicatorName: 'Temperature',
+    valueKind: 'primary',
+    severity: 'alert',
+    minValue: 37.5,
+    maxValue: 38.99,
+    label: 'Fiebre',
+  },
+  {
+    typeIndicatorName: 'Temperature',
+    valueKind: 'primary',
+    severity: 'normal',
+    minValue: 35.5,
+    maxValue: 37.49,
+    label: 'Temperatura normal',
+  },
+  {
+    typeIndicatorName: 'Temperature',
+    valueKind: 'primary',
+    severity: 'alert',
+    minValue: null,
+    maxValue: 35.49,
+    label: 'Hipotermia leve',
+  },
+  {
+    typeIndicatorName: 'Temperature',
+    valueKind: 'primary',
+    severity: 'critical',
+    minValue: null,
+    maxValue: 35,
+    label: 'Hipotermia',
+  },
+];
+
 export interface DepartmentSeed {
   name: string;
   municipalities: string[];

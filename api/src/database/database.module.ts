@@ -7,6 +7,9 @@ import { Major } from '../features/catalogues/entities/major.entity';
 import { HealthCenterType } from '../features/catalogues/entities/health-center-type.entity';
 import { Department } from '../features/catalogues/entities/department.entity';
 import { Municipality } from '../features/catalogues/entities/municipality.entity';
+import { TypeIndicator } from '../features/catalogues/entities/type-indicator.entity';
+import { ClinicalRange } from '../features/catalogues/entities/clinical-range.entity';
+import { ClinicalRangeBand } from '../features/catalogues/entities/clinical-range-band.entity';
 import { HealthCenter } from '../features/health-centers/entities/health-center.entity';
 import { User } from '../features/users/entities/user.entity';
 import { HealthcareWorker } from '../features/users/entities/healthcare-worker.entity';
@@ -20,6 +23,9 @@ import { HealthcareWorker } from '../features/users/entities/healthcare-worker.e
       HealthCenterType,
       Department,
       Municipality,
+      TypeIndicator,
+      ClinicalRange,
+      ClinicalRangeBand,
       HealthCenter,
       User,
       HealthcareWorker,
