@@ -125,6 +125,8 @@ El modelo se basa en el script DDL original y lo **modifica** para cumplir los c
 |---|---|
 | `appointment` | Cita médica programada |
 | `appointment_reminder` | Recordatorio previo a una cita |
+| `clinical_range` | Rangos clínicos de referencia por tipo de indicador |
+| `clinical_range_band` | Bandas de gravedad (`normal`/`alert`/`critical`) sobre esos rangos — *Fase 2* |
 
 **Catálogos (tablas de referencia)**
 
@@ -680,7 +682,9 @@ El modelo se basa en el script DDL original y lo **modifica** para cumplir los c
 
 ### 5.16 Token de restablecimiento de contraseña — `password_reset`
 
-**Propósito:** guarda el token de restablecimiento de contraseña generado en el flujo "olvidé mi contraseña" (HU-04). Solo se almacena el **hash SHA-256** del token (nunca el token en texto plano); el token en claro se devuelve al solicitante únicamente en el desarrollo para poder probar el flujo sin servidor de correo.
+**Propósito:** guarda el token de restablecimiento de contraseña generado en el flujo "olvidé mi contraseña" (HU-04). Solo se almacena el **hash SHA-256** del token (nunca el token en texto plano).
+
+> ⚠️ **Cambiado el 1-oct-2026 (Fase 1).** La API **ya no devuelve el token en la respuesta**: hacerlo permitía secuestrar cualquier cuenta con solo conocer el correo. El endpoint responde siempre 200 con un mensaje genérico, para no revelar qué correos existen. El token en claro se registra **únicamente fuera de producción**, mientras no haya servicio de correo.
 
 | Campo | Tipo | Descripción |
 |---|---|---|
@@ -697,6 +701,32 @@ El modelo se basa en el script DDL original y lo **modifica** para cumplir los c
 **Reglas:**
 - El `token_hash` es único.
 - Un token solo es válido si no ha expirado (`expires_at` futuro) y no ha sido utilizado (`used_at` nulo). Al usarse se marca `used_at` y el hash queda invalidado.
+
+### 5.17 Banda de rango clínico — `clinical_range_band` *(tabla nueva, Fase 2)*
+
+**Propósito:**_graduar la gravedad clínica_ de un indicador. `clinical_range` solo distingue dentro de rango / fuera de rango, de modo que una glucosa de 150 y otra de 400 producen la misma señal. Las bandas separan esa diferencia en tres niveles, que es lo que consume el índice de prioridad (IPCP, HU-32/33/34).
+
+⚠️ **Los cortes son PROVISIONALES.** Son valores estándar de referencia, no umbrales validados clínicamente. El equipo médico debe confirmarlos antes de usar el índice para priorizar pacientes reales.
+
+| Campo | Tipo | Descripción |
+|---|---|---|
+| id | Entero | Identificador |
+| clinical_range_id | Entero | Rango al que pertenece la banda (FK a `clinical_range.id`) |
+| sequence | Entero | Orden de evaluación ascendente. Gana la primera banda cuyo intervalo contiene el valor |
+| severity | Texto (16) | `normal`, `alert` o `critical` |
+| value_kind | Texto (16) | `primary` (valor principal) o `secondary` (diastólica en presión arterial) |
+| min_value | Decimal(8,2) | Límite inferior. **Nulo = extremo abierto** |
+| max_value | Decimal(8,2) | Límite superior. **Nulo = extremo abierto** |
+| label | Texto (64) | Etiqueta legible, ej. "Sistólica elevada" |
+| created_at | Fecha y hora | Fecha de creación |
+
+**Relaciones:**
+- Cada banda pertenece a **un rango clínico** (`clinical_range`), que a su vez corresponde a un tipo de indicador.
+- Borrado en cascada al eliminar el rango.
+
+**Reglas:**
+- Único por `(clinical_range_id, value_kind, sequence)`: no puede haber dos bandas con la misma posición en la evaluación.
+- En presión arterial se evalúan las dos: si la diastólica cae en una banda más grave que la sistólica, esa severidad prevalece.
 
 ---
 
@@ -726,6 +756,7 @@ El modelo se basa en el script DDL original y lo **modifica** para cumplir los c
 | health_center.health_center_type_id | cat_health_center_type.id | Restringido |
 | health_indicator.type_indicator_id | cat_type_indicator.id | Restringido |
 | health_indicator.registered_by | user.id | Restringido |
+| clinical_range_band.clinical_range_id | clinical_range.id | Cascada |
 | appointment.healthcare_worker_id | healthcare_worker.id | Restringido |
 | appointment.created_by | user.id | Restringido |
 | appointment.appointment_state_id | cat_appointment_state.id | Restringido |
@@ -748,6 +779,9 @@ El modelo se basa en el script DDL original y lo **modifica** para cumplir los c
 | health_indicator | `value` mayor que cero |
 | health_indicator | `value_secondary` mayor que cero cuando no es nulo |
 | medication_schedule_day | `week_day` entre 1 y 7 |
+| clinical_range_band | `severity` ∈ {`normal`, `alert`, `critical`} |
+| clinical_range_band | `value_kind` ∈ {`primary`, `secondary`} |
+| clinical_range_band | `min_value` <= `max_value` cuando ambos existen |
 
 ### 6.3 Unicidad
 
@@ -821,7 +855,9 @@ La tabla `cat_role` alimenta el control de acceso basado en roles del backend:
 | 20 | Se añade la tabla **`password_reset`** | Guardar el token de restablecimiento de contraseña (HU-04): se almacena el hash SHA-256 del token, con expiración y marca de uso |
 | 21 | Se añade la tabla **`clinical_range`** | Rangos clínicos normalizados por tipo de indicador (HU-13): permiten clasificar normal/bajo/alto (PA) con rangos primarios y secundarios. Valores iniciales pendientes de validación médica (Fase 1.D) |
 | 22 | Se añade el índice **`IDX_health_indicator_patient_type_date`** sobre `health_indicator (patient_id, type_indicator_id, date_hour)` | Consulta frecuente "últimos valores por tipo del paciente": el módulo de indicadores filtra por paciente, tipo y fecha (HU-13/14) |
-| 23 | Se añade `unit`-normalización a los catálogos (tipo de indicador con `measurement_unit`) | El catálogo ya existente expone la unidad de medida para que el móvil no la traduzca (HU-13). Se documenta aquí por completitud del mapeo seed→código |
+| 23 | Se añade la tabla **`clinical_range_band`** | Graduar la gravedad clínica (HU-32/33/34). Con un único par min/max no se distingue "levemente fuera de rango" de "en crisis": una glucosa de 150 y otra de 400 daban la misma señal. Las bandas añaden `severity` (`normal`/`alert`/`critical`) y `value_kind` para evaluar la diastólica aparte de la sistólica. ⚠️ **Cortes provisionales, pendientes de validación médica** |
+| 24 | Se añade el índice único `UQ_clinical_range_band (clinical_range_id, value_kind, sequence)` | Las bandas de un tipo de indicador se evalúan en orden y no puede haber dos con la misma posición |
+| 25 | Se documenta que el catálogo de tipos de indicador ya expone la unidad de medida, que el móvil no debe traducir | El mockup de indicadores muestra "Frecuencia cardiaca" y "Peso / IMC", que **no existen** en `cat_type_indicator`; son un desajuste de diseño, no un catálogo faltante |
 
 **No aplicados en esta versión** (mejoras futuras, ver sección 10).
 
