@@ -31,7 +31,8 @@ export interface PublicAppointmentReminder {
   notificationState: string;
 }
 
-export type PublicReminder = PublicMedicationReminder | PublicAppointmentReminder;
+export type PublicReminder =
+  PublicMedicationReminder | PublicAppointmentReminder;
 
 const DEFAULT_WINDOW_DAYS = 7;
 const MAX_WINDOW_DAYS = 31;
@@ -103,10 +104,11 @@ export class RemindersService {
       .map((reminder) => this.toMedicationReminder(reminder));
 
     const appointment = appointmentReminders
+      .filter((reminder) => reminder.dateHourSend.getTime() <= until.getTime())
       .filter(
-        (reminder) => reminder.dateHourSend.getTime() <= until.getTime(),
+        (reminder) =>
+          reminder.appointment.appointmentState.name === 'Scheduled',
       )
-      .filter((reminder) => reminder.appointment.appointmentState.name === 'Scheduled')
       .map((reminder) => this.toAppointmentReminder(reminder));
 
     return [...medication, ...appointment].sort(
