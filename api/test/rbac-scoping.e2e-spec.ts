@@ -27,6 +27,7 @@ describe('RBAC y scoping por centro de salud (e2e)', () => {
 
   let patientInStaffCenter: string;
   let patientInOtherCenter: string;
+  let patientEmail: string;
 
   const login = async (email: string) => {
     const response = await request(app.getHttpServer())
@@ -150,6 +151,7 @@ describe('RBAC y scoping por centro de salud (e2e)', () => {
     const other = await createPatient('patientother', otherCenter);
     patientInStaffCenter = own.patient.id;
     patientInOtherCenter = other.patient.id;
+    patientEmail = own.user.email;
 
     // Tokens reales: se validan contra la misma cadena de guards que la API.
     adminToken = await login(admin.email);
@@ -237,6 +239,23 @@ describe('RBAC y scoping por centro de salud (e2e)', () => {
         .get(`/patients/${patientInOtherCenter}/health-indicators`)
         .set('Authorization', `Bearer ${adminToken}`)
         .expect(200);
+    });
+  });
+
+  describe('Recuperación de contraseña', () => {
+    it('no debe revelar si una cuenta existe', async () => {
+      const existente = await request(app.getHttpServer())
+        .post('/auth/forgot-password')
+        .send({ email: 'e2e-inexistente-@test.com' })
+        .expect(201);
+
+      const registrado = await request(app.getHttpServer())
+        .post('/auth/forgot-password')
+        .send({ email: patientEmail })
+        .expect(201);
+
+      expect(registrado.body).toEqual(existente.body);
+      expect(registrado.body).not.toHaveProperty('resetToken');
     });
   });
 
