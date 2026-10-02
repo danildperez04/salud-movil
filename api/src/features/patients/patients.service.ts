@@ -283,6 +283,20 @@ export class PatientsService {
     if (dto.emergencyContactPhoneNumber !== undefined) {
       patient.emergencyContactPhoneNumber = dto.emergencyContactPhoneNumber;
     }
+    if (dto.healthCenterId !== undefined) {
+      if (currentUser.role !== 'admin') {
+        throw new ForbiddenException(
+          'Solo el administrador puede reasignar el centro de salud',
+        );
+      }
+      const healthCenter = await this.healthCenterRepository.findOne({
+        where: { id: dto.healthCenterId },
+      });
+      if (!healthCenter) {
+        throw new BadRequestException('Datos de referencia no válidos');
+      }
+      patient.healthCenter = healthCenter;
+    }
 
     await this.userRepository.save(user);
     await this.patientRepository.save(patient);
