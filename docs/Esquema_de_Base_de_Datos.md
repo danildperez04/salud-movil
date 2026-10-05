@@ -126,7 +126,7 @@ El modelo se basa en el script DDL original y lo **modifica** para cumplir los c
 | `appointment` | Cita médica programada |
 | `appointment_reminder` | Recordatorio previo a una cita |
 | `clinical_range` | Rangos clínicos de referencia por tipo de indicador |
-| `clinical_range_band` | Bandas de gravedad (`normal`/`alert`/`critical`) sobre esos rangos — *Fase 2* |
+| `clinical_range_band` | Bandas de gravedad (`normal`/`alert`/`critical`) sobre esos rangos |
 
 **Catálogos (tablas de referencia)**
 
@@ -702,7 +702,7 @@ El modelo se basa en el script DDL original y lo **modifica** para cumplir los c
 - El `token_hash` es único.
 - Un token solo es válido si no ha expirado (`expires_at` futuro) y no ha sido utilizado (`used_at` nulo). Al usarse se marca `used_at` y el hash queda invalidado.
 
-### 5.17 Banda de rango clínico — `clinical_range_band` *(tabla nueva, Fase 2)*
+### 5.17 Banda de rango clínico — `clinical_range_band`
 
 **Propósito:**_graduar la gravedad clínica_ de un indicador. `clinical_range` solo distingue dentro de rango / fuera de rango, de modo que una glucosa de 150 y otra de 400 producen la misma señal. Las bandas separan esa diferencia en tres niveles, que es lo que consume el índice de prioridad (IPCP, HU-32/33/34).
 
