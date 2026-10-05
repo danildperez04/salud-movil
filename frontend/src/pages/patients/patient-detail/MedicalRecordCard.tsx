@@ -6,13 +6,25 @@ import { Card } from "../../../components/ui/Card";
 import { RecordForm } from "./RecordForm";
 import type { RecordFormValue } from "./types";
 
-interface ExpedienteTabProps {
+interface MedicalRecordCardProps {
   patientId: string;
   record: PublicMedicalRecord | null;
   onSaved: (record: PublicMedicalRecord) => void;
 }
 
-export function Record({ patientId, record, onSaved }: ExpedienteTabProps) {
+/**
+ * Antes se llamaba `Record` (archivo `Record.tsx`), pero ese nombre choca
+ * con `Record<K, V>`, el tipo utilitario global de TypeScript que ya se usa
+ * en otras partes del proyecto (p. ej. `Record<string, unknown>` en
+ * PatientForm/CaregiverForm). TS separa el espacio de tipos del de valores,
+ * así que técnicamente no rompía nada — pero es una colisión de nombres
+ * innecesaria que solo genera confusión y autocompletados equivocados.
+ */
+export function MedicalRecordCard({
+  patientId,
+  record,
+  onSaved,
+}: MedicalRecordCardProps) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 

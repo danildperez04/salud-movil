@@ -9,8 +9,8 @@ import { Table } from "../../components/ui/Table";
 import type { Column } from "../../components/ui/Table";
 import { Button } from "../../components/ui/Button";
 import { Badge } from "../../components/ui/Badge";
-import { Modal } from "../../components/ui/Modal";
 import { Alert } from "../../components/ui/Alert";
+import { ConfirmDeleteModal } from "../../components/ui/ConfirmDeleteModal";
 import { IpcpBadge } from "../../components/patients/IpcpBadge";
 
 /** Espera antes de disparar la búsqueda mientras el usuario sigue escribiendo. */
@@ -229,32 +229,18 @@ export default function PatientsList() {
       </Card>
 
       {toDelete ? (
-        <Modal
+        <ConfirmDeleteModal
           title="Eliminar paciente"
-          onClose={() => setToDelete(null)}
-          footer={
+          message={
             <>
-              <Button
-                onClick={() => setToDelete(null)}
-                className="bg-slate-200 text-slate-700 hover:bg-slate-300"
-              >
-                Cancelar
-              </Button>
-              <Button
-                loading={deleting}
-                onClick={confirmDelete}
-                className="bg-red-600 hover:bg-red-700"
-              >
-                Eliminar
-              </Button>
+              ¿Seguro que deseas eliminar a <strong>{toDelete.name}</strong>? El
+              paciente quedará desactivado y no podrá volver a iniciar sesión.
             </>
           }
-        >
-          <p className="text-sm text-slate-700">
-            ¿Seguro que deseas eliminar a <strong>{toDelete.name}</strong>? El
-            paciente quedará desactivado y no podrá volver a iniciar sesión.
-          </p>
-        </Modal>
+          onCancel={() => setToDelete(null)}
+          onConfirm={confirmDelete}
+          loading={deleting}
+        />
       ) : null}
     </div>
   );

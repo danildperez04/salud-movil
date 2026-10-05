@@ -4,12 +4,13 @@ import { ArrowLeft } from "lucide-react";
 import { api, ApiError } from "../../lib/api";
 import type { PublicMedicalRecord, PublicPatient } from "../../types";
 import { Alert } from "../../components/ui/Alert";
-import { Record } from "./patient-detail/Record";
+import { MedicalRecordCard } from "./patient-detail/MedicalRecordCard";
 
 /**
- * Página propia del expediente clínico. Recicla `ExpedienteTab` (antes una
- * pestaña dentro de PatientDetail) como el cuerpo de esta pantalla, a la que
- * ahora se llega desde el botón "Expediente" en el encabezado del paciente.
+ * Página propia del expediente clínico. Recicla `MedicalRecordCard` (antes
+ * una pestaña dentro de PatientDetail) como el cuerpo de esta pantalla, a la
+ * que ahora se llega desde el botón "Expediente" en el encabezado del
+ * paciente.
  */
 export default function PatientRecord() {
   const { id } = useParams<{ id: string }>();
@@ -59,7 +60,7 @@ export default function PatientRecord() {
       .catch((err) => {
         // Un 404 aquí solo significa "el paciente aún no tiene expediente
         // creado", no un error real: se deja `record` en null para que
-        // ExpedienteTab muestre el formulario en modo "crear".
+        // MedicalRecordCard muestre el formulario en modo "crear".
         if (
           !cancelled &&
           !(err instanceof ApiError && err.statusCode === 404)
@@ -101,7 +102,7 @@ export default function PatientRecord() {
           {patient.name} · {patient.healthCenterName}
         </p>
       </div>
-      <Record patientId={id} record={record} onSaved={setRecord} />
+      <MedicalRecordCard patientId={id} record={record} onSaved={setRecord} />
     </div>
   );
 }
