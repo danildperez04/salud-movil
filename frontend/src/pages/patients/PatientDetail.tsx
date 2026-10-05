@@ -75,7 +75,9 @@ export default function PatientDetail() {
     );
   }
 
-  // MOCK: el IPCP real todavía no existe en el backend (ver lib/ipcp.ts).
+  // MOCK: el IPCP real todavía no existe en el backend (ver lib/ipcp.ts). El
+  // módulo del índice es el Bloque 2.D del plan; hasta entonces la tarjeta de
+  // resumen usa el hash provisional.
   const ipcp = getMockIpcp(patient.id);
 
   return (
@@ -140,7 +142,7 @@ export default function PatientDetail() {
         </div>
         <div className="flex flex-col gap-6">
           <CaregiverSummaryCard caregivers={caregivers} />
-          <FollowUpCard ipcpScore={ipcp.score} />
+          <FollowUpCard patientId={patient.id} />
         </div>
       </div>
     </div>

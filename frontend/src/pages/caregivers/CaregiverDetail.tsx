@@ -15,6 +15,14 @@ export default function CaregiverDetail() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  /** Desvincula y refresca la tabla con el resultado real del servidor. */
+  const unlinkPatient = async (patientId: string) => {
+    if (!id) return;
+    await api.unlinkCaregiver(patientId, id);
+    const updated = await api.getCaregiverPatients(id);
+    setPatients(updated);
+  };
+
   useEffect(() => {
     if (!id) {
       return;
@@ -85,7 +93,7 @@ export default function CaregiverDetail() {
         <PersonalDataCard caregiver={caregiver} />
       </div>
 
-      <LinkedPatientsTable patients={patients} />
+      <LinkedPatientsTable patients={patients} onUnlink={unlinkPatient} />
     </div>
   );
 }
