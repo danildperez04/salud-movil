@@ -3,7 +3,6 @@ import {
   ConflictException,
   Injectable,
   Logger,
-  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
@@ -145,12 +144,21 @@ export class AuthService {
     return this.toPublicUser(user);
   }
 
-  async forgotPassword(email: string): Promise<{ resetToken: string }> {
+  /**
+   * Siempre responde con éxito, exista o no la cuenta: un 404revealaría qué
+   * correos están registrados. El token **nunca** se devuelve en la respuesta;
+   * mientras no haya servicio de correo se registra solo fuera de producción,
+   * para poder completar el flujo en desarrollo.
+   */
+  async forgotPassword(email: string): Promise<{ message: string }> {
+    const genericMessage =
+      'Si la cuenta existe, se enviarán las instrucciones para restablecer la contraseña';
+
     const user = await this.userRepository.findOne({
       where: { email: email.toLowerCase() },
     });
     if (!user) {
-      throw new NotFoundException('No existe una cuenta con ese correo');
+      return { message: genericMessage };
     }
 
     const token = randomBytes(32).toString('hex');
@@ -169,10 +177,13 @@ export class AuthService {
       }),
     );
 
-    this.logger.log(
-      `Token de restablecimiento generado para ${email}: ${token} (vence en ${expiresMinutes} min)`,
-    );
-    return { resetToken: token };
+    if (process.env.NODE_ENV !== 'production') {
+      this.logger.warn(
+        `Token de restablecimiento para ${email}: ${token} (vence en ${expiresMinutes} min). Solo fuera de producción.`,
+      );
+    }
+
+    return { message: genericMessage };
   }
 
   async resetPassword(token: string, newPassword: string): Promise<void> {

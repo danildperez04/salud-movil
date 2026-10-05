@@ -9,6 +9,12 @@ import { HealthCenterType } from '../features/catalogues/entities/health-center-
 import { RelationshipType } from '../features/catalogues/entities/relationship-type.entity';
 import { Department } from '../features/catalogues/entities/department.entity';
 import { Municipality } from '../features/catalogues/entities/municipality.entity';
+import { TypeIndicator } from '../features/catalogues/entities/type-indicator.entity';
+import { AppointmentState } from '../features/catalogues/entities/appointment-state.entity';
+import { AppointmentType } from '../features/catalogues/entities/appointment-type.entity';
+import { NotificationState } from '../features/catalogues/entities/notification-state.entity';
+import { RouteAdministration } from '../features/catalogues/entities/route-administration.entity';
+import { ClinicalRange } from '../features/catalogues/entities/clinical-range.entity';
 import { HealthCenter } from '../features/health-centers/entities/health-center.entity';
 import { User } from '../features/users/entities/user.entity';
 import { HealthcareWorker } from '../features/users/entities/healthcare-worker.entity';
@@ -19,6 +25,12 @@ import {
   HEALTH_CENTER_TYPES,
   RELATIONSHIP_TYPES,
   DEPARTMENTS,
+  TYPE_INDICATORS,
+  APPOINTMENT_STATES,
+  APPOINTMENT_TYPES,
+  NOTIFICATION_STATES,
+  ROUTE_ADMINISTRATIONS,
+  CLINICAL_RANGES,
 } from './seed-data';
 
 @Injectable()
@@ -74,6 +86,68 @@ export class SeedService implements OnApplicationBootstrap {
       await manager.save(
         RelationshipType,
         RELATIONSHIP_TYPES.map((name) => ({ name })),
+      );
+    }
+    if ((await manager.count(TypeIndicator)) === 0) {
+      await manager.save(
+        TypeIndicator,
+        TYPE_INDICATORS.map((typeIndicator) => ({
+          name: typeIndicator.name,
+          measurementUnit: typeIndicator.measurementUnit,
+        })),
+      );
+    }
+    if ((await manager.count(AppointmentState)) === 0) {
+      await manager.save(
+        AppointmentState,
+        APPOINTMENT_STATES.map((name) => ({ name })),
+      );
+    }
+    if ((await manager.count(AppointmentType)) === 0) {
+      await manager.save(
+        AppointmentType,
+        APPOINTMENT_TYPES.map((name) => ({ name })),
+      );
+    }
+    if ((await manager.count(NotificationState)) === 0) {
+      await manager.save(
+        NotificationState,
+        NOTIFICATION_STATES.map((name) => ({ name })),
+      );
+    }
+    if ((await manager.count(RouteAdministration)) === 0) {
+      await manager.save(
+        RouteAdministration,
+        ROUTE_ADMINISTRATIONS.map((name) => ({ name })),
+      );
+    }
+    if ((await manager.count(ClinicalRange)) === 0) {
+      const typeIndicators = await manager.find(TypeIndicator);
+      await manager.save(
+        ClinicalRange,
+        CLINICAL_RANGES.map((range) => {
+          const typeIndicator = typeIndicators.find(
+            (indicator) => indicator.name === range.typeIndicatorName,
+          );
+          if (!typeIndicator) {
+            throw new Error(
+              `No se encontró el tipo de indicador para el rango: ${range.typeIndicatorName}`,
+            );
+          }
+          return {
+            typeIndicatorId: typeIndicator.id,
+            minValue: range.minValue !== null ? String(range.minValue) : null,
+            maxValue: range.maxValue !== null ? String(range.maxValue) : null,
+            minValueSecondary:
+              range.minValueSecondary !== null
+                ? String(range.minValueSecondary)
+                : null,
+            maxValueSecondary:
+              range.maxValueSecondary !== null
+                ? String(range.maxValueSecondary)
+                : null,
+          };
+        }),
       );
     }
 
@@ -151,7 +225,9 @@ export class SeedService implements OnApplicationBootstrap {
       role,
       municipality,
     });
-    this.logger.log(`Usuario admin creado: ${email} (contraseña: ${password})`);
+    this.logger.log(
+      `Usuario admin creado: ${email}${this.suffixPassword(password)}`,
+    );
   }
 
   private async seedPersonnel(manager: EntityManager): Promise<void> {
@@ -208,7 +284,17 @@ export class SeedService implements OnApplicationBootstrap {
       user,
     });
     this.logger.log(
-      `Personal de salud de ejemplo creado: ${email} (contraseña: ${password})`,
+      `Personal de salud de ejemplo creado: ${email}${this.suffixPassword(password)}`,
     );
+  }
+
+  /**
+   * La contraseña de seed solo se escribe en los logs fuera de producción:
+   * en Render los logs son públicos para el despliegue y la cuenta seed es real.
+   */
+  private suffixPassword(password: string): string {
+    return process.env.NODE_ENV === 'production'
+      ? ''
+      : ` (contraseña: ${password})`;
   }
 }

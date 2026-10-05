@@ -10,6 +10,8 @@ export interface Config {
     user: string;
     password: string;
     database: string;
+    /** El log de SQL imprime datos de pacientes: solo fuera de producción. */
+    logging: boolean;
   };
   jwt: {
     secret: string;
@@ -27,6 +29,7 @@ export default (): Config => ({
     user: process.env.DB_USER || 'test',
     password: process.env.DB_PASSWORD || 'test',
     database: process.env.DB_NAME || 'test',
+    logging: process.env.NODE_ENV !== 'production',
   },
   jwt: {
     secret: process.env.JWT_SECRET || 'secret',

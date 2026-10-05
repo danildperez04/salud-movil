@@ -1,25 +1,36 @@
-import type { ButtonHTMLAttributes, ReactNode } from 'react';
+import { Loader2 } from "lucide-react";
+import type { ButtonHTMLAttributes, ReactNode } from "react";
+import { getButtonClassName } from "./buttonStyles";
+import type { ButtonVariant } from "./buttonStyles";
+
+// Re-exportado solo como tipo: no dispara react-refresh/only-export-components
+// (esa regla solo mira exports en tiempo de ejecución, y los tipos se borran
+// al compilar). Así el resto del código puede seguir escribiendo
+// `import type { ButtonVariant } from ".../ui/Button"` sin romperse.
+export type { ButtonVariant };
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   loading?: boolean;
+  variant?: ButtonVariant;
   children: ReactNode;
 }
 
 export function Button({
   children,
   loading,
-  className = '',
+  variant = "primary",
+  className = "",
   disabled,
   ...props
 }: ButtonProps) {
   return (
     <button
-      className={`inline-flex items-center justify-center gap-2 rounded-lg bg-primary px-4 py-2 font-semibold text-white transition hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-60 ${className}`}
+      className={getButtonClassName(variant, className)}
       disabled={disabled || loading}
       {...props}
     >
       {loading ? (
-        <span className='h-4 w-4 animate-spin rounded-full border-2 border-white/40 border-t-white' />
+        <Loader2 size={16} className="animate-spin" aria-hidden="true" />
       ) : null}
       {children}
     </button>

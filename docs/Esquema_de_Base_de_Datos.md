@@ -819,6 +819,9 @@ La tabla `cat_role` alimenta el control de acceso basado en roles del backend:
 | 18 | Se añaden los catálogos `cat_appointment_type`, `cat_department` y `cat_municipality` | Tipos de cita y ubicación geográfica normalizada; el departamento se deriva del municipio (3NF) |
 | 19 | Se implementa el **borrado lógico (soft delete)** en todas las tablas principales: `deleted_at` (marca temporal) y cascada de aplicación (soft-remove) por jerarquía de agregados | Evitar la pérdida de información clínica; implementa la mejora futura prevista en la sección 10. Los catálogos y los estados de negocio (`is_active`, `active`) se conservan |
 | 20 | Se añade la tabla **`password_reset`** | Guardar el token de restablecimiento de contraseña (HU-04): se almacena el hash SHA-256 del token, con expiración y marca de uso |
+| 21 | Se añade la tabla **`clinical_range`** | Rangos clínicos normalizados por tipo de indicador (HU-13): permiten clasificar normal/bajo/alto (PA) con rangos primarios y secundarios. Valores iniciales pendientes de validación médica (Fase 1.D) |
+| 22 | Se añade el índice **`IDX_health_indicator_patient_type_date`** sobre `health_indicator (patient_id, type_indicator_id, date_hour)` | Consulta frecuente "últimos valores por tipo del paciente": el módulo de indicadores filtra por paciente, tipo y fecha (HU-13/14) |
+| 23 | Se añade `unit`-normalización a los catálogos (tipo de indicador con `measurement_unit`) | El catálogo ya existente expone la unidad de medida para que el móvil no la traduzca (HU-13). Se documenta aquí por completitud del mapeo seed→código |
 
 **No aplicados en esta versión** (mejoras futuras, ver sección 10).
 

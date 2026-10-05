@@ -34,6 +34,78 @@ export const HEALTH_CENTER_TYPES = [
   'Puesto de Salud',
 ];
 
+export interface TypeIndicatorSeed {
+  name: string;
+  measurementUnit: string;
+}
+
+export const TYPE_INDICATORS: TypeIndicatorSeed[] = [
+  { name: 'Blood pressure', measurementUnit: 'mmHg' },
+  { name: 'Glucose', measurementUnit: 'mg/dL' },
+  { name: 'Weight', measurementUnit: 'kg' },
+  { name: 'Temperature', measurementUnit: '°C' },
+];
+
+export const APPOINTMENT_STATES = [
+  'Scheduled',
+  'Cancelled',
+  'Completed',
+  'No show',
+];
+
+export const APPOINTMENT_TYPES = [
+  'First visit',
+  'Follow-up',
+  'Check-up',
+  'Other',
+];
+
+export const NOTIFICATION_STATES = ['Pending', 'Sent', 'Confirmed', 'Failed'];
+
+export const ROUTE_ADMINISTRATIONS = [
+  'Oral',
+  'Intravenous',
+  'Subcutaneous',
+  'Topical',
+  'Inhaled',
+];
+
+export interface ClinicalRangeSeed {
+  typeIndicatorName: string;
+  minValue: number | null;
+  maxValue: number | null;
+  minValueSecondary: number | null;
+  maxValueSecondary: number | null;
+}
+
+// Valores iniciales ESTÁNDAR. Pendientes de validación del equipo médico (ver
+// docs/00-ipcp-definition.md y el plan de cierre, §2.6). Se consumen para
+// clasificar normal/alto/bajo. La Fase 2 los rediseña como bandas
+// normal/alert/critical, porque un único umbral no gradúa gravedad.
+export const CLINICAL_RANGES: ClinicalRangeSeed[] = [
+  {
+    typeIndicatorName: 'Blood pressure',
+    minValue: 90,
+    maxValue: 139,
+    minValueSecondary: 60,
+    maxValueSecondary: 89,
+  },
+  {
+    typeIndicatorName: 'Glucose',
+    minValue: 70,
+    maxValue: 126,
+    minValueSecondary: null,
+    maxValueSecondary: null,
+  },
+  {
+    typeIndicatorName: 'Temperature',
+    minValue: 35.5,
+    maxValue: 37.5,
+    minValueSecondary: null,
+    maxValueSecondary: null,
+  },
+];
+
 export interface DepartmentSeed {
   name: string;
   municipalities: string[];
