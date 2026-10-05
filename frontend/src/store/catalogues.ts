@@ -10,6 +10,9 @@ interface CatalogueState {
   relationshipTypes: CatalogueItem[];
   majors: CatalogueItem[];
   healthCenters: HealthCenterItem[];
+  appointmentTypes: CatalogueItem[];
+  appointmentStates: CatalogueItem[];
+  routeAdministrations: CatalogueItem[];
   loaded: boolean;
   loadAll: () => Promise<void>;
   loadDepartments: () => Promise<void>;
@@ -19,6 +22,9 @@ interface CatalogueState {
   loadRelationshipTypes: () => Promise<void>;
   loadMajors: () => Promise<void>;
   loadHealthCenters: () => Promise<void>;
+  loadAppointmentTypes: () => Promise<void>;
+  loadAppointmentStates: () => Promise<void>;
+  loadRouteAdministrations: () => Promise<void>;
 }
 
 export const useCatalogueStore = create<CatalogueState>()((set, get) => ({
@@ -29,6 +35,9 @@ export const useCatalogueStore = create<CatalogueState>()((set, get) => ({
   relationshipTypes: [],
   majors: [],
   healthCenters: [],
+  appointmentTypes: [],
+  appointmentStates: [],
+  routeAdministrations: [],
   loaded: false,
 
   loadAll: async () => {
@@ -45,6 +54,9 @@ export const useCatalogueStore = create<CatalogueState>()((set, get) => ({
       get().loadRelationshipTypes(),
       get().loadMajors(),
       get().loadHealthCenters(),
+      get().loadAppointmentTypes(),
+      get().loadAppointmentStates(),
+      get().loadRouteAdministrations(),
     ]);
   },
 
@@ -90,5 +102,20 @@ export const useCatalogueStore = create<CatalogueState>()((set, get) => ({
   loadHealthCenters: async () => {
     const healthCenters = await api.getHealthCenters();
     set({ healthCenters });
+  },
+
+  loadAppointmentTypes: async () => {
+    const appointmentTypes = await api.getAppointmentTypes();
+    set({ appointmentTypes });
+  },
+
+  loadAppointmentStates: async () => {
+    const appointmentStates = await api.getAppointmentStates();
+    set({ appointmentStates });
+  },
+
+  loadRouteAdministrations: async () => {
+    const routeAdministrations = await api.getRouteAdministrations();
+    set({ routeAdministrations });
   },
 }));

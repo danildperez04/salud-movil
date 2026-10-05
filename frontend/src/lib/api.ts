@@ -177,6 +177,21 @@ export const api = {
     return request<HealthCenterItem[]>('/catalogues/health-centers');
   },
 
+  /** Tipos de cita, para el formulario de agenda. */
+  getAppointmentTypes() {
+    return request<CatalogueItem[]>('/catalogues/appointment-types');
+  },
+
+  /** Vías de administración, para el formulario de medicamentos. */
+  getRouteAdministrations() {
+    return request<CatalogueItem[]>('/catalogues/route-administrations');
+  },
+
+  /** Estados de cita, para filtrar la agenda sin escribir el texto a mano. */
+  getAppointmentStates() {
+    return request<CatalogueItem[]>('/catalogues/appointment-states');
+  },
+
   searchCaregivers(q: string) {
     return request<PublicCaregiver[]>('/caregivers?q=' + encodeURIComponent(q));
   },
