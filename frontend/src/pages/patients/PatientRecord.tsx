@@ -1,10 +1,11 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Link, useParams } from "react-router";
 import { ArrowLeft } from "lucide-react";
 import { api, ApiError } from "../../lib/api";
 import type { PublicMedicalRecord, PublicPatient } from "../../types";
 import { Alert } from "../../components/ui/Alert";
 import { MedicalRecordCard } from "./patient-detail/MedicalRecordCard";
+import { VisitsHistory } from "./patient-detail/VisitsHistory";
 
 /**
  * Página propia del expediente clínico. Recicla `MedicalRecordCard` (antes
@@ -45,26 +46,20 @@ export default function PatientRecord() {
     };
   }, [id]);
 
-  useEffect(() => {
+  const loadRecord = useCallback(() => {
     if (!id) {
       return;
     }
-    let cancelled = false;
     void api
       .getMedicalRecord(id)
       .then((loaded) => {
-        if (!cancelled) {
-          setRecord(loaded);
-        }
+        setRecord(loaded);
       })
       .catch((err) => {
         // Un 404 aquí solo significa "el paciente aún no tiene expediente
         // creado", no un error real: se deja `record` en null para que
         // MedicalRecordCard muestre el formulario en modo "crear".
-        if (
-          !cancelled &&
-          !(err instanceof ApiError && err.statusCode === 404)
-        ) {
+        if (!(err instanceof ApiError && err.statusCode === 404)) {
           setError(
             err instanceof ApiError
               ? err.message
@@ -72,10 +67,12 @@ export default function PatientRecord() {
           );
         }
       });
-    return () => {
-      cancelled = true;
-    };
   }, [id]);
+
+  // El expediente se recarga tras registrar una consulta.
+  useEffect(() => {
+    loadRecord();
+  }, [loadRecord]);
 
   if (error) {
     return <Alert>{error}</Alert>;
@@ -103,6 +100,11 @@ export default function PatientRecord() {
         </p>
       </div>
       <MedicalRecordCard patientId={id} record={record} onSaved={setRecord} />
+      <VisitsHistory
+        patientId={id}
+        visits={record?.visits ?? []}
+        onRegistered={loadRecord}
+      />
     </div>
   );
 }
