@@ -66,6 +66,13 @@ export default function PatientDetail() {
     };
   }, [id]);
 
+  /** Tras vincular un cuidador se recarga la lista de vínculos del paciente. */
+  const reloadCaregivers = async () => {
+    if (!id) return;
+    const list = await api.getPatientCaregivers(id);
+    setCaregivers(list);
+  };
+
   if (error) {
     return <Alert>{error}</Alert>;
   }
@@ -141,7 +148,11 @@ export default function PatientDetail() {
           <HealthIndicatorsCard patientId={patient.id} />
         </div>
         <div className="flex flex-col gap-6">
-          <CaregiverSummaryCard caregivers={caregivers} />
+          <CaregiverSummaryCard
+            patientId={patient.id}
+            caregivers={caregivers}
+            onLinked={reloadCaregivers}
+          />
           <FollowUpCard patientId={patient.id} />
         </div>
       </div>
