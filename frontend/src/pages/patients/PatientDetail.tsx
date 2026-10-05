@@ -10,6 +10,7 @@ import { getButtonClassName } from "../../components/ui/buttonStyles";
 import { PatientOverviewCard } from "./patient-detail/PatientOverviewCard";
 import { HealthIndicatorsCard } from "./patient-detail/HealthIndicatorsCard";
 import { AppointmentsPanel } from "./patient-detail/AppointmentsPanel";
+import { MedicationsPanel } from "./patient-detail/MedicationsPanel";
 import { CaregiverSummaryCard } from "./patient-detail/CaregiverSummaryCard";
 import { FollowUpCard } from "./patient-detail/FollowUpCard";
 
@@ -151,6 +152,7 @@ export default function PatientDetail() {
             patientId={patient.id}
             patientCenterId={patient.healthCenterId}
           />
+          <MedicationsPanel patientId={patient.id} />
         </div>
         <div className="flex flex-col gap-6">
           <CaregiverSummaryCard
