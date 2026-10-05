@@ -6,7 +6,7 @@ import { api, ApiError } from "../../lib/api";
 import { getMockIpcp } from "../../lib/ipcp";
 import type { PublicCaregiverLink, PublicPatient } from "../../types";
 import { Alert } from "../../components/ui/Alert";
-import { getButtonClassName } from "../../components/ui/Button";
+import { getButtonClassName } from "../../components/ui/buttonStyles";
 import { PatientOverviewCard } from "./patient-detail/PatientOverviewCard";
 import { HealthIndicatorsCard } from "./patient-detail/HealthIndicatorsCard";
 import { CaregiverSummaryCard } from "./patient-detail/CaregiverSummaryCard";
