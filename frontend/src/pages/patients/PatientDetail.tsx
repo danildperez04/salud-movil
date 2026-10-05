@@ -9,6 +9,7 @@ import { Alert } from "../../components/ui/Alert";
 import { getButtonClassName } from "../../components/ui/buttonStyles";
 import { PatientOverviewCard } from "./patient-detail/PatientOverviewCard";
 import { HealthIndicatorsCard } from "./patient-detail/HealthIndicatorsCard";
+import { AppointmentsPanel } from "./patient-detail/AppointmentsPanel";
 import { CaregiverSummaryCard } from "./patient-detail/CaregiverSummaryCard";
 import { FollowUpCard } from "./patient-detail/FollowUpCard";
 
@@ -146,6 +147,10 @@ export default function PatientDetail() {
         <div className="flex flex-col gap-6">
           <PatientOverviewCard patient={patient} ipcp={ipcp} />
           <HealthIndicatorsCard patientId={patient.id} />
+          <AppointmentsPanel
+            patientId={patient.id}
+            patientCenterId={patient.healthCenterId}
+          />
         </div>
         <div className="flex flex-col gap-6">
           <CaregiverSummaryCard
