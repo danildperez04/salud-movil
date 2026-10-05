@@ -15,6 +15,7 @@ import { HealthIndicatorsModule } from './features/health-indicators/health-indi
 import { AppointmentsModule } from './features/appointments/appointments.module';
 import { MedicationsModule } from './features/medications/medications.module';
 import { RemindersModule } from './features/reminders/reminders.module';
+import { DashboardModule } from './features/dashboard/dashboard.module';
 import { DatabaseModule } from './database/database.module';
 
 @Module({
@@ -53,6 +54,7 @@ import { DatabaseModule } from './database/database.module';
     AppointmentsModule,
     MedicationsModule,
     RemindersModule,
+    DashboardModule,
     DatabaseModule,
   ],
   controllers: [AppController],
