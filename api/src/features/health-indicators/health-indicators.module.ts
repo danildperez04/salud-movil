@@ -5,6 +5,8 @@ import { HealthIndicatorsService } from './health-indicators.service';
 import { HealthIndicator } from './entities/health-indicator.entity';
 import { TypeIndicator } from '../catalogues/entities/type-indicator.entity';
 import { ClinicalRange } from '../catalogues/entities/clinical-range.entity';
+import { ClinicalRangeBand } from '../catalogues/entities/clinical-range-band.entity';
+import { ClinicalRangeBandsService } from '../catalogues/clinical-range-bands.service';
 import { User } from '../users/entities/user.entity';
 import { PatientsModule } from '../patients/patients.module';
 
@@ -14,11 +16,13 @@ import { PatientsModule } from '../patients/patients.module';
       HealthIndicator,
       TypeIndicator,
       ClinicalRange,
+      ClinicalRangeBand,
       User,
     ]),
     PatientsModule,
   ],
   controllers: [HealthIndicatorsController],
-  providers: [HealthIndicatorsService],
+  providers: [HealthIndicatorsService, ClinicalRangeBandsService],
+  exports: [ClinicalRangeBandsService],
 })
 export class HealthIndicatorsModule {}

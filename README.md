@@ -135,6 +135,12 @@ salud-móvil/
 | `GET` | `/catalogues/notification-states` | Listar estados de notificación |
 | `GET` | `/catalogues/route-administrations` | Listar vías de administración |
 
+### Panel (`/dashboard`)
+
+| Método | Ruta | Descripción | Acceso |
+| --- | --- | --- | --- |
+| `GET` | `/dashboard/stats` | Contadores del panel y pacientes con indicadores en banda de alerta o crítica | Admin, Personal de salud |
+
 ### Pacientes (`/patients`)
 
 | Método | Ruta | Descripción | Acceso |

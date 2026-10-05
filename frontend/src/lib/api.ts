@@ -1,22 +1,34 @@
 import type {
   AuthResponse,
   CatalogueItem,
+  CreateAppointmentPayload,
   CreateCaregiverPayload,
+  CreateHealthIndicatorPayload,
   CreateMedicalVisitPayload,
+  CreateMedicationPayload,
   CreatePatientPayload,
   CreateStaffPayload,
   HealthCenterItem,
   LinkCaregiverPayload,
   MunicipalityItem,
+  PublicAppointment,
   PublicCaregiver,
   PublicCaregiverDetail,
   PublicCaregiverLink,
+  PublicDashboardStats,
+  PublicHealthIndicator,
+  PublicIndicatorSummary,
   PublicMedicalRecord,
+  PublicMedication,
   PublicPatient,
   PublicPatientLink,
+  PublicReminder,
   PublicStaff,
+  UpdateAppointmentPayload,
   UpdateCaregiverPayload,
+  UpdateHealthIndicatorPayload,
   UpdateMedicalRecordPayload,
+  UpdateMedicationPayload,
   UpdatePatientPayload,
   UpdateStaffPayload,
 } from '../types';
@@ -25,9 +37,19 @@ const API_URL =
   (import.meta.env.VITE_API_URL as string | undefined) ?? 'http://localhost:3000';
 
 let tokenGetter: () => string | null = () => null;
+let unauthorizedHandler: () => void = () => {};
 
 export function setTokenGetter(getter: () => string | null) {
   tokenGetter = getter;
+}
+
+/**
+ * Se invoca cuando la API responde 401. Lo registra el store de autenticación
+ * para limpiar la sesión: sin esto, un token expirado dejaba al usuario
+ * atascado viendo errores en lugar de volver al login.
+ */
+export function setUnauthorizedHandler(handler: () => void) {
+  unauthorizedHandler = handler;
 }
 
 interface ApiErrorBody {
@@ -44,6 +66,24 @@ export class ApiError extends Error {
   }
 }
 
+type QueryValue = string | number | boolean | null | undefined;
+
+/** Serializa query params omitiendo los vacíos, sin dejar `?a=&b=`. */
+function withQuery(path: string, query?: Record<string, QueryValue>): string {
+  if (!query) {
+    return path;
+  }
+  const params = new URLSearchParams();
+  for (const [key, value] of Object.entries(query)) {
+    if (value === undefined || value === null || value === '') {
+      continue;
+    }
+    params.set(key, String(value));
+  }
+  const qs = params.toString();
+  return qs ? `${path}?${qs}` : path;
+}
+
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const token = tokenGetter();
   const headers: Record<string, string> = {
@@ -57,6 +97,10 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     response = await fetch(`${API_URL}${path}`, { ...options, headers });
   } catch {
     throw new ApiError('No se pudo conectar con el servidor', 0);
+  }
+
+  if (response.status === 401) {
+    unauthorizedHandler();
   }
 
   if (!response.ok) {
@@ -75,7 +119,14 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   }
 
   const text = await response.text();
-  return text ? (JSON.parse(text) as T) : (undefined as T);
+  if (!text) {
+    return undefined as T;
+  }
+  try {
+    return JSON.parse(text) as T;
+  } catch {
+    throw new ApiError('El servidor devolvió una respuesta inesperada', response.status);
+  }
 }
 
 export const api = {
@@ -88,6 +139,17 @@ export const api = {
 
   me() {
     return request<AuthResponse['user']>('/auth/me');
+  },
+
+  /**
+   * La API responde siempre 200 con un mensaje genérico, exista o no la cuenta,
+   * y no devuelve el token. `{ message }` documenta ese contrato.
+   */
+  requestPasswordReset(email: string) {
+    return request<{ message: string }>('/auth/forgot-password', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    });
   },
 
   getDepartments() {
@@ -231,5 +293,161 @@ export const api = {
       method: 'POST',
       body: JSON.stringify(payload),
     });
+  },
+  // --- Panel ---
+
+  getDashboardStats() {
+    return request<PublicDashboardStats>('/dashboard/stats');
+  },
+
+  // --- Indicadores de salud ---
+
+  getPatientHealthIndicators(
+    patientId: string,
+    query?: { typeIndicatorId?: number; from?: string; to?: string },
+  ) {
+    return request<PublicHealthIndicator[]>(
+      withQuery(`/patients/${patientId}/health-indicators`, query),
+    );
+  },
+
+  getPatientHealthIndicatorsLatest(patientId: string) {
+    return request<PublicHealthIndicator[]>(
+      `/patients/${patientId}/health-indicators/latest`,
+    );
+  },
+
+  getPatientHealthIndicatorsSummary(patientId: string) {
+    return request<PublicIndicatorSummary[]>(
+      `/patients/${patientId}/health-indicators/summary`,
+    );
+  },
+
+  createPatientHealthIndicator(
+    patientId: string,
+    payload: CreateHealthIndicatorPayload,
+  ) {
+    return request<PublicHealthIndicator>(
+      `/patients/${patientId}/health-indicators`,
+      { method: 'POST', body: JSON.stringify(payload) },
+    );
+  },
+
+  updatePatientHealthIndicator(
+    patientId: string,
+    indicatorId: string,
+    payload: UpdateHealthIndicatorPayload,
+  ) {
+    return request<PublicHealthIndicator>(
+      `/patients/${patientId}/health-indicators/${indicatorId}`,
+      { method: 'PATCH', body: JSON.stringify(payload) },
+    );
+  },
+
+  deletePatientHealthIndicator(patientId: string, indicatorId: string) {
+    return request<void>(`/patients/${patientId}/health-indicators/${indicatorId}`, {
+      method: 'DELETE',
+    });
+  },
+
+  // --- Citas médicas ---
+
+  getPatientAppointments(patientId: string) {
+    return request<PublicAppointment[]>(`/patients/${patientId}/appointments`);
+  },
+
+  getPatientUpcomingAppointments(patientId: string) {
+    return request<PublicAppointment[]>(`/patients/${patientId}/appointments/upcoming`);
+  },
+
+  createPatientAppointment(
+    patientId: string,
+    payload: CreateAppointmentPayload,
+  ) {
+    return request<PublicAppointment>(`/patients/${patientId}/appointments`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  },
+
+  updatePatientAppointment(
+    patientId: string,
+    appointmentId: string,
+    payload: UpdateAppointmentPayload,
+  ) {
+    return request<PublicAppointment>(
+      `/patients/${patientId}/appointments/${appointmentId}`,
+      { method: 'PATCH', body: JSON.stringify(payload) },
+    );
+  },
+
+  cancelPatientAppointment(
+    patientId: string,
+    appointmentId: string,
+    cancelReason: string,
+  ) {
+    return request<PublicAppointment>(
+      `/patients/${patientId}/appointments/${appointmentId}/cancel`,
+      { method: 'POST', body: JSON.stringify({ cancelReason }) },
+    );
+  },
+
+  changePatientAppointmentState(
+    patientId: string,
+    appointmentId: string,
+    state: 'Completed' | 'No show',
+  ) {
+    return request<PublicAppointment>(
+      `/patients/${patientId}/appointments/${appointmentId}/state`,
+      { method: 'PATCH', body: JSON.stringify({ state }) },
+    );
+  },
+
+  deletePatientAppointment(patientId: string, appointmentId: string) {
+    return request<void>(`/patients/${patientId}/appointments/${appointmentId}`, {
+      method: 'DELETE',
+    });
+  },
+
+  // --- Medicamentos ---
+
+  getPatientMedications(patientId: string) {
+    return request<PublicMedication[]>(`/patients/${patientId}/medications`);
+  },
+
+  createPatientMedication(patientId: string, payload: CreateMedicationPayload) {
+    return request<PublicMedication>(`/patients/${patientId}/medications`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  },
+
+  updatePatientMedication(
+    patientId: string,
+    medicationId: string,
+    payload: UpdateMedicationPayload,
+  ) {
+    return request<PublicMedication>(
+      `/patients/${patientId}/medications/${medicationId}`,
+      { method: 'PATCH', body: JSON.stringify(payload) },
+    );
+  },
+
+  deletePatientMedication(patientId: string, medicationId: string) {
+    return request<void>(`/patients/${patientId}/medications/${medicationId}`, {
+      method: 'DELETE',
+    });
+  },
+
+  // --- Recordatorios ---
+
+  getMyReminders(windowDays?: number) {
+    return request<PublicReminder[]>(withQuery('/patients/me/reminders', { windowDays }));
+  },
+
+  getPatientReminders(patientId: string, windowDays?: number) {
+    return request<PublicReminder[]>(
+      withQuery(`/patients/${patientId}/reminders`, { windowDays }),
+    );
   },
 };

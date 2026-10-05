@@ -157,6 +157,8 @@ export interface UpdatePatientPayload {
   genreId?: number;
   emergencyContactName?: string;
   emergencyContactPhoneNumber?: string;
+  /** Solo el administrador puede reasignar el centro de salud. */
+  healthCenterId?: string;
 }
 
 export interface LinkCaregiverPayload {
@@ -221,4 +223,216 @@ export interface PublicPatientLink {
   relationshipTypeName: string;
   isPrimary: boolean;
   dateLink: string;
+}
+
+// ---------------------------------------------------------------------------
+// Indicadores de salud
+// ---------------------------------------------------------------------------
+
+/**
+ * Gravedad según las bandas clínicas (`clinical_range_band`).
+ * `null` cuando el tipo de indicador no tiene bandas definidas.
+ */
+export type IndicatorSeverity = 'normal' | 'alert' | 'critical' | null;
+
+/** Clasificación binaria. Se conserva por compatibilidad con el cliente móvil. */
+export type IndicatorStatus = 'low' | 'normal' | 'high' | null;
+
+export interface PublicHealthIndicator {
+  id: string;
+  typeIndicatorId: number;
+  typeIndicatorName: string;
+  measurementUnit: string;
+  value: number;
+  valueSecondary: number | null;
+  dateHour: string;
+  notes: string | null;
+  registeredById: string;
+  registeredByName: string;
+  status: IndicatorStatus;
+  severity: IndicatorSeverity;
+  band: string | null;
+}
+
+export interface PublicIndicatorSummary {
+  typeIndicatorId: number;
+  typeIndicatorName: string;
+  measurementUnit: string;
+  value: number;
+  valueSecondary: number | null;
+  dateHour: string;
+  status: IndicatorStatus;
+  severity: IndicatorSeverity;
+  band: string | null;
+  minValue: number | null;
+  maxValue: number | null;
+  minValueSecondary: number | null;
+  maxValueSecondary: number | null;
+}
+
+export interface CreateHealthIndicatorPayload {
+  typeIndicatorId: number;
+  value: number;
+  /** Obligatorio para presión arterial. */
+  valueSecondary?: number;
+  dateHour?: string;
+  notes?: string;
+}
+
+export interface UpdateHealthIndicatorPayload {
+  typeIndicatorId?: number;
+  value?: number;
+  valueSecondary?: number;
+  dateHour?: string;
+  notes?: string;
+}
+
+// ---------------------------------------------------------------------------
+// Citas médicas
+// ---------------------------------------------------------------------------
+
+export interface PublicAppointment {
+  id: string;
+  dateHour: string;
+  reason: string;
+  durationMinutes: number | null;
+  appointmentStateId: number;
+  appointmentStateName: string;
+  appointmentTypeId: number;
+  appointmentTypeName: string;
+  cancelReason: string | null;
+  cancelledAt: string | null;
+  patientId: string;
+  patientName: string;
+  healthcareWorkerId: string;
+  healthcareWorkerName: string;
+}
+
+export interface CreateAppointmentPayload {
+  dateHour: string;
+  reason: string;
+  appointmentTypeId: number;
+  healthcareWorkerId?: string;
+  durationMinutes?: number;
+}
+
+export interface UpdateAppointmentPayload {
+  dateHour?: string;
+  reason?: string;
+  appointmentTypeId?: number;
+  healthcareWorkerId?: string;
+  durationMinutes?: number;
+}
+
+// ---------------------------------------------------------------------------
+// Medicamentos
+// ---------------------------------------------------------------------------
+
+export interface PublicMedicationSchedule {
+  id: string;
+  hour: string;
+  timesPerDay: number;
+  days: number[];
+}
+
+export interface PublicMedication {
+  id: string;
+  drugName: string;
+  dose: string;
+  instructions: string | null;
+  startDate: string;
+  endDate: string | null;
+  active: boolean;
+  routeAdministrationId: number;
+  routeAdministrationName: string;
+  prescribedById: string | null;
+  prescribedByName: string | null;
+  schedules: PublicMedicationSchedule[];
+}
+
+export interface CreateMedicationSchedulePayload {
+  hour: string;
+  timesPerDay: number;
+  days: number[];
+}
+
+export interface CreateMedicationPayload {
+  drugName: string;
+  dose: string;
+  instructions?: string;
+  startDate: string;
+  endDate?: string;
+  active?: boolean;
+  routeAdministrationId: number;
+  schedules: CreateMedicationSchedulePayload[];
+}
+
+export interface UpdateMedicationPayload {
+  drugName?: string;
+  dose?: string;
+  instructions?: string;
+  startDate?: string;
+  endDate?: string;
+  active?: boolean;
+  routeAdministrationId?: number;
+  schedules?: CreateMedicationSchedulePayload[];
+}
+
+// ---------------------------------------------------------------------------
+// Recordatorios
+// ---------------------------------------------------------------------------
+
+export interface PublicMedicationReminderItem {
+  type: 'medication';
+  id: string;
+  medicationId: string;
+  scheduleId: string;
+  title: string;
+  dose: string;
+  dateHour: string;
+  reminderAt: string;
+  confirmedAt: string | null;
+  notificationState: string;
+}
+
+export interface PublicAppointmentReminderItem {
+  type: 'appointment';
+  id: string;
+  appointmentId: string;
+  title: string;
+  professionalName: string;
+  specialty: string;
+  dateHour: string;
+  reminderAt: string;
+  notificationState: string;
+}
+
+export type PublicReminder =
+  | PublicMedicationReminderItem
+  | PublicAppointmentReminderItem;
+
+// ---------------------------------------------------------------------------
+// Panel
+// ---------------------------------------------------------------------------
+
+export interface PublicPatientAttention {
+  id: string;
+  name: string;
+  healthCenterName: string;
+  indicatorName: string | null;
+  indicatorValue: number | null;
+  indicatorUnit: string | null;
+  indicatorDateHour: string | null;
+  severity: IndicatorSeverity;
+  band: string | null;
+}
+
+export interface PublicDashboardStats {
+  totalPatients: number;
+  activePatients: number;
+  patientsWithAttention: number;
+  upcomingAppointments: number;
+  pendingMedicationIntakes: number;
+  attention: PublicPatientAttention[];
+  generatedAt: string;
 }

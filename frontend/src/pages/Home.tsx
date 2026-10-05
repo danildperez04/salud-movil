@@ -1,24 +1,22 @@
 import {
   AlertCircle,
   AlertTriangle,
+  CalendarClock,
   HeartHandshake,
   Map,
+  Pill,
   Plus,
-  UserCheck,
   Users,
   type LucideIcon,
 } from "lucide-react";
+import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { Button } from "../components/ui/Button";
+import { Alert } from "../components/ui/Alert";
 import { useAuthStore } from "../store/auth";
-import { getPriorityLevel, PRIORITY_STYLES } from "../lib//priority";
-
-// ---------------------------------------------------------------------------
-// TODO: todo lo de esta sección es DATA MOCK. El backend todavía no expone
-// el cálculo de IPCP ni los contadores del panel — cuando exista, reemplazar
-// estos arrays por la respuesta real del API (ver lib/api.ts) sin tocar el
-// JSX de abajo, ya que ambos consumen la misma forma de datos.
-// ---------------------------------------------------------------------------
+import { api, ApiError } from "../lib/api";
+import { formatDateTime } from "../lib/date";
+import type { PublicDashboardStats } from "../types";
 
 interface StatCard {
   label: string;
@@ -35,70 +33,59 @@ const STAT_TONE_STYLES: Record<StatCard["tone"], string> = {
   neutral: "bg-mint-soft text-primary",
 };
 
-const MOCK_STATS: StatCard[] = [
-  {
-    label: "Prioridad alta",
-    value: 3,
-    caption: PRIORITY_STYLES.high.range,
-    icon: AlertTriangle,
-    tone: "high",
-  },
-  {
-    label: "Prioridad moderada",
-    value: 3,
-    caption: PRIORITY_STYLES.moderate.range,
-    icon: AlertCircle,
-    tone: "moderate",
-  },
-  {
-    label: "Prioridad baja",
-    value: 2,
-    caption: PRIORITY_STYLES.low.range,
-    icon: UserCheck,
-    tone: "low",
-  },
-  {
-    label: "Pacientes activos",
-    value: 8,
-    caption: "Con seguimiento activo",
-    icon: Users,
-    tone: "neutral",
-  },
-];
+const SEVERITY_STYLES: Record<"alert" | "critical", string> = {
+  alert: "bg-amber-100 text-amber-700",
+  critical: "bg-red-100 text-red-700",
+};
 
-interface MockPatientAlert {
-  name: string;
-  center: string;
-  minutesAgo: number;
-  score: number;
+const SEVERITY_LABELS: Record<"alert" | "critical", string> = {
+  alert: "Fuera de rango",
+  critical: "Crítico",
+};
+
+/**
+ * Las tarjetas se derivan de `/dashboard/stats`.
+ *
+ * ⚠️ No son prioridades de IPCP: el índice todavía no existe en la API. Se cuenta
+ * por gravedad clínica del último indicador de cada paciente, que es lo que hoy
+ * sí se puede afirmar con datos reales. Cuando exista el IPCP, estas tarjetas
+ * pasarán a consumir su `level`.
+ */
+function buildStatCards(stats: PublicDashboardStats): StatCard[] {
+  const critical = stats.attention.filter((a) => a.severity === "critical").length;
+  const alert = stats.attention.filter((a) => a.severity === "alert").length;
+
+  return [
+    {
+      label: "En estado crítico",
+      value: critical,
+      caption: "Último indicador crítico",
+      icon: AlertTriangle,
+      tone: "high",
+    },
+    {
+      label: "Fuera de rango",
+      value: alert,
+      caption: "Último indicador en alerta",
+      icon: AlertCircle,
+      tone: "moderate",
+    },
+    {
+      label: "Próximas citas",
+      value: stats.upcomingAppointments,
+      caption: "En los próximos 7 días",
+      icon: CalendarClock,
+      tone: "neutral",
+    },
+    {
+      label: "Pacientes activos",
+      value: stats.activePatients,
+      caption: "Con seguimiento activo",
+      icon: Users,
+      tone: "low",
+    },
+  ];
 }
-
-const MOCK_ATTENTION_LIST: MockPatientAlert[] = [
-  {
-    name: "Jorge Gutiérrez",
-    center: "Centro de Salud Carlos Núñez Téllez",
-    minutesAgo: 8,
-    score: 92,
-  },
-  {
-    name: "Julio Reyes",
-    center: "Centro de Salud Carlos Núñez Téllez",
-    minutesAgo: 13,
-    score: 84,
-  },
-  {
-    name: "Sofía Mendoza",
-    center: "Hospital Regional",
-    minutesAgo: 40,
-    score: 76,
-  },
-  {
-    name: "María López",
-    center: "Centro de Salud Carlos Núñez Téllez",
-    minutesAgo: 25,
-    score: 63,
-  },
-];
 
 const QUICK_ACTIONS: {
   label: string;
@@ -119,6 +106,12 @@ const QUICK_ACTIONS: {
     to: "/app/alerts",
   },
   {
+    label: "Medicamentos",
+    description: "Controla la adherencia",
+    icon: Pill,
+    to: "/app/patients",
+  },
+  {
     label: "Cuidadores",
     description: "Contacta personas de apoyo",
     icon: HeartHandshake,
@@ -126,12 +119,40 @@ const QUICK_ACTIONS: {
   },
 ];
 
-// ---------------------------------------------------------------------------
-
 export default function Home() {
   const navigate = useNavigate();
   const user = useAuthStore((s) => s.user);
-  const highPriorityCount = MOCK_STATS[0].value;
+  const [stats, setStats] = useState<PublicDashboardStats | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let active = true;
+    api
+      .getDashboardStats()
+      .then((data) => {
+        if (active) setStats(data);
+      })
+      .catch((err) => {
+        if (active) {
+          setError(
+            err instanceof ApiError
+              ? err.message
+              : "No se pudieron cargar las estadísticas",
+          );
+        }
+      })
+      .finally(() => {
+        if (active) setLoading(false);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const statCards = stats ? buildStatCards(stats) : [];
+  const criticalCount =
+    stats?.attention.filter((a) => a.severity === "critical").length ?? 0;
 
   return (
     <div className="flex flex-col gap-6">
@@ -154,46 +175,63 @@ export default function Home() {
         </Button>
       </div>
 
+      {error ? <Alert>{error}</Alert> : null}
+
       <div className="flex flex-col justify-between gap-2 rounded-2xl bg-mint-soft-2 p-5 sm:flex-row sm:items-center">
         <div>
           <p className="font-display text-sm font-bold text-navy">
             ¡Hola, {user?.name ?? "Administrador"}! 👋
           </p>
           <p className="mt-1 font-body text-sm text-muted">
-            Hay{" "}
-            <span className="font-semibold text-red-600">
-              {highPriorityCount} pacientes en prioridad alta
-            </span>{" "}
-            que requieren seguimiento cercano.
+            {loading ? (
+              "Calculando el estado de los pacientes…"
+            ) : (
+              <>
+                Hay{" "}
+                <span className="font-semibold text-red-600">
+                  {criticalCount} pacientes en estado crítico
+                </span>{" "}
+                que requieren seguimiento cercano.
+              </>
+            )}
           </p>
         </div>
         <span className="whitespace-nowrap font-body text-xs font-medium text-primary-dark">
-          Actualizado hace 2 min
+          {stats ? `Actualizado ${formatDateTime(stats.generatedAt)}` : "—"}
         </span>
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-        {MOCK_STATS.map((stat) => (
-          <div
-            key={stat.label}
-            className="rounded-2xl border border-line bg-white p-5 shadow-soft"
-          >
-            <div className="flex items-start justify-between">
-              <p className="font-body text-xs font-medium text-muted">
-                {stat.label}
-              </p>
-              <span
-                className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${STAT_TONE_STYLES[stat.tone]}`}
+        {loading
+          ? Array.from({ length: 4 }).map((_, index) => (
+              <div
+                key={index}
+                className="h-32 animate-pulse rounded-2xl border border-line bg-white"
+              />
+            ))
+          : statCards.map((stat) => (
+              <div
+                key={stat.label}
+                className="rounded-2xl border border-line bg-white p-5 shadow-soft"
               >
-                <stat.icon size={16} aria-hidden="true" />
-              </span>
-            </div>
-            <p className="mt-3 font-display text-3xl font-bold text-navy">
-              {stat.value}
-            </p>
-            <p className="mt-1 font-body text-xs text-muted">{stat.caption}</p>
-          </div>
-        ))}
+                <div className="flex items-start justify-between">
+                  <p className="font-body text-xs font-medium text-muted">
+                    {stat.label}
+                  </p>
+                  <span
+                    className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${STAT_TONE_STYLES[stat.tone]}`}
+                  >
+                    <stat.icon size={16} aria-hidden="true" />
+                  </span>
+                </div>
+                <p className="mt-3 font-display text-3xl font-bold text-navy">
+                  {stat.value}
+                </p>
+                <p className="mt-1 font-body text-xs text-muted">
+                  {stat.caption}
+                </p>
+              </div>
+            ))}
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.4fr_1fr]">
@@ -211,34 +249,52 @@ export default function Home() {
           </div>
 
           <div className="mt-3 flex flex-col divide-y divide-line">
-            {MOCK_ATTENTION_LIST.map((patient) => {
-              const level = getPriorityLevel(patient.score);
-              return (
-                <div
-                  key={patient.name}
-                  className="flex items-center gap-3 py-3"
-                >
-                  <span
-                    className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full font-display text-sm font-bold ${PRIORITY_STYLES[level].badge}`}
+            {loading ? (
+              <p className="py-6 text-center font-body text-sm text-muted">
+                Cargando…
+              </p>
+            ) : stats && stats.attention.length > 0 ? (
+              stats.attention.map((patient) => {
+                const severity =
+                  patient.severity === "critical" ? "critical" : "alert";
+                return (
+                  <Link
+                    key={patient.id}
+                    to={`/app/patients/${patient.id}`}
+                    className="flex items-center gap-3 py-3 transition hover:bg-surface"
                   >
-                    {patient.score}
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate font-body text-sm font-semibold text-navy">
-                      {patient.name}
-                    </p>
-                    <p className="truncate font-body text-xs text-muted">
-                      {patient.center} · Hace {patient.minutesAgo} min
-                    </p>
-                  </div>
-                  {/* Placeholder: sin id de paciente real detrás de este mock,
-                      no se navega todavía a un detalle específico. */}
-                  <span className="shrink-0 font-body text-xs font-medium text-primary">
-                    Ver
-                  </span>
-                </div>
-              );
-            })}
+                    <span
+                      className={`flex h-9 w-9 shrink-0 items-center justify-center rounded-full font-body text-xs font-bold ${SEVERITY_STYLES[severity]}`}
+                    >
+                      {patient.indicatorValue ?? "—"}
+                    </span>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate font-body text-sm font-semibold text-navy">
+                        {patient.name}
+                      </p>
+                      <p className="truncate font-body text-xs text-muted">
+                        {patient.indicatorName ?? "Indicador"}
+                        {patient.indicatorUnit
+                          ? ` · ${patient.indicatorValue ?? "—"} ${patient.indicatorUnit}`
+                          : ""}
+                        {patient.indicatorDateHour
+                          ? ` · ${formatDateTime(patient.indicatorDateHour)}`
+                          : ""}
+                      </p>
+                    </div>
+                    <span
+                      className={`shrink-0 rounded-full px-2 py-1 font-body text-xs font-medium ${SEVERITY_STYLES[severity]}`}
+                    >
+                      {SEVERITY_LABELS[severity]}
+                    </span>
+                  </Link>
+                );
+              })
+            ) : (
+              <p className="py-6 text-center font-body text-sm text-muted">
+                Ningún paciente con indicadores fuera de rango.
+              </p>
+            )}
           </div>
         </div>
 
