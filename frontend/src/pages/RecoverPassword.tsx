@@ -6,7 +6,7 @@ import { Input } from "../components/ui/Input";
 import { Button } from "../components/ui/Button";
 import { Alert } from "../components/ui/Alert";
 import { Logo } from "../components/ui/Logo";
-import { ApiError } from "../lib/api";
+import { api, ApiError } from "../lib/api";
 
 export default function RecoverPassword() {
   const [email, setEmail] = useState("");
@@ -23,15 +23,9 @@ export default function RecoverPassword() {
     }
     setLoading(true);
     try {
-      // TODO: agregar `requestPasswordReset` a lib/api.ts cuando exista
-      // el endpoint en el backend, ej.:
-      //   requestPasswordReset(email: string) {
-      //     return request<void>('/auth/forgot-password', {
-      //       method: 'POST',
-      //       body: JSON.stringify({ email }),
-      //     });
-      //   },
-      // await api.requestPasswordReset(email);
+      // La API responde 200 exista o no la cuenta, para no revelar qué correos
+      // están registrados, así que un error aquí sí es un fallo real.
+      await api.requestPasswordReset(email.trim());
       setSubmitted(true);
     } catch (err) {
       setError(
