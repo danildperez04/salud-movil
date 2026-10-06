@@ -1,0 +1,137 @@
+# Verificación continua de `api/` y `frontend/`.
+#
+# `mobile/` queda fuera a propósito: lo asume jarey, y un job suyo bloquearía
+# este pipeline con trabajo en curso que no es nuestro. Cuando se entregue, se
+# añade un job aquí.
+#
+# Lo que este pipeline protege, y por qué importa:
+# - `api/`: el esquema lo crean las migraciones, no `synchronize`. Si una
+#   entidad y su migración divergen, la diferencia se detecta en una base limpia
+#   de CI, no en el despliegue.
+# - `frontend/`: el guardia `check:mocks` falla si alguien reintroduce el IPCP
+#   simulado (un hash del UUID del paciente mostrado como prioridad clínica).
+
+name: CI
+
+on:
+  push:
+    branches: [develop, main]
+  pull_request:
+    branches: [develop, main]
+
+# Cancela ejecuciones anteriores del mismo ref: no aporta nada y consume cuota.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  api:
+    name: API (build, lint, unit, e2e)
+    runs-on: ubuntu-latest
+
+    # Servicio Postgres aislado. Los e2e se niegan a correr si el nombre de la
+    # base no contiene "test" (`api/test/global-setup.ts`).
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: salud_movil_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U postgres"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    defaults:
+      run:
+        working-directory: api
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+          cache-dependency-path: api/pnpm-lock.yaml
+
+      - name: Instalar dependencias
+        run: pnpm install --frozen-lockfile
+
+      - name: Variables de entorno
+        run: |
+          {
+            echo "NODE_ENV=test"
+            echo "DB_TYPE=postgres"
+            echo "DB_HOST=localhost"
+            echo "DB_PORT=5432"
+            echo "DB_USER=postgres"
+            echo "DB_PASSWORD=postgres"
+            echo "DB_NAME=salud_movil_test"
+            echo "JWT_SECRET=ci-secret-no-usar-fuera-de-ci"
+            echo "JWT_EXPIRES_IN=1h"
+            echo "CORS_ORIGIN=http://localhost:5173"
+          } >> "$GITHUB_ENV"
+
+      - name: Build
+        run: pnpm build
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Pruebas unitarias
+        run: pnpm test
+
+      # El `globalSetup` de los e2e aplica las migraciones sobre la base de
+      # pruebas; no hace falta un paso previo.
+      - name: Pruebas e2e
+        run: pnpm test:e2e
+
+      # Detecta el error más insidioso con migraciones: que una entidad cambie
+      # sin que su migración lo refleje. Compara el esquema que producirían las
+      # entidades con el que hay en la base; sale con código 1 si difieren.
+      #
+      # Requiere que la base esté al día, y por eso va **después** de los e2e
+      # (cuyo `globalSetup` aplica las migraciones).
+      - name: Sin divergencia entre entidades y migraciones
+        run: pnpm migration:check
+
+  frontend:
+    name: Frontend (lint, mocks, build)
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: frontend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          # pnpm es el gestor canónico. `frontend/` tiene un `package-lock.json`
+          # obsoleto: instalar con npm reintroduce el build roto, así que el
+          # lockfile que se usa aquí es el de pnpm.
+          cache: pnpm
+          cache-dependency-path: frontend/pnpm-lock.yaml
+
+      - name: Instalar dependencias
+        run: pnpm install --frozen-lockfile
+
+      - name: Lint
+        run: pnpm lint
+
+      - name: Sin mocks clínicos
+        run: pnpm check:mocks
+
+      - name: Build
+        run: pnpm build
