@@ -1,7 +1,4 @@
-/**
- * Antes vivía duplicada en PatientsList.tsx. Muévela ahí también
- * (import { ageOf } from '../../lib/age') para no tener dos copias.
- */
+/** Edad a partir de la fecha de nacimiento, en años. */
 export function ageOf(dateOfBirth: string): string {
   const birth = new Date(`${dateOfBirth.slice(0, 10)}T00:00:00`);
   const now = new Date();

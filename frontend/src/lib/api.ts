@@ -216,8 +216,12 @@ export const api = {
     return request<PublicCaregiver[]>('/caregivers?q=' + encodeURIComponent(q));
   },
 
-  listUsers() {
-    return request<PublicStaff[]>('/users');
+  /**
+   * `role` filtra en el servidor. Sin él el backend devuelve pacientes y
+   * cuidadores también, que el panel descarta en el navegador.
+   */
+  listUsers(role?: string) {
+    return request<PublicStaff[]>(withQuery('/users', { role }));
   },
 
   getUser(id: string) {

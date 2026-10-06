@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { api, ApiError } from "../../lib/api";
+import { ageOf } from "../../lib/age";
 import { useAuthStore } from "../../store/auth";
 import type { PublicPatient } from "../../types";
 import { Card } from "../../components/ui/Card";
@@ -226,15 +227,4 @@ export default function PatientsList() {
       ) : null}
     </div>
   );
-}
-
-function ageOf(dateOfBirth: string): string {
-  const birth = new Date(`${dateOfBirth.slice(0, 10)}T00:00:00`);
-  const now = new Date();
-  let years = now.getFullYear() - birth.getFullYear();
-  const monthDiff = now.getMonth() - birth.getMonth();
-  if (monthDiff < 0 || (monthDiff === 0 && now.getDate() < birth.getDate())) {
-    years -= 1;
-  }
-  return years >= 0 ? `${years} años` : "—";
 }

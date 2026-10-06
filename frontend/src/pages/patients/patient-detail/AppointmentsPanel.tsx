@@ -128,7 +128,7 @@ export function AppointmentsPanel({
   useEffect(() => {
     if (role !== 'admin') return;
     void api
-      .listUsers()
+      .listUsers('health_staff')
       .then((users) =>
         setStaff(
           users.filter(
