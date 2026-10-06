@@ -57,6 +57,7 @@ export const SCREEN_TITLES = {
   appointmentDetail: 'Detalle de cita',
   appointmentForm: 'Agendar Cita',
   medications: 'Medicamentos',
+  medicationForm: 'Agregar Medicamento',
   reminders: 'Recordatorios',
   medicalRecord: 'Expediente clinico',
 } as const;
@@ -163,6 +164,17 @@ export const APPOINTMENTS_LABELS = {
 export const MEDICATIONS_LABELS = {
   tipTitle: 'Toma tus medicamentos',
   tipSubtitle: '¡No olvides tomar tus medicamentos a tiempo!',
+  addButton: 'Agregar medicamento',
+  empty: 'Aún no tienes medicamentos registrados',
+  nameLabel: 'Nombre del medicamento',
+  namePlaceholder: 'Ej: Losartán',
+  doseLabel: 'Dosis',
+  dosePlaceholder: 'Ej: 50mg',
+  quantityLabel: 'Cantidad por toma',
+  quantityPlaceholder: 'Ej: 1 tableta',
+  timeLabel: 'Hora de la toma',
+  submit: 'Guardar medicamento',
+  createError: 'No se pudo guardar el medicamento. Intentá de nuevo.',
 } as const;
 
 // Textos generales reutilizables en toda la app

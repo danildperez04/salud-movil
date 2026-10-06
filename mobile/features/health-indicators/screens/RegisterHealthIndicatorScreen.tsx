@@ -21,7 +21,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { Text } from '@/components/ui/text';
 import { INDICATOR_TYPE_LABELS, REGISTER_INDICATOR_LABELS } from '@/constants/labels';
 import { createMockHealthIndicator } from '../api/mock-health-indicators';
-import { FIELD_CLASS_NAME, FormField, PickerField } from '../components/FormField';
+import { FIELD_CLASS_NAME, FormField, PickerField } from '@/components/ui/form-field';
 import { HEALTH_INDICATORS_QUERY_KEY } from '../hooks/useHealthIndicators';
 
 // TODO: no existe GET /catalogues/type-indicators en el backend todavía.

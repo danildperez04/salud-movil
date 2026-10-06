@@ -28,7 +28,7 @@ let mockMedications: MedicationRecord[] = [
     drugName: 'Metoprolol',
     dose: '850mg',
     quantityLabel: '1 tableta',
-    time: '12:00 pM',
+    time: '12:00 PM',
     active: true,
   },
   {
@@ -46,6 +46,15 @@ const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 export async function fetchMockMedications(): Promise<MedicationRecord[]> {
   await delay(300);
   return mockMedications;
+}
+
+export async function createMockMedication(
+  payload: Omit<MedicationRecord, 'id' | 'active'>,
+): Promise<MedicationRecord> {
+  await delay(300);
+  const record: MedicationRecord = { ...payload, id: String(Date.now()), active: true };
+  mockMedications = [...mockMedications, record];
+  return record;
 }
 
 export async function toggleMockMedicationActive(
