@@ -8,6 +8,7 @@ import AppLayout from "./layouts/AppLayout";
 import LandingPage from "./landing/LandingPage";
 import Login from "./pages/Login";
 import RecoverPassword from "./pages/RecoverPassword";
+import ResetPassword from "./pages/ResetPassword";
 import Home from "./pages/Home";
 import ComingSoon from "./pages/ComingSoon";
 import StaffList from "./pages/staff/StaffList";
@@ -50,6 +51,10 @@ function App() {
               </RedirectIfAuthed>
             }
           />
+          {/* Último paso de la recuperación: con el token del enlace. Va fuera
+              de `RedirectIfAuthed` a propósito: quien restablece su contraseña
+              puede haber perdido la sesión y aun así necesita entrar. */}
+          <Route path="/nueva-contrasena" element={<ResetPassword />} />
         </Route>
         <Route
           path="/app"

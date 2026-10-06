@@ -59,10 +59,32 @@ export default function RecoverPassword() {
       </p>
 
       {submitted ? (
-        <Alert variant="success">
-          Si el correo existe en nuestro sistema, recibirás instrucciones para
-          restablecer tu contraseña en unos minutos.
-        </Alert>
+        <div className="flex flex-col gap-4">
+          <Alert variant="success">
+            Si el correo existe en nuestro sistema, recibirás instrucciones para
+            restablecer tu contraseña en unos minutos.
+          </Alert>
+          {/* Sin servicio de correo el token solo se registra en el log de la
+              API (`auth.service.ts`, fuera de producción), así que en
+              desarrollo no hay forma de probar el paso final si no se ofrece
+              este atajo. En producción el token llega por el enlace del correo.
+              Ver §4 Fase 3 del plan de cierre: el envío de correo está
+              documentado como fuera del MVP. */}
+          {import.meta.env.DEV ? (
+            <p className="font-body text-xs text-muted">
+              <strong>Desarrollo:</strong> el token aparece en el log de la API
+              ({"<token de restablecimiento>"}). Pégalo en{" "}
+              <code className="rounded bg-mint-soft px-1">/nueva-contrasena</code>
+              .
+            </p>
+          ) : null}
+          <Link
+            to="/login"
+            className="font-body text-sm font-medium text-primary hover:underline"
+          >
+            Volver al inicio de sesión
+          </Link>
+        </div>
       ) : (
         <form
           onSubmit={handleSubmit}

@@ -153,6 +153,25 @@ export const api = {
     });
   },
 
+  /**
+   * Cierra el flujo de recuperación de contraseña (HU-04). El `token` llega por
+   * el enlace del correo; la API responde 400 si venció o ya se usó.
+   */
+  resetPassword(token: string, newPassword: string) {
+    return request<{ message: string }>('/auth/reset-password', {
+      method: 'POST',
+      body: JSON.stringify({ token, newPassword }),
+    });
+  },
+
+  /** Cambio de contraseña con la sesión abierta (HU-08). */
+  changePassword(currentPassword: string, newPassword: string) {
+    return request<{ message: string }>('/auth/change-password', {
+      method: 'POST',
+      body: JSON.stringify({ currentPassword, newPassword }),
+    });
+  },
+
   getDepartments() {
     return request<CatalogueItem[]>('/catalogues/departments');
   },
