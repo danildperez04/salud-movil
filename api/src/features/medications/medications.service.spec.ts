@@ -49,6 +49,46 @@ describe('MedicationsService', () => {
     expect(service).toBeDefined();
   });
 
+  it('debería rechazar horarios mal formados', async () => {
+    service = await buildModule();
+    const base = {
+      drugName: 'Losartán',
+      dose: '50mg',
+      startDate: '2026-10-01',
+      routeAdministrationId: 1,
+    };
+
+    // Sin `@ValidateNested` + `@Type` estas reglas no se aplican: una hora
+    // imposible llegaba a Postgres (500) y `days` vacío se aceptaba en silencio.
+    await expect(
+      service.create('pat-1', currentUser, {
+        ...base,
+        schedules: [{ hour: '25:00', timesPerDay: 1, days: [1] }],
+      }),
+    ).rejects.toThrow();
+
+    await expect(
+      service.create('pat-1', currentUser, {
+        ...base,
+        schedules: [{ hour: '08:00', timesPerDay: 1, days: [] }],
+      }),
+    ).rejects.toThrow();
+
+    await expect(
+      service.create('pat-1', currentUser, {
+        ...base,
+        schedules: [{ hour: '08:00', timesPerDay: 5, days: [1] }],
+      }),
+    ).rejects.toThrow();
+
+    await expect(
+      service.create('pat-1', currentUser, {
+        ...base,
+        schedules: [{ hour: '08:00', timesPerDay: 1, days: [9] }],
+      }),
+    ).rejects.toThrow();
+  });
+
   it('debería rechazar endDate anterior a startDate', async () => {
     service = await buildModule();
 

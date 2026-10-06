@@ -1,3 +1,4 @@
+import { Type } from 'class-transformer';
 import {
   ArrayMinSize,
   IsArray,
@@ -8,6 +9,7 @@ import {
   IsOptional,
   IsString,
   MaxLength,
+  ValidateNested,
 } from 'class-validator';
 import { CreateMedicationScheduleDto } from './create-medication.dto';
 
@@ -48,5 +50,7 @@ export class UpdateMedicationDto {
   @IsOptional()
   @IsArray()
   @ArrayMinSize(1)
+  @ValidateNested({ each: true })
+  @Type(() => CreateMedicationScheduleDto)
   schedules?: CreateMedicationScheduleDto[];
 }

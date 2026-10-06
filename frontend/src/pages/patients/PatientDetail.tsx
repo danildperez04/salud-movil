@@ -9,6 +9,8 @@ import { Alert } from "../../components/ui/Alert";
 import { getButtonClassName } from "../../components/ui/buttonStyles";
 import { PatientOverviewCard } from "./patient-detail/PatientOverviewCard";
 import { HealthIndicatorsCard } from "./patient-detail/HealthIndicatorsCard";
+import { AppointmentsPanel } from "./patient-detail/AppointmentsPanel";
+import { MedicationsPanel } from "./patient-detail/MedicationsPanel";
 import { CaregiverSummaryCard } from "./patient-detail/CaregiverSummaryCard";
 import { FollowUpCard } from "./patient-detail/FollowUpCard";
 
@@ -66,6 +68,13 @@ export default function PatientDetail() {
     };
   }, [id]);
 
+  /** Tras vincular un cuidador se recarga la lista de vínculos del paciente. */
+  const reloadCaregivers = async () => {
+    if (!id) return;
+    const list = await api.getPatientCaregivers(id);
+    setCaregivers(list);
+  };
+
   if (error) {
     return <Alert>{error}</Alert>;
   }
@@ -75,7 +84,9 @@ export default function PatientDetail() {
     );
   }
 
-  // MOCK: el IPCP real todavía no existe en el backend (ver lib/ipcp.ts).
+  // MOCK: el IPCP real todavía no existe en el backend (ver lib/ipcp.ts). El
+  // módulo del índice es el Bloque 2.D del plan; hasta entonces la tarjeta de
+  // resumen usa el hash provisional.
   const ipcp = getMockIpcp(patient.id);
 
   return (
@@ -137,10 +148,19 @@ export default function PatientDetail() {
         <div className="flex flex-col gap-6">
           <PatientOverviewCard patient={patient} ipcp={ipcp} />
           <HealthIndicatorsCard patientId={patient.id} />
+          <AppointmentsPanel
+            patientId={patient.id}
+            patientCenterId={patient.healthCenterId}
+          />
+          <MedicationsPanel patientId={patient.id} />
         </div>
         <div className="flex flex-col gap-6">
-          <CaregiverSummaryCard caregivers={caregivers} />
-          <FollowUpCard ipcpScore={ipcp.score} />
+          <CaregiverSummaryCard
+            patientId={patient.id}
+            caregivers={caregivers}
+            onLinked={reloadCaregivers}
+          />
+          <FollowUpCard patientId={patient.id} />
         </div>
       </div>
     </div>

@@ -148,14 +148,20 @@ Sin este paso, el navegador bloquea las peticiones del panel con errores de CORS
 
 | Tema | Situación actual | Recomendación |
 |---|---|---|
-| Esquema de BD | `synchronize: true` crea/altera tablas al arrancar (deuda conocida) | Reemplazar por migraciones SQL antes de v1.0.0 (Fase 7) |
-| Logging SQL | `logging: true` imprime cada query (incluye contraseñas en tránsito de queries de login) | Desactivar o filtrar en producción (Fase 7) |
+| Esquema de BD | `synchronize: true` crea/altera tablas al arrancar | **Pendiente y bloqueante del despliegue de las bandas clínicas** (`clinical_range_band`). Revisar el diff de esquema o migrar antes de desplegar |
+| Logging SQL | Solo fuera de producción: `logging` depende de `NODE_ENV` y el seed no imprime contraseñas cuando es `production` | **Resuelto.** Configurar `NODE_ENV=production` en Render |
 | Usuario admin | El seed crea `admin@saludmovil.com` / `Admin123!` | Cambiar la contraseña inmediatamente después del primer despliegue |
 | `JWT_SECRET` | Debe ser aleatorio y exclusivo de producción | `openssl rand -base64 48`; rotar ante cualquier sospecha |
 | Cold starts | El plan Free de Render duerme el servicio tras ~15 min sin tráfico (~50 s en despertar) | Aceptable para demos; evitar en producción real |
 | Pausa de Supabase | Proyectos free se pausan por inactividad | Revisar el dashboard si la API reporta errores de conexión tras días sin uso |
-| Seguridad extra | Sin Helmet ni rate limiting | Pendiente en Fase 7 (`@nestjs/throttler`) |
+| Seguridad extra | Helmet activo y rate limiting global con `@nestjs/throttler` (por defecto 100 req/min por IP) | **Resuelto.** Ajustar con `THROTTLE_LIMIT` y `THROTTLE_TTL_MS` |
 | Health check | No existe endpoint público | Agregar `GET /health` en Fase 7 |
+
+> ⚠️ **`forgot-password` cambió de contrato.** Ya **no devuelve el token** en la
+> respuesta (permitía secuestrar cualquier cuenta con solo conocer el correo) y
+> responde **siempre 200** con un mensaje genérico, para no revelar qué correos
+> existen. Mientras no haya servicio de correo, el token se registra **únicamente
+> fuera de producción**.
 
 ## 8. Checklist post-despliegue
 

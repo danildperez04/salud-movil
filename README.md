@@ -86,10 +86,11 @@ salud-móvil/
 ├── frontend/
 │   └── src/
 │       ├── auth/             # Guards de rutas (RequireAuth, RequireRole)
-│       ├── components/ui/    # 8 componentes reutilizables (Alert, Badge, Button, Card, Input, Modal, Select, Table)
+│       ├── components/ui/    # 11 componentes (Alert, Badge, Button, Card, ConfirmDeleteModal, Input, Logo, Modal, Select, Table, buttonStyles)
+│       ├── components/patients/  # HealthIndicatorBar e IpcpBadge
 │       ├── layouts/          # AppLayout (sidebar) y AuthLayout
-│       ├── lib/              # Cliente API, mapeo de roles
-│       ├── pages/            # Login, Home, StaffList, StaffForm, PatientsList, PatientForm, PatientDetail
+│       ├── lib/              # Cliente API, tipos de fecha, roles, navegación
+│       ├── pages/            # Login, Home, RecoverPassword, personal, pacientes, cuidadores y ficha clínica
 │       └── store/            # Zustand (auth con persist, catalogues)
 ├── docs/                     # Documentación del proyecto
 └── shared/                   # Logo del proyecto
@@ -210,9 +211,23 @@ salud-móvil/
 
 | Aplicación | Estado | Detalle |
 | --- | --- | --- |
-| **API** | ~88% | 9 módulos funcionales (auth, users, patients, catalogues, medical-records, health-indicators, appointments, medications, reminders). Con Helmet, rate limiting global y 39 pruebas (unitarias + e2e de RBAC y scoping). Pendientes: migraciones SQL (`synchronize: false`) e IPCP. |
-| **Frontend** | ~60% | Login, dashboard, gestión de personal de salud y pacientes completa. Pendiente: módulo de indicadores de salud en panel web. |
-| **Mobile** | ~5% | Scaffold con Expo SDK 57, tokens de diseño y layout base. Sin pantallas funcionales ni cliente API. |
+| **API** | ~92% | 11 módulos funcionales (auth, users, patients, catalogues, medical-records, health-indicators, appointments, medications, reminders, dashboard, health-centers). Helmet, rate limiting global, bandas de gravedad clínica y 47 pruebas unitarias + 14 e2e de RBAC y scoping. Pendientes: IPCP y migraciones SQL (`synchronize: false`) |
+| **Frontend** | ~75% | Login, recuperación de contraseña, dashboard con datos reales, gestión de personal, pacientes y cuidadores, ficha clínica con indicadores, citas, medicamentos y consultas. Pendiente: las 5 rutas `ComingSoon` y el IPCP |
+| **Mobile** | ~5% | Scaffold con Expo SDK 57, tokens de diseño y layout base. La API que necesita ya está entregada (recordatorios, indicadores, citas, medicamentos, IPCP pendiente) |
+
+### Reparto del trabajo
+
+- **`api/` y `frontend/`**: un solo frente. El panel consume la API directamente.
+- **`mobile/`**: lo asume **jarey**. La API entrega lo que necesita en `me/*` y en el feed de recordatorios; ver el contrato en el plan de cierre.
+- El plan de cierre vive **fuera del repositorio**, en
+  `/data/development/opencode-plans/salud-movil/plan-cierre-mvp.md`, y ahí se
+  registra el avance de cada fase.
+
+> ⚠️ **Rangos clínicos e IPCP pendientes de validación médica.** Las bandas
+> `normal` / `alert` / `critical` son valores estándar de referencia, no
+> umbrales validados clínicamente. El índice de prioridad se calcula con ellos y
+> **no debe usarse para priorizar pacientes reales** hasta que el equipo médico
+> los confirme.
 
 **Cronograma de desarrollo (ver `docs/Plan_de_Desarrollo.md`):**
 
