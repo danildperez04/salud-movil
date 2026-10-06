@@ -42,7 +42,11 @@ import { DatabaseModule } from './database/database.module';
       password: config().db.password,
       database: config().db.database,
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: true,
+      // El esquema lo gobiernan las migraciones (`pnpm migration:run`), nunca el
+      // arranque. Con `synchronize: true` cualquier despliegue alteraba la base
+      // de producción sin revisión: es la razón por la que los despliegues
+      // estuvieron aplazados. Ver `docs/Guia_de_Despliegue.md` §7.
+      synchronize: false,
       // El log de SQL imprime valores de pacientes. Solo en desarrollo.
       logging: config().db.logging,
     }),
