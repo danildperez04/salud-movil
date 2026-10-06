@@ -7,6 +7,8 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
+    "check:mocks": "bash scripts/check-no-clinical-mocks.sh",
+    "verify": "pnpm lint && pnpm check:mocks && pnpm build",
     "preview": "vite preview"
   },
   "dependencies": {

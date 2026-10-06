@@ -17,6 +17,7 @@ import type {
   PublicCaregiverLink,
   PublicDashboardStats,
   PublicHealthIndicator,
+  PublicIpcp,
   PublicIndicatorSummary,
   PublicMedicalRecord,
   PublicMedication,
@@ -464,5 +465,9 @@ export const api = {
     return request<PublicReminder[]>(
       withQuery(`/patients/${patientId}/reminders`, { windowDays }),
     );
+  },
+
+  getPatientIpcp(patientId: string) {
+    return request<PublicIpcp>(`/patients/${patientId}/ipcp`);
   },
 };
