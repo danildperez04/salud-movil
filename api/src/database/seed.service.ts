@@ -35,6 +35,13 @@ import {
   CLINICAL_RANGE_BANDS,
 } from './seed-data';
 
+/**
+ * Clave del lock consultivo que serializa el seed. Es un entero arbitrario y
+ * fijo: solo tiene que coincidir entre procesos de esta aplicación, así que no
+ * se usa `hashtext()` (depende de la colación y no es estable).
+ */
+const SEED_LOCK_KEY = 8_674_321;
+
 @Injectable()
 export class SeedService implements OnApplicationBootstrap {
   private readonly logger = new Logger(SeedService.name);
@@ -50,6 +57,15 @@ export class SeedService implements OnApplicationBootstrap {
 
   async seed(): Promise<void> {
     await this.dataSource.transaction(async (manager) => {
+      // El seed comprueba `count === 0` y después inserta. Con dos procesos
+      // arrancando a la vez (los e2e, que levantan la app en paralelo; dos
+      // réplicas; un reinicio mientras otro arranca) los dos ven la tabla vacía y
+      // los dos insertan, y el segundo muere con violación de clave única.
+      //
+      // El lock consultivo de transacción serializa a quien siembre: el segundo
+      // espera a que el primero confirme, y para entonces los `count` ya nonzero.
+      await manager.query('SELECT pg_advisory_xact_lock($1)', [SEED_LOCK_KEY]);
+
       await this.seedCatalogues(manager);
       await this.seedHealthCenter(manager);
       await this.seedAdmin(manager);
