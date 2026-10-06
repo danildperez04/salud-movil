@@ -1,41 +1,48 @@
 // features/more/screens/MoreScreen.tsx
-import { router } from 'expo-router';
-import { Bell, ChevronRight, FileText, LogOut } from 'lucide-react-native';
-import { Pressable, ScrollView } from 'react-native';
+import { LogOut } from 'lucide-react-native';
+import { Pressable, ScrollView, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Text } from '@/components/ui/text';
-import { SCREEN_TITLES, TAB_LABELS } from '@/constants/labels';
+import { MORE_LABELS, ROLE_LABELS } from '@/constants/labels';
 import { useAppStore } from '@/store';
-
-const MENU_ITEMS = [
-  { icon: Bell, label: SCREEN_TITLES.reminders, href: '/(app)/reminders' as const },
-  { icon: FileText, label: SCREEN_TITLES.medicalRecord, href: '/(app)/medical-record' as const },
-];
+import { IpcpCard } from '../components/IpcpCard';
+import { MenuSection } from '../components/MenuSection';
+import { ProfileCard } from '../components/ProfileCard';
+import { MENU_SECTIONS } from '../domain/menu-sections';
 
 export default function MoreScreen() {
+  const insets = useSafeAreaInsets();
+  const user = useAppStore((state) => state.user);
   const logout = useAppStore((state) => state.logout);
 
-  return (
-    <ScrollView className="bg-background flex-1" contentContainerClassName="gap-3 p-6">
-      <Text className="text-h1 font-heading text-foreground">{TAB_LABELS.more}</Text>
+  const profileSubtitle = [user && ROLE_LABELS[user.role], user?.email].filter(Boolean).join(' · ');
 
-      {MENU_ITEMS.map((item) => (
-        <Pressable
-          key={item.href}
-          onPress={() => router.push(item.href)}
-          className="bg-muted/40 flex-row items-center gap-4 rounded-2xl p-4 active:opacity-80"
-        >
-          <item.icon size={20} color="#2DB79A" />
-          <Text className="text-body font-heading-medium text-foreground flex-1">{item.label}</Text>
-          <ChevronRight size={18} color="#6B7280" />
-        </Pressable>
+  return (
+    <ScrollView
+      className="bg-background flex-1"
+      contentContainerClassName="gap-7 px-6 pb-12"
+      contentContainerStyle={{ paddingTop: insets.top + 16 }}
+    >
+      <Text className="text-h2 font-heading text-foreground text-center">{MORE_LABELS.title}</Text>
+
+      <View className="gap-4">
+        <ProfileCard name={user?.name ?? MORE_LABELS.fallbackName} subtitle={profileSubtitle} />
+        <IpcpCard />
+      </View>
+
+      {MENU_SECTIONS.map((section) => (
+        <MenuSection key={section.id} section={section} />
       ))}
 
       <Pressable
         onPress={() => logout()}
-        className="bg-destructive/10 mt-4 flex-row items-center gap-4 rounded-2xl p-4 active:opacity-80"
+        accessibilityRole="button"
+        className="border-destructive/40 flex-row items-center justify-center gap-3 rounded-2xl border py-4 active:opacity-70"
       >
         <LogOut size={20} color="#DC2626" />
-        <Text className="text-body font-heading-medium text-destructive">Cerrar sesión</Text>
+        <Text className="text-body font-heading-semibold text-destructive">
+          {MORE_LABELS.logout}
+        </Text>
       </Pressable>
     </ScrollView>
   );
