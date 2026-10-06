@@ -9,6 +9,7 @@ import LandingPage from "./landing/LandingPage";
 import Login from "./pages/Login";
 import RecoverPassword from "./pages/RecoverPassword";
 import ResetPassword from "./pages/ResetPassword";
+import Profile from "./pages/Profile";
 import Home from "./pages/Home";
 import ComingSoon from "./pages/ComingSoon";
 import StaffList from "./pages/staff/StaffList";
@@ -72,6 +73,7 @@ function App() {
             <Route path="staff/new" element={<StaffForm />} />
             <Route path="staff/:id/edit" element={<StaffForm />} />
             {/* TODO: reemplazar por la página real de Reportes */}
+            <Route path="perfil" element={<Profile />} />
             <Route path="reports" element={<ComingSoon title="Reportes" />} />
           </Route>
           <Route
