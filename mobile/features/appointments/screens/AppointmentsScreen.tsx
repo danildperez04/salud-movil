@@ -1,68 +1,60 @@
 // features/appointments/screens/AppointmentsScreen.tsx
-import { useQuery } from '@tanstack/react-query';
 import { router } from 'expo-router';
 import { useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import { Button } from '@/components/ui/button';
 import { ScreenHeader } from '@/components/ui/screen-header';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { SummaryTabsList, type SummaryTab } from '@/components/ui/summary-tabs-list';
+import { Tabs, TabsContent } from '@/components/ui/tabs';
 import { Text } from '@/components/ui/text';
 import { APPOINTMENTS_LABELS, SCREEN_TITLES, SUMMARY_TABS_LABELS } from '@/constants/labels';
-import { fetchMockAppointments } from '../api/mock-appointments';
 import { AppointmentCard } from '../components/AppointmentCard';
+import { parseLocalDate } from '../domain/appointment-date';
+import { useAppointments } from '../hooks/useAppointments';
 
 export default function AppointmentsScreen() {
-  const [tab, setTab] = useState<'summary' | 'history'>('summary');
-
-  // TODO: reemplazar fetchMockAppointments por apiClient.get('/appointments')
-  // cuando el backend exponga el endpoint.
-  const { data: appointments, isLoading } = useQuery({
-    queryKey: ['appointments'],
-    queryFn: fetchMockAppointments,
-  });
+  const [tab, setTab] = useState<SummaryTab>('summary');
+  const { data: appointments, isLoading } = useAppointments();
 
   return (
     <View className="bg-background flex-1">
-      <ScreenHeader title={SCREEN_TITLES.appointments} size="large" />
+      <ScreenHeader title={SCREEN_TITLES.appointments} align="center" />
 
-      <Tabs
-        value={tab}
-        onValueChange={(value) => setTab(value as 'summary' | 'history')}
-        className="flex-1"
-      >
-        <TabsList className="mx-6">
-          <TabsTrigger value="summary" className="flex-1">
-            <Text>{SUMMARY_TABS_LABELS.summary}</Text>
-          </TabsTrigger>
-          <TabsTrigger value="history" className="flex-1">
-            <Text>{SUMMARY_TABS_LABELS.history}</Text>
-          </TabsTrigger>
-        </TabsList>
+      <Tabs value={tab} onValueChange={(value) => setTab(value as SummaryTab)} className="flex-1">
+        <SummaryTabsList value={tab} />
 
         <TabsContent value="summary" className="flex-1">
-          <ScrollView contentContainerClassName="gap-3 p-6">
+          <ScrollView contentContainerClassName="gap-5 px-6 pt-6 pb-10">
             {isLoading ? (
-              <View className="gap-3">
-                <Skeleton className="h-20 w-full rounded-2xl" />
-                <Skeleton className="h-20 w-full rounded-2xl" />
-                <Skeleton className="h-20 w-full rounded-2xl" />
+              <View className="gap-5">
+                <Skeleton className="h-36 w-full rounded-3xl" />
+                <Skeleton className="h-36 w-full rounded-3xl" />
+                <Skeleton className="h-36 w-full rounded-3xl" />
               </View>
             ) : (
               appointments?.map((appointment) => (
                 <AppointmentCard
                   key={appointment.id}
-                  date={new Date(appointment.date)}
+                  date={parseLocalDate(appointment.date)}
                   specialty={appointment.specialty}
                   doctorName={appointment.doctorName}
                   time={appointment.time}
                   status={appointment.status}
+                  onPress={() => router.push(`/(app)/appointments/${appointment.id}`)}
                 />
               ))
             )}
 
-            <Button className="mt-2" onPress={() => router.push('/(app)/appointments/new')}>
-              <Text>{APPOINTMENTS_LABELS.bookButton}</Text>
+            {/* TODO: la ruta /appointments/new (formulario de agendado) aún no existe */}
+            <Button
+              size="lg"
+              className="mt-2"
+              onPress={() => router.push('/(app)/appointments/new')}
+            >
+              <Text className="text-body text-primary-foreground">
+                {APPOINTMENTS_LABELS.bookButton}
+              </Text>
             </Button>
           </ScrollView>
         </TabsContent>
@@ -70,7 +62,7 @@ export default function AppointmentsScreen() {
         <TabsContent value="history" className="flex-1">
           <View className="flex-1 items-center justify-center p-6">
             <Text className="text-body text-muted-foreground text-center">
-              El historial estará disponible próximamente
+              {SUMMARY_TABS_LABELS.historyPlaceholder}
             </Text>
           </View>
         </TabsContent>

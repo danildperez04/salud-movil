@@ -5,46 +5,23 @@ import { ScrollView, View } from 'react-native';
 import { Button } from '@/components/ui/button';
 import { ScreenHeader } from '@/components/ui/screen-header';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { SummaryTabsList, type SummaryTab } from '@/components/ui/summary-tabs-list';
+import { Tabs, TabsContent } from '@/components/ui/tabs';
 import { Text } from '@/components/ui/text';
-import { HEALTH_INDICATORS_LABELS, SCREEN_TITLES, SUMMARY_TABS_LABELS } from '@/constants/labels';
-import { cn } from '@/lib/utils';
+import { HEALTH_INDICATORS_LABELS, SCREEN_TITLES } from '@/constants/labels';
 import { HealthIndicatorCard } from '../components/HealthIndicatorCard';
 import { useHealthIndicators } from '../hooks/useHealthIndicators';
 
-const TABS = [
-  { value: 'summary', label: SUMMARY_TABS_LABELS.summary },
-  { value: 'history', label: SUMMARY_TABS_LABELS.history },
-] as const;
-
 export default function HealthIndicatorsScreen() {
-  const [tab, setTab] = useState<'summary' | 'history'>('summary');
+  const [tab, setTab] = useState<SummaryTab>('summary');
   const { data: indicators, isLoading } = useHealthIndicators();
 
   return (
     <View className="bg-background flex-1">
       <ScreenHeader title={SCREEN_TITLES.healthIndicators} align="center" />
 
-      <Tabs
-        value={tab}
-        onValueChange={(value) => setTab(value as 'summary' | 'history')}
-        className="flex-1"
-      >
-        {/* Cada tab ocupa la mitad del ancho, como en el Figma */}
-        <TabsList className="gap-0 px-6">
-          {TABS.map(({ value, label }) => (
-            <TabsTrigger key={value} value={value} className="flex-1">
-              <Text
-                className={cn(
-                  'font-heading-semibold text-body',
-                  tab === value ? 'text-primary' : 'text-secondary-steel',
-                )}
-              >
-                {label}
-              </Text>
-            </TabsTrigger>
-          ))}
-        </TabsList>
+      <Tabs value={tab} onValueChange={(value) => setTab(value as SummaryTab)} className="flex-1">
+        <SummaryTabsList value={tab} />
 
         <TabsContent value="summary" className="flex-1">
           <ScrollView contentContainerClassName="gap-5 px-6 pt-6 pb-10">

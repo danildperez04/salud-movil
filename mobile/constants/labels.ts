@@ -14,14 +14,6 @@ export const APPOINTMENT_STATUS_LABELS: Record<string, string> = {
   Pending: 'Pendiente',
 };
 
-export const APPOINTMENT_STATUS_VARIANT: Record<string, 'secondary' | 'destructive' | 'outline'> = {
-  Scheduled: 'secondary',
-  Cancelled: 'destructive',
-  Completed: 'outline',
-  'No show': 'destructive',
-  Pending: 'outline',
-};
-
 // cat_frequency de la BD → label en español para mostrar en ReminderCard
 export const FREQUENCY_LABELS: Record<string, string> = {
   Daily: 'Todos los días',
@@ -61,7 +53,8 @@ export const TAB_LABELS = {
 // no hardcodearlo directo en el componente.
 export const SCREEN_TITLES = {
   healthIndicators: 'Indicadores de Salud',
-  appointments: 'Citas Medicas',
+  appointments: 'Citas Médicas',
+  appointmentDetail: 'Detalle de cita',
   appointmentForm: 'Agendar Cita',
   medications: 'Medicamentos',
   reminders: 'Recordatorios',
@@ -112,6 +105,7 @@ export const HOME_LABELS = {
 export const SUMMARY_TABS_LABELS = {
   summary: 'Resumen',
   history: 'Historial',
+  historyPlaceholder: 'El historial estará disponible próximamente',
 } as const;
 
 export const HEALTH_INDICATORS_LABELS = {
@@ -153,6 +147,17 @@ export const APPOINTMENTS_LABELS = {
   reasonPlaceholder: 'Describe brevemente el motivo',
   submit: 'Confirmar cita',
   stepperSteps: ['Especialidad', 'Profesional', 'Fecha', 'Confirmar'],
+  infoTitle: 'Información',
+  placeLabel: 'Lugar',
+  reminderTitle: 'Recordatorio',
+  reminderSubtitle: 'Notificarme antes de esta cita',
+  directionsButton: 'Cómo llegar',
+  cancelButton: 'Cancelar cita',
+  cancelConfirmTitle: '¿Cancelar cita?',
+  cancelConfirmMessage: 'Esta acción no se puede deshacer.',
+  cancelConfirmKeep: 'Mantener cita',
+  cancelError: 'No se pudo cancelar la cita. Intentá de nuevo.',
+  notFound: 'No encontramos esta cita',
 } as const;
 
 export const MEDICATIONS_LABELS = {
