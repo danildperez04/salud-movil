@@ -16,6 +16,7 @@ import { AppointmentsModule } from './features/appointments/appointments.module'
 import { MedicationsModule } from './features/medications/medications.module';
 import { RemindersModule } from './features/reminders/reminders.module';
 import { DashboardModule } from './features/dashboard/dashboard.module';
+import { IpcpModule } from './features/ipcp/ipcp.module';
 import { DatabaseModule } from './database/database.module';
 
 @Module({
@@ -55,6 +56,7 @@ import { DatabaseModule } from './database/database.module';
     MedicationsModule,
     RemindersModule,
     DashboardModule,
+    IpcpModule,
     DatabaseModule,
   ],
   controllers: [AppController],
