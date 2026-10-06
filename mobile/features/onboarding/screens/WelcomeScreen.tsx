@@ -139,7 +139,7 @@ export default function WelcomeScreen() {
         <Button
           size="lg"
           onPress={handleContinue}
-          className="mt-3.5 h-14 w-full max-w-[314px] rounded-2xl shadow-none"
+          className="mt-3.5 h-14 w-full max-w-78.5 rounded-2xl shadow-none"
           style={{ boxShadow: `0px 8px 24px ${colors.brandGreen}4D` }}
         >
           <Text

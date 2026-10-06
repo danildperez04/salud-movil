@@ -48,12 +48,6 @@ export const INDICATOR_STATUS_LABELS = {
   high: 'Alto',
 } as const;
 
-export const INDICATOR_STATUS_VARIANT = {
-  normal: 'secondary',
-  low: 'outline',
-  high: 'destructive',
-} as const;
-
 // Labels de los 4 tabs del Bottom Navigation Bar
 export const TAB_LABELS = {
   home: 'Home',
@@ -123,6 +117,25 @@ export const SUMMARY_TABS_LABELS = {
 export const HEALTH_INDICATORS_LABELS = {
   registerButton: 'Registrar nuevo indicador',
   historyPlaceholder: 'El historial estará disponible próximamente',
+  currentStatus: 'Estado actual',
+  noReferenceRange: 'Sin rango de referencia',
+  editButton: 'Editar',
+} as const;
+
+export const REGISTER_INDICATOR_LABELS = {
+  title: 'Registrar Indicador',
+  introTitle: 'Nueva medición',
+  introDescription:
+    'Selecciona el indicador y registra el valor. Puedes llevar un control más completo de tu salud desde un solo lugar.',
+  typeLabel: 'Tipo de indicador',
+  typePlaceholder: 'Indicador',
+  valueLabel: 'Valor',
+  systolicLabel: 'Sistólica',
+  diastolicLabel: 'Diastólica',
+  dateLabel: 'Fecha',
+  timeLabel: 'Hora',
+  notesLabel: 'Notas (opcional)',
+  submitButton: 'Nuevo indicador',
 } as const;
 
 export const APPOINTMENTS_LABELS = {
