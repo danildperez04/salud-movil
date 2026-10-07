@@ -93,6 +93,9 @@ function AppointmentDetail({ appointment }: { appointment: AppointmentRecord }) 
           />
         </View>
         <AppointmentInfoTile label={APPOINTMENTS_LABELS.placeLabel} value={appointment.location} />
+        {appointment.reason && (
+          <AppointmentInfoTile label={APPOINTMENTS_LABELS.reasonLabel} value={appointment.reason} />
+        )}
       </View>
 
       <View className="bg-card border-border flex-row items-center justify-between gap-4 rounded-3xl border p-5 shadow-lg shadow-black/5">

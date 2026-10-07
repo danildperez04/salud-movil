@@ -1,4 +1,6 @@
 // features/health-indicators/domain/measurement-format.ts
+import { formatTime12h } from '@/lib/date-format';
+
 // Formato fijo ("11 sep", "08:30 AM") en vez de toLocale*: la abreviatura del mes
 // y el AM/PM cambian según el motor de Intl y la versión de ICU del dispositivo.
 
@@ -24,13 +26,7 @@ export function formatMeasurementDate(isoDate: string): string {
 }
 
 /** "08:30 AM" */
-export function formatMeasurementTime(isoDate: string): string {
-  const date = new Date(isoDate);
-  const hours = date.getHours();
-  const period = hours < 12 ? 'AM' : 'PM';
-  const hours12 = String(hours % 12 || 12).padStart(2, '0');
-  return `${hours12}:${String(date.getMinutes()).padStart(2, '0')} ${period}`;
-}
+export const formatMeasurementTime = (isoDate: string): string => formatTime12h(new Date(isoDate));
 
 /** Etiquetas [inicio, fin] del eje X de una serie cronológica. undefined si no hay puntos. */
 export function seriesDateLabels(points: { x: number }[]): [string, string] | undefined {
