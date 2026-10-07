@@ -16,6 +16,4 @@ export function calculateAge(birthDate: string, now: Date = new Date()): number 
 export const isOngoingDiagnosis = (status: DiagnosisStatus) =>
   status === 'active' || status === 'follow-up';
 
-/** Une los textos no vacíos con " · " (o el separador indicado). */
-export const joinParts = (parts: (string | undefined)[], separator = ' · ') =>
-  parts.filter((part): part is string => !!part).join(separator);
+export { joinParts } from '@/lib/text-format';

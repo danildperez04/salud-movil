@@ -10,11 +10,7 @@ import {
   HISTORY_KIND_LABELS,
   LAB_STATUS_LABELS,
 } from '@/constants/labels';
-
-/** Claves de un catálogo con el tipo que pide z.enum. */
-export function keysOf<T extends Record<string, unknown>>(catalog: T) {
-  return Object.keys(catalog) as [Extract<keyof T, string>, ...Extract<keyof T, string>[]];
-}
+import { keysOf } from '@/lib/catalog';
 
 export type AllergyType = keyof typeof ALLERGY_TYPE_LABELS;
 export type AllergySeverity = keyof typeof ALLERGY_SEVERITY_LABELS;
