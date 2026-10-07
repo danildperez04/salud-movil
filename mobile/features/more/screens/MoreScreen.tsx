@@ -1,4 +1,5 @@
 // features/more/screens/MoreScreen.tsx
+import { router } from 'expo-router';
 import { LogOut } from 'lucide-react-native';
 import { Pressable, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -26,7 +27,11 @@ export default function MoreScreen() {
       <Text className="text-h2 font-heading text-foreground text-center">{MORE_LABELS.title}</Text>
 
       <View className="gap-4">
-        <ProfileCard name={user?.name ?? MORE_LABELS.fallbackName} subtitle={profileSubtitle} />
+        <ProfileCard
+          name={user?.name ?? MORE_LABELS.fallbackName}
+          subtitle={profileSubtitle}
+          onPress={() => router.push('/(app)/profile')}
+        />
         <IpcpCard />
       </View>
 

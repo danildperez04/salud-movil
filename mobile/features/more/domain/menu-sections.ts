@@ -50,7 +50,7 @@ export const MENU_SECTIONS: MenuSection[] = [
         href: '/(app)/medical-record',
       },
       { id: 'indicators', icon: LineChart, ...items.indicators, href: '/(app)/health-indicators' },
-      { id: 'activity', icon: Activity, ...items.activity },
+      { id: 'activity', icon: Activity, ...items.activity, href: '/(app)/activity' },
     ],
   },
   {
@@ -58,34 +58,50 @@ export const MENU_SECTIONS: MenuSection[] = [
     title: sections.services,
     items: [
       { id: 'scanner', icon: Camera, ...items.scanner },
-      { id: 'voice', icon: Mic, ...items.voice },
-      { id: 'referral', icon: Stethoscope, ...items.referral },
-      { id: 'wait-times', icon: Clock, ...items.waitTimes },
-      { id: 'health-map', icon: Map, ...items.healthMap },
+      { id: 'voice', icon: Mic, ...items.voice, href: '/(app)/voice-assistant' },
+      { id: 'referral', icon: Stethoscope, ...items.referral, href: '/(app)/referral' },
+      { id: 'wait-times', icon: Clock, ...items.waitTimes, href: '/(app)/wait-times' },
+      { id: 'health-map', icon: Map, ...items.healthMap, href: '/(app)/health-map' },
     ],
   },
   {
     id: 'accessibility',
     title: sections.accessibility,
     items: [
-      { id: 'accessibility-center', icon: Accessibility, ...items.accessibilityCenter },
-      { id: 'language', icon: Globe, ...items.language },
+      {
+        id: 'accessibility-center',
+        icon: Accessibility,
+        ...items.accessibilityCenter,
+        href: '/(app)/accessibility',
+      },
+      { id: 'language', icon: Globe, ...items.language, href: '/(app)/language' },
     ],
   },
   {
     id: 'preferences',
     title: sections.preferences,
     items: [
-      { id: 'notifications', icon: Bell, ...items.notifications },
-      { id: 'privacy', icon: Lock, ...items.privacy },
+      {
+        id: 'notifications',
+        icon: Bell,
+        ...items.notifications,
+        href: '/(app)/notifications/settings',
+      },
+      { id: 'privacy', icon: Lock, ...items.privacy, href: '/(app)/security' },
     ],
   },
   {
     id: 'help',
     title: sections.help,
     items: [
-      { id: 'emergency', icon: Siren, ...items.emergency, tone: 'danger' },
-      { id: 'support', icon: HelpCircle, ...items.support },
+      {
+        id: 'emergency',
+        icon: Siren,
+        ...items.emergency,
+        href: '/(app)/emergency',
+        tone: 'danger',
+      },
+      { id: 'support', icon: HelpCircle, ...items.support, href: '/(app)/help' },
     ],
   },
 ];

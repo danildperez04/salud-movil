@@ -1,17 +1,26 @@
 // features/more/components/ProfileCard.tsx
-import { View } from 'react-native';
+import { ChevronRight } from 'lucide-react-native';
+import { Pressable, View } from 'react-native';
 import { Text } from '@/components/ui/text';
+import { colors } from '@/lib/tokens';
 import { getInitials } from '../domain/user-initials';
 
 type ProfileCardProps = {
   name: string;
   /** rol y/o correo, ya formateado para mostrar */
   subtitle: string;
+  /** con `onPress` la tarjeta abre el perfil y muestra la flecha */
+  onPress?: () => void;
 };
 
-export function ProfileCard({ name, subtitle }: ProfileCardProps) {
+export function ProfileCard({ name, subtitle, onPress }: ProfileCardProps) {
   return (
-    <View className="bg-primary/5 border-primary/20 flex-row items-center gap-4 rounded-3xl border p-5">
+    <Pressable
+      onPress={onPress}
+      disabled={!onPress}
+      accessibilityRole={onPress ? 'button' : undefined}
+      className="bg-primary/5 border-primary/20 flex-row items-center gap-4 rounded-3xl border p-5 active:opacity-80"
+    >
       <View className="bg-primary h-16 w-16 items-center justify-center rounded-full">
         <Text className="text-h3 font-heading text-primary-foreground">{getInitials(name)}</Text>
       </View>
@@ -24,6 +33,8 @@ export function ProfileCard({ name, subtitle }: ProfileCardProps) {
           {subtitle}
         </Text>
       </View>
-    </View>
+
+      {onPress && <ChevronRight size={20} color={colors.secondarySteel} />}
+    </Pressable>
   );
 }
