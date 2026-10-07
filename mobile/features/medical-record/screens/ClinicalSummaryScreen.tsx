@@ -9,7 +9,6 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Text } from '@/components/ui/text';
 import { MEDICAL_RECORD_LABELS, SCREEN_TITLES } from '@/constants/labels';
 import { PatientCard } from '../components/PatientCard';
-import { joinParts } from '../domain/clinical-summary';
 import { useClinicalSummary } from '../hooks/useClinicalSummary';
 
 const labels = MEDICAL_RECORD_LABELS.summary;
@@ -42,7 +41,7 @@ export default function ClinicalSummaryScreen() {
                 <ListItemCard
                   icon={Phone}
                   title={emergencyContact.name}
-                  subtitle={joinParts([emergencyContact.relation, emergencyContact.phone])}
+                  subtitle={emergencyContact.detail}
                 />
               ) : (
                 <Text className="text-small font-body text-muted-foreground px-1">

@@ -1,8 +1,10 @@
 // features/medical-record/hooks/useClinicalSummary.ts
 import type { InfoRow } from '@/components/ui/info-rows-card';
-import { MEDICAL_RECORD_LABELS, MORE_LABELS } from '@/constants/labels';
+import { EMERGENCY_RELATION_LABELS, MEDICAL_RECORD_LABELS, MORE_LABELS } from '@/constants/labels';
+import { useEmergencyContacts } from '@/features/emergency/hooks/useEmergencyContacts';
 import { useMedications } from '@/features/medications/hooks/useMedications';
 import { formatIsoDateShort } from '@/lib/date-format';
+import { joinParts } from '@/lib/text-format';
 import { useAppStore } from '@/store';
 import { calculateAge, isOngoingDiagnosis } from '../domain/clinical-summary';
 import { useDiagnoses, usePatientProfile } from './useMedicalRecord';
@@ -15,6 +17,7 @@ export function useClinicalSummary() {
   const { data: profile, isLoading: loadingProfile } = usePatientProfile();
   const { data: diagnoses, isLoading: loadingDiagnoses } = useDiagnoses();
   const { data: medications, isLoading: loadingMedications } = useMedications();
+  const { data: contacts, isLoading: loadingContacts } = useEmergencyContacts();
 
   const ongoingConditions = (diagnoses ?? [])
     .filter((diagnosis) => isOngoingDiagnosis(diagnosis.status))
@@ -43,11 +46,20 @@ export function useClinicalSummary() {
       ]
     : [];
 
+  // el contacto principal (o, si no hay, el primero) es el que se muestra en el resumen
+  const emergencyContact = contacts?.find((contact) => contact.isPrimary) ?? contacts?.[0];
+
   return {
-    isLoading: loadingProfile || loadingDiagnoses || loadingMedications,
+    isLoading: loadingProfile || loadingDiagnoses || loadingMedications || loadingContacts,
     patientName: user?.name ?? MORE_LABELS.fallbackName,
     updatedAt: profile ? formatIsoDateShort(profile.updatedAt) : undefined,
     rows,
-    emergencyContact: profile?.emergencyContact,
+    emergencyContact: emergencyContact && {
+      name: emergencyContact.name,
+      detail: joinParts([
+        EMERGENCY_RELATION_LABELS[emergencyContact.relation],
+        emergencyContact.phone,
+      ]),
+    },
   };
 }
