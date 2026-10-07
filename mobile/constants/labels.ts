@@ -53,6 +53,8 @@ export const TAB_LABELS = {
 // no hardcodearlo directo en el componente.
 export const SCREEN_TITLES = {
   healthIndicators: 'Indicadores de Salud',
+  indicatorHistory: 'Historial de Indicadores',
+  indicatorEvolution: 'Evolución',
   appointments: 'Citas Médicas',
   appointmentDetail: 'Detalle de cita',
   appointmentForm: 'Agendar Cita',
@@ -111,10 +113,52 @@ export const SUMMARY_TABS_LABELS = {
 
 export const HEALTH_INDICATORS_LABELS = {
   registerButton: 'Registrar nuevo indicador',
-  historyPlaceholder: 'El historial estará disponible próximamente',
   currentStatus: 'Estado actual',
   noReferenceRange: 'Sin rango de referencia',
   editButton: 'Editar',
+  hint: 'Toca un indicador para ver cómo ha evolucionado.',
+  updatedPrefix: 'Actualizado',
+} as const;
+
+export const INDICATOR_HISTORY_LABELS = {
+  ranges: { '7d': '7 días', '30d': '30 días', '3m': '3 meses' },
+  trends: { stable: 'Estable', rising: 'En aumento', falling: 'En descenso' },
+  stats: { average: 'Promedio', min: 'Mínimo', max: 'Máximo' },
+  // el gráfico usa un solo valor por medición; se aclara cuando el indicador tiene más de uno
+  seriesNotes: { 'Blood pressure': 'Se grafica la presión sistólica (el primer valor).' } as Record<
+    string,
+    string
+  >,
+  recentTitle: 'Mediciones recientes',
+  register: '+ Registrar',
+  noNotes: 'Sin observaciones',
+  emptyRange: 'No hay mediciones en este período',
+  notFound: 'No encontramos este indicador',
+  chartSummary: (count: number, min: string, max: string) =>
+    `${count} ${count === 1 ? 'medición' : 'mediciones'}, entre ${min} y ${max}`,
+} as const;
+
+export const INDICATOR_EVOLUTION_LABELS = {
+  latestTitle: 'Última medición',
+  statusDescriptions: {
+    normal: 'Dentro del rango esperado.',
+    low: 'Por debajo del rango esperado.',
+    high: 'Por encima del rango esperado.',
+  },
+  trendTitle: 'Tendencia',
+  trendPeriod: 'Últimos 30 días',
+  viewHistory: 'Ver historial',
+  interpretationTitle: 'Interpretación orientativa',
+  interpretations: {
+    stable: 'Los valores recientes se mantienen estables. Continúa registrando tus mediciones.',
+    rising:
+      'Los valores recientes van en aumento. Continúa registrando tus mediciones y coméntalo con tu médico si persiste.',
+    falling:
+      'Los valores recientes van en descenso. Continúa registrando tus mediciones y coméntalo con tu médico si persiste.',
+    insufficient: 'Aún no hay suficientes mediciones para ver una tendencia. Sigue registrando.',
+  },
+  newMeasurement: 'Nueva medición',
+  empty: 'Aún no tienes mediciones de este indicador',
 } as const;
 
 export const REGISTER_INDICATOR_LABELS = {

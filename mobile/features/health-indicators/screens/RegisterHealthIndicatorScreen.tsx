@@ -1,7 +1,7 @@
 // features/health-indicators/screens/RegisterHealthIndicatorScreen.tsx
 import { zodResolver } from '@hookform/resolvers/zod';
 import DateTimePicker, { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
-import { router } from 'expo-router';
+import { router, useLocalSearchParams } from 'expo-router';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Controller, useForm, useWatch } from 'react-hook-form';
@@ -22,6 +22,7 @@ import { Text } from '@/components/ui/text';
 import { INDICATOR_TYPE_LABELS, REGISTER_INDICATOR_LABELS } from '@/constants/labels';
 import { createMockHealthIndicator } from '../api/mock-health-indicators';
 import { FIELD_CLASS_NAME, FormField, PickerField } from '@/components/ui/form-field';
+import { typeNameFromSlug } from '../domain/indicator-type';
 import { HEALTH_INDICATORS_QUERY_KEY } from '../hooks/useHealthIndicators';
 
 // TODO: no existe GET /catalogues/type-indicators en el backend todavía.
@@ -71,6 +72,9 @@ type PickerMode = 'date' | 'time';
 
 export default function RegisterHealthIndicatorScreen() {
   const queryClient = useQueryClient();
+  // si se llega desde el historial/evolución de un indicador, viene preseleccionado
+  const { type: typeSlug } = useLocalSearchParams<{ type?: string }>();
+  const presetTypeId = INDICATOR_TYPES.find((t) => t.name === typeNameFromSlug(typeSlug))?.id;
   const [dateHour, setDateHour] = useState(new Date());
   const [iosPickerMode, setIosPickerMode] = useState<PickerMode | null>(null);
 
@@ -80,7 +84,13 @@ export default function RegisterHealthIndicatorScreen() {
     formState: { errors },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
-    defaultValues: { typeIndicatorId: '', value: '', systolic: '', diastolic: '', notes: '' },
+    defaultValues: {
+      typeIndicatorId: presetTypeId ?? '',
+      value: '',
+      systolic: '',
+      diastolic: '',
+      notes: '',
+    },
   });
 
   const selectedType = findType(useWatch({ control, name: 'typeIndicatorId' }));

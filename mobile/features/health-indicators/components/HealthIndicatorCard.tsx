@@ -1,5 +1,13 @@
 // features/health-indicators/components/HealthIndicatorCard.tsx
-import { Droplet, Heart, Pencil, Scale, Thermometer, type LucideIcon } from 'lucide-react-native';
+import {
+  ChevronRight,
+  Droplet,
+  Heart,
+  Pencil,
+  Scale,
+  Thermometer,
+  type LucideIcon,
+} from 'lucide-react-native';
 import { Pressable, View } from 'react-native';
 import { Text } from '@/components/ui/text';
 import {
@@ -7,8 +15,10 @@ import {
   INDICATOR_STATUS_LABELS,
   INDICATOR_TYPE_LABELS,
 } from '@/constants/labels';
+import { colors } from '@/lib/tokens';
 import { cn } from '@/lib/utils';
 import { evaluateIndicator } from '../domain/indicator-range';
+import { formatMeasurementDate, formatMeasurementTime } from '../domain/measurement-format';
 import { IndicatorRangeBar } from './IndicatorRangeBar';
 
 const INDICATOR_ICONS: Record<string, LucideIcon> = {
@@ -23,6 +33,8 @@ type HealthIndicatorCardProps = {
   typeName: string;
   value: string | number;
   unit: string;
+  /** ISO de la medición; en variant="default" se muestra como "Actualizado ..." */
+  measuredAt?: string;
   /**
    * default: tarjeta de la lista de indicadores. summary: versión destacada
    * para el Home (valor grande, sin ícono, con acción de editar).
@@ -37,6 +49,7 @@ export function HealthIndicatorCard({
   typeName,
   value,
   unit,
+  measuredAt,
   variant = 'default',
   onPress,
   onEdit,
@@ -90,12 +103,24 @@ export function HealthIndicatorCard({
                 ? `${HEALTH_INDICATORS_LABELS.currentStatus}: ${INDICATOR_STATUS_LABELS[evaluation.status].toLowerCase()}`
                 : HEALTH_INDICATORS_LABELS.noReferenceRange}
             </Text>
+            {measuredAt && (
+              <Text className="text-caption font-body text-muted-foreground">
+                {HEALTH_INDICATORS_LABELS.updatedPrefix} {formatMeasurementDate(measuredAt)} ·{' '}
+                {formatMeasurementTime(measuredAt)}
+              </Text>
+            )}
           </View>
 
           <View className="items-end gap-1">
             <Text className="text-h3 font-heading text-foreground">{value}</Text>
             <Text className="text-caption font-body-semibold text-muted-foreground">{unit}</Text>
           </View>
+
+          {onPress && (
+            <View className="self-center">
+              <ChevronRight size={20} color={colors.neutralMedium} />
+            </View>
+          )}
         </View>
       )}
 
