@@ -27,7 +27,7 @@ function Stepper({ steps, currentStep, className }: StepperProps) {
             <React.Fragment key={index}>
               <View
                 className={cn(
-                  'h-8 w-8 items-center justify-center rounded-full',
+                  'h-9 w-9 items-center justify-center rounded-full',
                   isCompleted || isActive ? 'bg-primary' : 'bg-muted',
                 )}
               >
@@ -47,12 +47,12 @@ function Stepper({ steps, currentStep, className }: StepperProps) {
           );
         })}
       </View>
-      <View className="mt-2 flex-row justify-between">
+      <View className="mt-2 flex-row">
         {steps.map((step, index) => (
           <Text
             key={index}
             className={cn(
-              'text-caption font-body',
+              'text-caption font-body flex-1 text-center',
               index === currentStep ? 'text-primary font-body-semibold' : 'text-muted-foreground',
             )}
           >

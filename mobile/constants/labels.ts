@@ -104,13 +104,6 @@ export const HOME_LABELS = {
   },
 } as const;
 
-// Tabs "Resumen"/"Historial" — se repite en Indicadores, Citas y Medicamentos
-export const SUMMARY_TABS_LABELS = {
-  summary: 'Resumen',
-  history: 'Historial',
-  historyPlaceholder: 'El historial estará disponible próximamente',
-} as const;
-
 export const HEALTH_INDICATORS_LABELS = {
   registerButton: 'Registrar nuevo indicador',
   currentStatus: 'Estado actual',
@@ -192,6 +185,17 @@ export const APPOINTMENTS_LABELS = {
   reasonPlaceholder: 'Describe brevemente el motivo',
   submit: 'Confirmar cita',
   stepperSteps: ['Especialidad', 'Profesional', 'Fecha', 'Confirmar'],
+  errors: {
+    specialtyRequired: 'Seleccioná una especialidad',
+    professionalRequired: 'Seleccioná un profesional',
+    dateRequired: 'Seleccioná una fecha',
+    timeRequired: 'Seleccioná una hora',
+    timeInPast: 'Elegí una hora posterior a la actual',
+    reasonRequired: 'Describí el motivo de la consulta',
+    reasonTooLong: 'El motivo no puede superar los 300 caracteres',
+  },
+  createError: 'No se pudo agendar la cita. Intentá de nuevo.',
+  noProfessionals: 'No hay profesionales disponibles para esta especialidad',
   infoTitle: 'Información',
   placeLabel: 'Lugar',
   reminderTitle: 'Recordatorio',

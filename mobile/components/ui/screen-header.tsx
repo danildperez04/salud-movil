@@ -16,6 +16,8 @@ type ScreenHeaderProps = {
   size?: 'default' | 'large';
   /** center: flecha a la izquierda y título centrado en la misma fila (ignora size) */
   align?: 'start' | 'center';
+  /** outlined: flecha dentro de un círculo con borde (solo con align="center") */
+  backButton?: 'plain' | 'outlined';
 };
 
 type BackButtonProps = {
@@ -43,6 +45,7 @@ export function ScreenHeader({
   onBack,
   size = 'default',
   align = 'start',
+  backButton = 'plain',
 }: ScreenHeaderProps) {
   const insets = useSafeAreaInsets();
   const handleBack = onBack ?? (() => router.back());
@@ -53,7 +56,19 @@ export function ScreenHeader({
       <View className="justify-center pb-5" style={{ paddingTop }}>
         {/* La flecha va absoluta para que el título quede centrado en la pantalla
             y no entre la flecha y el borde derecho. */}
-        <BackButton onPress={handleBack} className="absolute bottom-4 left-3 z-10" iconSize={26} />
+        {backButton === 'outlined' ? (
+          <BackButton
+            onPress={handleBack}
+            className="border-border bg-background absolute bottom-3 left-6 z-10 rounded-full border"
+            iconSize={20}
+          />
+        ) : (
+          <BackButton
+            onPress={handleBack}
+            className="absolute bottom-4 left-3 z-10"
+            iconSize={26}
+          />
+        )}
         <Text
           numberOfLines={1}
           adjustsFontSizeToFit

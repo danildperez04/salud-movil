@@ -1,5 +1,5 @@
 // components/ui/form-field.tsx
-import { ChevronDown } from 'lucide-react-native';
+import { ChevronDown, type LucideIcon } from 'lucide-react-native';
 import type { ReactNode } from 'react';
 import { Pressable, View } from 'react-native';
 import { Label } from '@/components/ui/label';
@@ -27,12 +27,18 @@ export function FormField({ label, error, className, children }: FormFieldProps)
 }
 
 type PickerFieldProps = {
-  value: string;
+  /** vacío -> se muestra `placeholder` */
+  value?: string;
+  placeholder?: string;
+  /** por defecto una flecha hacia abajo */
+  icon?: LucideIcon;
   onPress: () => void;
 };
 
 /** Campo que se ve como un select pero abre un picker nativo de fecha/hora. */
-export function PickerField({ value, onPress }: PickerFieldProps) {
+export function PickerField({ value, placeholder, icon, onPress }: PickerFieldProps) {
+  const Icon = icon ?? ChevronDown;
+
   return (
     <Pressable
       onPress={onPress}
@@ -42,8 +48,10 @@ export function PickerField({ value, onPress }: PickerFieldProps) {
         FIELD_CLASS_NAME,
       )}
     >
-      <Text className="text-body text-foreground">{value}</Text>
-      <ChevronDown size={16} color="#2D7F8E" />
+      <Text className={cn('text-body', value ? 'text-foreground' : 'text-muted-foreground')}>
+        {value || placeholder}
+      </Text>
+      <Icon size={icon ? 20 : 16} color="#2D7F8E" />
     </Pressable>
   );
 }
