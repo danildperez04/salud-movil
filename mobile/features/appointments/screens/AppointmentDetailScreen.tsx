@@ -9,7 +9,7 @@ import { Text } from '@/components/ui/text';
 import { APPOINTMENTS_LABELS, SCREEN_TITLES } from '@/constants/labels';
 import { cn } from '@/lib/utils';
 import type { AppointmentRecord } from '../api/mock-appointments';
-import { AppointmentInfoTile } from '../components/AppointmentInfoTile';
+import { InfoTile } from '@/components/ui/info-tile';
 import { formatLongDate, parseLocalDate } from '../domain/appointment-date';
 import { getAppointmentStatus, isCancellable } from '../domain/appointment-status';
 import { useAppointmentReminderToggle } from '@/features/reminders/hooks/useReminders';
@@ -80,20 +80,20 @@ function AppointmentDetail({ appointment }: { appointment: AppointmentRecord }) 
           {APPOINTMENTS_LABELS.infoTitle}
         </Text>
         <View className="flex-row gap-3">
-          <AppointmentInfoTile
+          <InfoTile
             className="flex-1"
             label={APPOINTMENTS_LABELS.dateLabel}
             value={formatLongDate(parseLocalDate(appointment.date))}
           />
-          <AppointmentInfoTile
+          <InfoTile
             className="flex-1"
             label={APPOINTMENTS_LABELS.timeLabel}
             value={appointment.time}
           />
         </View>
-        <AppointmentInfoTile label={APPOINTMENTS_LABELS.placeLabel} value={appointment.location} />
+        <InfoTile label={APPOINTMENTS_LABELS.placeLabel} value={appointment.location} />
         {appointment.reason && (
-          <AppointmentInfoTile label={APPOINTMENTS_LABELS.reasonLabel} value={appointment.reason} />
+          <InfoTile label={APPOINTMENTS_LABELS.reasonLabel} value={appointment.reason} />
         )}
       </View>
 
