@@ -55,3 +55,18 @@ const MONTHS_LONG = [
 export function formatDateLong(date: Date): string {
   return `${date.getDate()} de ${MONTHS_LONG[date.getMonth()]} de ${date.getFullYear()}`;
 }
+
+/** Date -> "15 mayo" */
+export function formatDayMonth(date: Date): string {
+  return `${date.getDate()} ${MONTHS_LONG[date.getMonth()]}`;
+}
+
+/** "08:30 AM" -> Date de `base` (por defecto hoy) con esa hora. Formato inválido -> `base` sin cambios. */
+export function timeLabelToDate(label: string, base: Date = new Date()): Date {
+  const minutes = /^(\d{1,2}):(\d{2})\s*(AM|PM)$/i.test(label.trim())
+    ? timeLabelToMinutes(label)
+    : null;
+  const date = new Date(base);
+  if (minutes !== null) date.setHours(Math.floor(minutes / 60), minutes % 60, 0, 0);
+  return date;
+}

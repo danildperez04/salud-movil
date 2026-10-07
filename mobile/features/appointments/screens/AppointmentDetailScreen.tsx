@@ -1,6 +1,5 @@
 // features/appointments/screens/AppointmentDetailScreen.tsx
 import { useLocalSearchParams } from 'expo-router';
-import { useState } from 'react';
 import { Alert, Linking, ScrollView, View } from 'react-native';
 import { Button } from '@/components/ui/button';
 import { ScreenHeader } from '@/components/ui/screen-header';
@@ -13,6 +12,7 @@ import type { AppointmentRecord } from '../api/mock-appointments';
 import { AppointmentInfoTile } from '../components/AppointmentInfoTile';
 import { formatLongDate, parseLocalDate } from '../domain/appointment-date';
 import { getAppointmentStatus, isCancellable } from '../domain/appointment-status';
+import { useAppointmentReminderToggle } from '@/features/reminders/hooks/useReminders';
 import { useAppointment, useCancelAppointment } from '../hooks/useAppointments';
 
 export default function AppointmentDetailScreen() {
@@ -43,8 +43,7 @@ export default function AppointmentDetailScreen() {
 
 function AppointmentDetail({ appointment }: { appointment: AppointmentRecord }) {
   const cancelAppointment = useCancelAppointment(appointment.id);
-  // TODO: persistir con el módulo de recordatorios (features/reminders) cuando exista el endpoint
-  const [reminderEnabled, setReminderEnabled] = useState(true);
+  const reminder = useAppointmentReminderToggle(appointment.id);
 
   const status = getAppointmentStatus(appointment.status);
 
@@ -107,7 +106,11 @@ function AppointmentDetail({ appointment }: { appointment: AppointmentRecord }) 
             {APPOINTMENTS_LABELS.reminderSubtitle}
           </Text>
         </View>
-        <Switch checked={reminderEnabled} onCheckedChange={setReminderEnabled} />
+        <Switch
+          checked={reminder.enabled}
+          onCheckedChange={reminder.setEnabled}
+          aria-label={APPOINTMENTS_LABELS.reminderTitle}
+        />
       </View>
 
       <View className="gap-3">
