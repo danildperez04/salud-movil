@@ -1,6 +1,2 @@
 // app/(app)/language.tsx
-// TODO: ruta provisional; reemplazar por la pantalla real de su feature cuando exista el diseño.
-import { createComingSoonScreen } from '@/components/coming-soon-screen';
-import { SCREEN_TITLES } from '@/constants/labels';
-
-export default createComingSoonScreen(SCREEN_TITLES.language);
+export { default } from '@/features/language/screens/LanguageScreen';
