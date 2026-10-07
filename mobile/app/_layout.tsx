@@ -15,6 +15,7 @@ import {
   Poppins_700Bold,
 } from '@expo-google-fonts/poppins';
 import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold } from '@expo-google-fonts/inter';
+import { AccessibilityEffects } from '@/components/accessibility-effects';
 import { NAV_THEME } from '@/lib/theme';
 import { queryClient } from '@/lib/query-client';
 import { setupOnlineManager } from '@/lib/query-online-manager';
@@ -66,6 +67,7 @@ export default function RootLayout() {
       <QueryClientProvider client={queryClient}>
         <ThemeProvider value={theme}>
           <SplashScreenController fontsLoaded={fontsLoaded || !!fontError} />
+          <AccessibilityEffects />
           <Stack screenOptions={{ headerShown: false }} />
           <PortalHost />
         </ThemeProvider>

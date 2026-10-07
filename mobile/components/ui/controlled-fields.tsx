@@ -20,6 +20,10 @@ type TextFormFieldProps<T extends FieldValues> = BaseProps<T> & {
   multiline?: boolean;
   keyboardType?: KeyboardTypeOptions;
   maxLength?: number;
+  /** oculta lo escrito (contraseñas) */
+  secureTextEntry?: boolean;
+  /** none para correos y contraseñas */
+  autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters';
 };
 
 export function TextFormField<T extends FieldValues>({
@@ -31,6 +35,8 @@ export function TextFormField<T extends FieldValues>({
   multiline,
   keyboardType,
   maxLength,
+  secureTextEntry,
+  autoCapitalize,
 }: TextFormFieldProps<T>) {
   return (
     <Controller
@@ -45,6 +51,9 @@ export function TextFormField<T extends FieldValues>({
             textAlignVertical={multiline ? 'top' : undefined}
             keyboardType={keyboardType}
             maxLength={maxLength}
+            secureTextEntry={secureTextEntry}
+            autoCapitalize={autoCapitalize}
+            autoCorrect={secureTextEntry ? false : undefined}
             value={(value as string | undefined) ?? ''}
             onChangeText={onChange}
             onBlur={onBlur}

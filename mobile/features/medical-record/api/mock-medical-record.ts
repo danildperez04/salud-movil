@@ -70,7 +70,6 @@ export type PatientProfile = {
   /** "YYYY-MM-DD" */
   birthDate: string;
   bloodType: string;
-  emergencyContact?: { name: string; relation: string; phone: string };
   /** última vez que se modificó el expediente */
   updatedAt: string;
 };
@@ -205,7 +204,6 @@ let labs: LabResult[] = [
 let profile: PatientProfile = {
   birthDate: '2003-03-10',
   bloodType: 'O+',
-  emergencyContact: { name: 'María Martínez', relation: 'Madre', phone: '+505 8888 8888' },
   updatedAt: '2026-09-11',
 };
 

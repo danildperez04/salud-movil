@@ -1,5 +1,11 @@
 // store/types.ts
 import type { AuthResponse, PublicUser } from '@/types/auth';
+import type {
+  AccessibilityPreferences,
+  LanguageCode,
+  NotificationPreferences,
+  SecurityPreferences,
+} from '@/types/preferences';
 
 export type UISlice = {
   isBottomSheetOpen: boolean;
@@ -25,4 +31,17 @@ export type AuthSlice = {
 export type OnboardingSlice = {
   hasSeenOnboarding: boolean;
   markOnboardingSeen: () => void;
+};
+
+/** Ajustes locales del dispositivo; persisten aunque se cierre la sesión. */
+export type PreferencesSlice = {
+  accessibility: AccessibilityPreferences;
+  language: LanguageCode;
+  notificationPreferences: NotificationPreferences;
+  securityPreferences: SecurityPreferences;
+  setAccessibility: (patch: Partial<AccessibilityPreferences>) => void;
+  resetAccessibility: () => void;
+  setLanguage: (language: LanguageCode) => void;
+  setNotificationPreferences: (preferences: NotificationPreferences) => void;
+  setSecurityPreferences: (preferences: SecurityPreferences) => void;
 };
