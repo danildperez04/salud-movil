@@ -9,6 +9,9 @@ import { cn } from '@/lib/utils';
 /** Apariencia de campo del Figma: más redondeado y con fondo tenue. Se aplica a Input/Select. */
 export const FIELD_CLASS_NAME = 'h-14 rounded-2xl bg-muted/10 px-4 shadow-none';
 
+/** Mismo estilo para campos de varias líneas (notas, motivo, detalle). */
+export const TEXTAREA_CLASS_NAME = 'bg-muted/10 h-36 rounded-2xl px-4 py-4';
+
 type FormFieldProps = {
   label: string;
   error?: string;

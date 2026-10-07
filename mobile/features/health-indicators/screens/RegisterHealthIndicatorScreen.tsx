@@ -9,6 +9,7 @@ import { Platform, ScrollView, View } from 'react-native';
 import { z } from 'zod';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { IntroCard } from '@/components/ui/intro-card';
 import { ScreenHeader } from '@/components/ui/screen-header';
 import {
   Select,
@@ -149,14 +150,10 @@ export default function RegisterHealthIndicatorScreen() {
         contentContainerClassName="gap-6 px-6 pt-2 pb-6"
         keyboardShouldPersistTaps="handled"
       >
-        <View className="bg-primary/5 border-primary/20 gap-2 rounded-3xl border p-5">
-          <Text className="text-body font-heading-semibold text-foreground">
-            {REGISTER_INDICATOR_LABELS.introTitle}
-          </Text>
-          <Text className="text-small font-body text-muted-foreground">
-            {REGISTER_INDICATOR_LABELS.introDescription}
-          </Text>
-        </View>
+        <IntroCard
+          title={REGISTER_INDICATOR_LABELS.introTitle}
+          description={REGISTER_INDICATOR_LABELS.introDescription}
+        />
 
         <FormField
           label={REGISTER_INDICATOR_LABELS.typeLabel}

@@ -6,6 +6,7 @@ import { Platform } from 'react-native';
 type PickerFieldConfig = {
   mode: 'date' | 'time';
   minimumDate?: Date;
+  maximumDate?: Date;
 };
 
 type UseDateTimePickerOptions<F extends string> = {
@@ -27,7 +28,7 @@ export function useDateTimePicker<F extends string>({
   const [iosField, setIosField] = useState<F | null>(null);
 
   const open = (field: F) => {
-    const { mode, minimumDate } = fields[field];
+    const { mode, minimumDate, maximumDate } = fields[field];
     const current = getValue(field) ?? new Date();
 
     if (Platform.OS === 'android') {
@@ -35,6 +36,7 @@ export function useDateTimePicker<F extends string>({
         value: current,
         mode,
         minimumDate,
+        maximumDate,
         onValueChange: (_event, selected) => onChange(field, selected),
       });
       return;
@@ -48,7 +50,7 @@ export function useDateTimePicker<F extends string>({
 
   const renderIosPicker = (field: F): ReactElement | null => {
     if (Platform.OS !== 'ios' || iosField !== field) return null;
-    const { mode, minimumDate } = fields[field];
+    const { mode, minimumDate, maximumDate } = fields[field];
 
     return (
       <DateTimePicker
@@ -56,6 +58,7 @@ export function useDateTimePicker<F extends string>({
         mode={mode}
         display={mode === 'date' ? 'inline' : 'spinner'}
         minimumDate={minimumDate}
+        maximumDate={maximumDate}
         onValueChange={(_event, selected) => onChange(field, selected)}
       />
     );

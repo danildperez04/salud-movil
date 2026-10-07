@@ -376,6 +376,246 @@ export const REMINDERS_LABELS = {
   },
 } as const;
 
+// ===== Expediente clínico =====
+// Catálogos: la clave es el valor que se guarda; el texto, lo que se muestra.
+export const ALLERGY_TYPE_LABELS = {
+  medication: 'Medicamento',
+  food: 'Alimento',
+  environmental: 'Ambiental',
+  material: 'Material',
+  other: 'Otra',
+} as const;
+
+export const ALLERGY_SEVERITY_LABELS = {
+  mild: 'Leve',
+  moderate: 'Moderada',
+  severe: 'Severa',
+} as const;
+
+export const HISTORY_KIND_LABELS = { personal: 'Personal', family: 'Familiar' } as const;
+
+export const HISTORY_CATEGORY_LABELS = {
+  disease: 'Enfermedad',
+  surgery: 'Cirugía',
+  hospitalization: 'Hospitalización',
+  habits: 'Hábitos',
+  hereditary: 'Condición hereditaria',
+  other: 'Otro',
+} as const;
+
+export const DIAGNOSIS_STATUS_LABELS = {
+  active: 'Activo',
+  'follow-up': 'En seguimiento',
+  resolved: 'Resuelto',
+  history: 'Antecedente',
+} as const;
+
+// La clave coincide con el segmento de la ruta: /medical-record/documents/category/[category]
+export const DOCUMENT_CATEGORIES = {
+  prescriptions: { title: 'Recetas', singular: 'Receta', subtitle: 'Medicamentos e indicaciones' },
+  certificates: {
+    title: 'Constancias',
+    singular: 'Constancia',
+    subtitle: 'Reposo, asistencia y certificados',
+  },
+  studies: { title: 'Estudios', singular: 'Estudio', subtitle: 'Ultrasonidos e imágenes' },
+  notes: { title: 'Notas médicas', singular: 'Nota médica', subtitle: 'Consultas y seguimiento' },
+} as const;
+
+export const LAB_STATUS_LABELS = {
+  normal: 'Normal',
+  review: 'Revisar',
+  'out-of-range': 'Fuera de rango',
+} as const;
+
+export const MEDICAL_RECORD_LABELS = {
+  menu: {
+    summary: { title: 'Resumen clínico', subtitle: 'Ver información general' },
+    diagnosis: { title: 'Diagnóstico', empty: 'Sin diagnósticos registrados' },
+    history: { title: 'Antecedentes', subtitle: 'Personales y familiares' },
+    allergies: {
+      title: 'Alergias',
+      none: 'Ninguna registrada',
+      some: (count: number) => `${count} ${count === 1 ? 'registrada' : 'registradas'}`,
+    },
+    documents: { title: 'Documentos', subtitle: 'Recetas, estudios, notas' },
+    labs: { title: 'Laboratorios', subtitle: 'Ver resultados' },
+  },
+  summary: {
+    patient: 'Paciente',
+    updated: 'Última actualización',
+    generalInfo: 'Información general',
+    age: 'Edad',
+    years: (age: number) => `${age} ${age === 1 ? 'año' : 'años'}`,
+    bloodType: 'Tipo de sangre',
+    conditions: 'Condiciones activas',
+    noConditions: 'Ninguna registrada',
+    medications: 'Medicamentos activos',
+    medicationsCount: (count: number) =>
+      count === 0 ? 'Ninguno' : `${count} ${count === 1 ? 'registrado' : 'registrados'}`,
+    notRegistered: 'No registrado',
+    emergencyContact: 'Contacto de emergencia',
+    noEmergencyContact: 'Aún no tienes un contacto de emergencia',
+  },
+  diagnosis: {
+    add: 'Agregar diagnóstico',
+    emptyTitle: 'No hay diagnósticos registrados',
+    emptyDescription: 'Registra los diagnósticos indicados por un profesional de salud.',
+    introTitle: 'Nuevo diagnóstico',
+    introDescription: 'Registra la condición tal como fue indicada por un profesional de salud.',
+    nameLabel: 'Diagnóstico',
+    namePlaceholder: 'Ej. Asma bronquial',
+    statusLabel: 'Estado',
+    dateLabel: 'Fecha de diagnóstico (opcional)',
+    datePlaceholder: 'Fecha',
+    providerLabel: 'Profesional o especialidad (opcional)',
+    providerPlaceholder: 'Ej. Medicina Interna',
+    notesLabel: 'Observaciones (opcional)',
+    notesPlaceholder: 'Tratamiento, controles o indicaciones relevantes',
+    save: 'Guardar diagnóstico',
+    saveError: 'No se pudo guardar el diagnóstico. Intentá de nuevo.',
+    errors: {
+      nameRequired: 'Escribí el diagnóstico',
+      dateFuture: 'La fecha no puede ser posterior a hoy',
+    },
+  },
+  history: {
+    personal: 'Personales',
+    family: 'Familiares',
+    emptyPersonal: 'Sin antecedentes personales registrados',
+    emptyFamily: 'Sin antecedentes familiares registrados',
+    add: 'Agregar',
+    introTitle: 'Información clínica previa',
+    introDescription:
+      'Registra antecedentes personales o familiares para mantener el expediente actualizado.',
+    kindLabel: 'Tipo',
+    categoryLabel: 'Categoría',
+    titleLabel: 'Antecedente',
+    titlePlaceholder: 'Ej. Asma, cirugía de rodilla',
+    dateLabel: 'Fecha o año (opcional)',
+    datePlaceholder: 'Ej. 2022',
+    detailLabel: 'Detalle (opcional)',
+    detailPlaceholder: 'Agrega información relevante',
+    save: 'Guardar',
+    saveError: 'No se pudo guardar el antecedente. Intentá de nuevo.',
+    errors: {
+      titleRequired: 'Escribí el antecedente',
+      periodTooLong: 'Usa hasta 30 caracteres',
+    },
+  },
+  allergies: {
+    add: 'Agregar alergia',
+    emptyTitle: 'No hay alergias registradas',
+    emptyDescription:
+      'Agrega alergias a medicamentos, alimentos u otras sustancias para mantener tu expediente completo.',
+    noticeTitle: 'Importante',
+    noticeMessage: 'Esta información puede ser útil en una atención médica de emergencia.',
+    unspecifiedReaction: 'Reacción no especificada',
+    typeLabel: 'Tipo de alergia',
+    nameLabel: 'Nombre o sustancia',
+    namePlaceholder: 'Ej. Penicilina, maní',
+    reactionLabel: 'Reacción (opcional)',
+    reactionPlaceholder: 'Ej. Urticaria, dificultad respiratoria',
+    severityLabel: 'Severidad',
+    notesLabel: 'Notas (opcional)',
+    notesPlaceholder: 'Detalles adicionales',
+    save: 'Guardar',
+    saveError: 'No se pudo guardar la alergia. Intentá de nuevo.',
+    errors: { nameRequired: 'Escribí la sustancia o alergia' },
+  },
+  documents: {
+    introTitle: 'Documentos del expediente',
+    introDescription:
+      'Consulta recetas, constancias, estudios y notas médicas guardadas en tu cuenta.',
+    recent: 'Recientes',
+    emptyRecent: 'Aún no hay documentos guardados',
+    emptyCategory: 'No hay documentos en esta categoría',
+    upload: 'Subir documento',
+    formatPdf: 'PDF',
+    formatImage: 'Imagen',
+    notFoundCategory: 'No encontramos esta categoría',
+    notFound: 'No encontramos este documento',
+    share: 'Guardar copia',
+    typeLabel: 'Tipo',
+    nameLabel: 'Nombre',
+    namePlaceholder: 'Ej. Receta de Cardiología',
+    providerLabel: 'Profesional o centro (opcional)',
+    providerPlaceholder: 'Ej. Dra. Ana Gómez',
+    dateLabel: 'Fecha del documento',
+    fileEmptyTitle: 'Sin archivo todavía',
+    fileEmptyDescription: 'Fotografía el documento o elige un PDF guardado en tu teléfono.',
+    datePlaceholder: 'Fecha',
+    takePhoto: 'Tomar foto',
+    chooseImage: 'Elegir de la galería',
+    chooseFile: 'Elegir archivo (PDF)',
+    notesLabel: 'Notas (opcional)',
+    notesPlaceholder: 'Información adicional',
+    save: 'Guardar en expediente',
+    saveError: 'No se pudo guardar el documento. Intentá de nuevo.',
+    errors: {
+      nameRequired: 'Escribí el nombre del documento',
+      fileRequired: 'Adjuntá un archivo o una fotografía',
+      dateRequired: 'Seleccioná la fecha del documento',
+      dateFuture: 'La fecha no puede ser posterior a hoy',
+    },
+  },
+  labs: {
+    scanTitle: 'Escanear examen',
+    scanDescription: 'Usa la cámara para guardar el resultado original dentro de tu expediente.',
+    openCamera: 'Abrir cámara',
+    listTitle: 'Exámenes escaneados',
+    listSubtitle: 'Los resultados se guardan en tu expediente junto con una copia del original.',
+    scanned: 'Documento escaneado',
+    empty: 'Aún no tienes exámenes escaneados',
+    scan: {
+      introTitle: 'Fotografía el examen',
+      introDescription:
+        '“Abrir cámara” usa la cámara del teléfono. También puedes elegir una foto existente.',
+      emptyTitle: 'Sin imagen todavía',
+      emptyDescription: 'Coloca el documento completo dentro del encuadre.',
+      takePhoto: 'Abrir cámara',
+      chooseImage: 'Elegir de la galería',
+      nameLabel: 'Nombre del examen',
+      namePlaceholder: 'Ej. Hemograma completo',
+      dateLabel: 'Fecha',
+      datePlaceholder: 'Fecha',
+      statusLabel: 'Estado',
+      valueLabel: 'Resultado principal (opcional)',
+      valuePlaceholder: 'Ej. 13.8 g/dL',
+      notesLabel: 'Notas (opcional)',
+      notesPlaceholder: 'Observaciones del documento',
+      save: 'Guardar examen en expediente',
+      saveError: 'No se pudo guardar el examen. Intentá de nuevo.',
+      errors: {
+        imageRequired: 'Tomá o elegí una foto del examen',
+        nameRequired: 'Escribí el nombre del examen',
+        dateRequired: 'Seleccioná la fecha del examen',
+        dateFuture: 'La fecha no puede ser posterior a hoy',
+      },
+    },
+    detail: {
+      eyebrow: 'Laboratorio · Expediente personal',
+      noImageTitle: 'Sin imagen escaneada',
+      noImageDescription: 'Este examen se guardó solo con sus datos.',
+      resultLabel: 'Resultado principal',
+      notesLabel: 'Notas',
+      noticeTitle: 'Información del expediente',
+      noticeMessage:
+        'La imagen escaneada y los valores registrados se muestran juntos para facilitar la consulta personal.',
+      share: 'Guardar copia',
+      notFound: 'No encontramos este examen',
+    },
+  },
+  media: {
+    permissionTitle: 'Permiso necesario',
+    cameraDenied: 'Activa el permiso de la cámara en los ajustes del teléfono para tomar la foto.',
+    openSettings: 'Abrir ajustes',
+    errorTitle: 'No se pudo continuar',
+    pickError: 'No se pudo abrir el archivo. Intentá de nuevo.',
+    shareError: 'No se pudo compartir el archivo. Intentá de nuevo.',
+  },
+} as const;
+
 // Roles de `user.role` (types/auth.ts) -> texto visible
 export const ROLE_LABELS: Record<string, string> = {
   patient: 'Paciente',

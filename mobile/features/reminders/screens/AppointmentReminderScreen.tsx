@@ -5,6 +5,7 @@ import { Alert, ScrollView, View } from 'react-native';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { FIELD_CLASS_NAME, FormField } from '@/components/ui/form-field';
+import { IntroCard } from '@/components/ui/intro-card';
 import { ScreenHeader } from '@/components/ui/screen-header';
 import {
   Select,
@@ -171,14 +172,7 @@ function AppointmentReminderForm({
         contentContainerClassName="gap-6 px-6 pt-2 pb-6"
         keyboardShouldPersistTaps="handled"
       >
-        <View className="bg-primary/5 border-primary/20 gap-2 rounded-3xl border p-5">
-          <Text className="text-body font-heading-semibold text-foreground">
-            {labels.introTitle}
-          </Text>
-          <Text className="text-small font-body text-muted-foreground">
-            {labels.introDescription}
-          </Text>
-        </View>
+        <IntroCard title={labels.introTitle} description={labels.introDescription} />
 
         <FormField label={labels.appointmentLabel} error={errors.appointmentId?.message}>
           <Controller
