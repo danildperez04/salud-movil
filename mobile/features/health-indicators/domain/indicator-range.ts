@@ -78,7 +78,7 @@ const RANGES_BY_TYPE: Record<string, IndicatorRange[]> = {
 };
 
 /** "120/80" -> [120, 80]; "110" -> [110]. Partes inválidas quedan como NaN para conservar el índice. */
-function parseComponents(rawValue: string): number[] {
+export function parseComponents(rawValue: string): number[] {
   return rawValue.split('/').map((part) => Number.parseFloat(part.trim().replace(',', '.')));
 }
 
