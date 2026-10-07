@@ -12,6 +12,13 @@ export type MedicationRecord = {
   quantityLabel: string;
   time: string;
   active: boolean;
+  /** valor de cat_frequency.name (ej "Every 12 hours"); ver FREQUENCY_LABELS */
+  frequency?: string;
+  activeIngredient?: string;
+  /** fechas YYYY-MM-DD */
+  startDate?: string;
+  endDate?: string;
+  expiryDate?: string;
 };
 
 let mockMedications: MedicationRecord[] = [
@@ -22,6 +29,8 @@ let mockMedications: MedicationRecord[] = [
     quantityLabel: '1 tableta',
     time: '09:00 AM',
     active: true,
+    frequency: 'Daily',
+    activeIngredient: 'Losartán potásico',
   },
   {
     id: '2',
@@ -30,6 +39,7 @@ let mockMedications: MedicationRecord[] = [
     quantityLabel: '1 tableta',
     time: '12:00 PM',
     active: true,
+    frequency: 'Every 12 hours',
   },
   {
     id: '3',
@@ -38,6 +48,7 @@ let mockMedications: MedicationRecord[] = [
     quantityLabel: '1 tableta',
     time: '08:00 AM',
     active: false,
+    frequency: 'Daily',
   },
 ];
 

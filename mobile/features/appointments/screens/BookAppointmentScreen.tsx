@@ -1,11 +1,9 @@
 // features/appointments/screens/BookAppointmentScreen.tsx
 import { zodResolver } from '@hookform/resolvers/zod';
-import DateTimePicker, { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import { router } from 'expo-router';
 import { Calendar, Clock } from 'lucide-react-native';
-import { useState } from 'react';
 import { Controller, useForm, useWatch } from 'react-hook-form';
-import { Platform, ScrollView, View } from 'react-native';
+import { ScrollView, View } from 'react-native';
 import { Button } from '@/components/ui/button';
 import { FIELD_CLASS_NAME, FormField, PickerField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
@@ -21,8 +19,9 @@ import { Spinner } from '@/components/ui/spinner';
 import { Stepper } from '@/components/ui/tepper';
 import { Text } from '@/components/ui/text';
 import { APPOINTMENTS_LABELS, SCREEN_TITLES } from '@/constants/labels';
-import { formatTime12h } from '@/lib/date-format';
-import { formatLongDate, toLocalIsoDate } from '../domain/appointment-date';
+import { useDateTimePicker } from '@/hooks/useDateTimePicker';
+import { formatTime12h, startOfToday, toLocalIsoDate } from '@/lib/date-format';
+import { formatLongDate } from '../domain/appointment-date';
 import {
   bookAppointmentSchema,
   getBookingStep,
@@ -32,12 +31,8 @@ import { useCreateAppointment, useProfessionals, useSpecialties } from '../hooks
 
 const STEPS = APPOINTMENTS_LABELS.stepperSteps.map((label) => ({ label }));
 
-type DateTimeField = 'date' | 'time';
-
 export default function BookAppointmentScreen() {
   const createAppointment = useCreateAppointment();
-  // iOS no tiene diálogo: el picker se muestra inline bajo los campos
-  const [iosPicker, setIosPicker] = useState<DateTimeField | null>(null);
 
   const {
     control,
@@ -73,29 +68,15 @@ export default function BookAppointmentScreen() {
     );
   };
 
-  const setDateTime = (field: DateTimeField, selected: Date) =>
-    setValue(field, selected, { shouldValidate: isSubmitted, shouldDirty: true });
-
-  const openPicker = (field: DateTimeField) => {
-    const current = getValues(field) ?? new Date();
-
-    if (Platform.OS === 'android') {
-      DateTimePickerAndroid.open({
-        value: current,
-        mode: field,
-        minimumDate: field === 'date' ? startOfToday() : undefined,
-        onValueChange: (_event, selected) => setDateTime(field, selected),
-      });
-      return;
-    }
-
-    // en iOS el picker no emite cambio hasta que el usuario lo mueve: se fija
-    // el valor inicial al abrirlo para que el campo no quede vacío.
-    if (!getValues(field)) setDateTime(field, current);
-    setIosPicker((open) => (open === field ? null : field));
-  };
-
-  const pickerValue = iosPicker ? (values[iosPicker] ?? new Date()) : new Date();
+  const { open: openPicker, renderIosPicker } = useDateTimePicker({
+    fields: {
+      date: { mode: 'date', minimumDate: startOfToday() },
+      time: { mode: 'time' },
+    },
+    getValue: (field) => getValues(field),
+    onChange: (field, selected) =>
+      setValue(field, selected, { shouldValidate: isSubmitted, shouldDirty: true }),
+  });
 
   return (
     <View className="bg-background flex-1">
@@ -187,6 +168,7 @@ export default function BookAppointmentScreen() {
             placeholder={APPOINTMENTS_LABELS.datePlaceholder}
             onPress={() => openPicker('date')}
           />
+          {renderIosPicker('date')}
         </FormField>
 
         <FormField label={APPOINTMENTS_LABELS.timeLabel} error={errors.time?.message}>
@@ -196,17 +178,8 @@ export default function BookAppointmentScreen() {
             placeholder={APPOINTMENTS_LABELS.timePlaceholder}
             onPress={() => openPicker('time')}
           />
+          {renderIosPicker('time')}
         </FormField>
-
-        {Platform.OS === 'ios' && iosPicker && (
-          <DateTimePicker
-            value={pickerValue}
-            mode={iosPicker}
-            display={iosPicker === 'date' ? 'inline' : 'spinner'}
-            minimumDate={iosPicker === 'date' ? startOfToday() : undefined}
-            onValueChange={(_event, selected) => setDateTime(iosPicker, selected)}
-          />
-        )}
 
         <FormField label={APPOINTMENTS_LABELS.reasonLabel} error={errors.reason?.message}>
           <Controller
@@ -248,10 +221,4 @@ export default function BookAppointmentScreen() {
       </View>
     </View>
   );
-}
-
-function startOfToday() {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  return today;
 }

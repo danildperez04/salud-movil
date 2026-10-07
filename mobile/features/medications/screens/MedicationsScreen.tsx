@@ -1,19 +1,25 @@
 // features/medications/screens/MedicationsScreen.tsx
 import { router } from 'expo-router';
 import { Plus } from 'lucide-react-native';
+import { useMemo } from 'react';
 import { ScrollView, View } from 'react-native';
 import { Button } from '@/components/ui/button';
 import { ScreenHeader } from '@/components/ui/screen-header';
+import { SectionHeader } from '@/components/ui/section-header';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Text } from '@/components/ui/text';
 import { MEDICATIONS_LABELS, SCREEN_TITLES } from '@/constants/labels';
 import { MedicationCard } from '../components/MedicationCard';
 import { MedicationTipCard } from '../components/MedicationTipCard';
+import { sortMedications } from '../domain/medication-form';
 import { useMedications, useToggleMedication } from '../hooks/useMedications';
 
 export default function MedicationsScreen() {
-  const { data: medications, isLoading } = useMedications();
+  const { data, isLoading } = useMedications();
   const toggleMedication = useToggleMedication();
+
+  const medications = useMemo(() => (data ? sortMedications(data) : []), [data]);
+  const activeCount = medications.filter((medication) => medication.active).length;
 
   return (
     <View className="bg-background flex-1">
@@ -26,18 +32,25 @@ export default function MedicationsScreen() {
             <Skeleton className="h-36 w-full rounded-3xl" />
             <Skeleton className="h-36 w-full rounded-3xl" />
           </View>
-        ) : medications?.length ? (
-          medications.map((medication) => (
-            <MedicationCard
-              key={medication.id}
-              drugName={medication.drugName}
-              dose={medication.dose}
-              quantityLabel={medication.quantityLabel}
-              time={medication.time}
-              active={medication.active}
-              onToggleActive={(active) => toggleMedication.mutate({ id: medication.id, active })}
+        ) : medications.length > 0 ? (
+          <>
+            <SectionHeader
+              title={MEDICATIONS_LABELS.listTitle}
+              subtitle={MEDICATIONS_LABELS.activeCount(activeCount, medications.length)}
             />
-          ))
+            {medications.map((medication) => (
+              <MedicationCard
+                key={medication.id}
+                drugName={medication.drugName}
+                dose={medication.dose}
+                quantityLabel={medication.quantityLabel}
+                frequency={medication.frequency}
+                time={medication.time}
+                active={medication.active}
+                onToggleActive={(active) => toggleMedication.mutate({ id: medication.id, active })}
+              />
+            ))}
+          </>
         ) : (
           <Text className="text-body text-muted-foreground py-6 text-center">
             {MEDICATIONS_LABELS.empty}
