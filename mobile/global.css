@@ -6,6 +6,7 @@
   --font-heading: 'Poppins_700Bold';
   --font-heading-semibold: 'Poppins_600SemiBold';
   --font-heading-medium: 'Poppins_500Medium';
+  --font-heading-regular: 'Poppins_400Regular';
   --font-body: 'Inter_400Regular';
   --font-body-medium: 'Inter_500Medium';
   --font-body-semibold: 'Inter_600SemiBold';
@@ -74,7 +75,7 @@
       --color-accent: #77d1b5;
       --color-accent-foreground: #0e2a3a;
 
-      --color-destructive: #fecdcf;
+      --color-destructive: #ef4444;
       --color-destructive-foreground: #ef4444;
       --color-border: #d9d9d9;
       --color-input: #d9d9d9;

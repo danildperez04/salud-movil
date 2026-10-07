@@ -1,19 +1,17 @@
-import type { IndicatorStatus } from '../components/HealthIndicatorCard';
-
 export type HealthIndicatorRecord = {
   id: string;
   typeName: string;
   value: string;
   unit: string;
-  status: IndicatorStatus;
   dateHour: string;
+  notes?: string;
 };
 
 const UNIT_BY_TYPE: Record<string, string> = {
-  'Blood pressure': 'mmhg',
-  Glucose: 'mg/dl',
+  'Blood pressure': 'mmHg',
+  Glucose: 'mg/dL',
   Weight: 'kg',
-  Temperature: 'C',
+  Temperature: '°C',
 };
 
 let mockIndicators: HealthIndicatorRecord[] = [
@@ -21,16 +19,14 @@ let mockIndicators: HealthIndicatorRecord[] = [
     id: '1',
     typeName: 'Blood pressure',
     value: '120/80',
-    unit: 'mmhg',
-    status: 'normal',
+    unit: 'mmHg',
     dateHour: new Date().toISOString(),
   },
   {
     id: '2',
     typeName: 'Glucose',
     value: '110',
-    unit: 'mg/dl',
-    status: 'high',
+    unit: 'mg/dL',
     dateHour: new Date().toISOString(),
   },
   {
@@ -38,15 +34,13 @@ let mockIndicators: HealthIndicatorRecord[] = [
     typeName: 'Weight',
     value: '72.5',
     unit: 'kg',
-    status: 'low',
     dateHour: new Date().toISOString(),
   },
   {
     id: '4',
     typeName: 'Temperature',
     value: '36.6',
-    unit: 'C',
-    status: 'normal',
+    unit: '°C',
     dateHour: new Date().toISOString(),
   },
 ];
@@ -62,6 +56,7 @@ export async function createMockHealthIndicator(payload: {
   typeName: string;
   value: string;
   dateHour: Date;
+  notes?: string;
 }): Promise<HealthIndicatorRecord> {
   await delay(300);
   const record: HealthIndicatorRecord = {
@@ -69,8 +64,8 @@ export async function createMockHealthIndicator(payload: {
     typeName: payload.typeName,
     value: payload.value,
     unit: UNIT_BY_TYPE[payload.typeName] ?? '',
-    status: 'normal', // TODO: calcular status real cuando se defina la lógica de rangos
     dateHour: payload.dateHour.toISOString(),
+    notes: payload.notes,
   };
   mockIndicators = [record, ...mockIndicators];
   return record;

@@ -14,14 +14,6 @@ export const APPOINTMENT_STATUS_LABELS: Record<string, string> = {
   Pending: 'Pendiente',
 };
 
-export const APPOINTMENT_STATUS_VARIANT: Record<string, 'secondary' | 'destructive' | 'outline'> = {
-  Scheduled: 'secondary',
-  Cancelled: 'destructive',
-  Completed: 'outline',
-  'No show': 'destructive',
-  Pending: 'outline',
-};
-
 // cat_frequency de la BD → label en español para mostrar en ReminderCard
 export const FREQUENCY_LABELS: Record<string, string> = {
   Daily: 'Todos los días',
@@ -48,12 +40,6 @@ export const INDICATOR_STATUS_LABELS = {
   high: 'Alto',
 } as const;
 
-export const INDICATOR_STATUS_VARIANT = {
-  normal: 'secondary',
-  low: 'outline',
-  high: 'destructive',
-} as const;
-
 // Labels de los 4 tabs del Bottom Navigation Bar
 export const TAB_LABELS = {
   home: 'Home',
@@ -67,9 +53,11 @@ export const TAB_LABELS = {
 // no hardcodearlo directo en el componente.
 export const SCREEN_TITLES = {
   healthIndicators: 'Indicadores de Salud',
-  appointments: 'Citas Medicas',
+  appointments: 'Citas Médicas',
+  appointmentDetail: 'Detalle de cita',
   appointmentForm: 'Agendar Cita',
   medications: 'Medicamentos',
+  medicationForm: 'Agregar Medicamento',
   reminders: 'Recordatorios',
   medicalRecord: 'Expediente clinico',
 } as const;
@@ -118,11 +106,31 @@ export const HOME_LABELS = {
 export const SUMMARY_TABS_LABELS = {
   summary: 'Resumen',
   history: 'Historial',
+  historyPlaceholder: 'El historial estará disponible próximamente',
 } as const;
 
 export const HEALTH_INDICATORS_LABELS = {
   registerButton: 'Registrar nuevo indicador',
   historyPlaceholder: 'El historial estará disponible próximamente',
+  currentStatus: 'Estado actual',
+  noReferenceRange: 'Sin rango de referencia',
+  editButton: 'Editar',
+} as const;
+
+export const REGISTER_INDICATOR_LABELS = {
+  title: 'Registrar Indicador',
+  introTitle: 'Nueva medición',
+  introDescription:
+    'Selecciona el indicador y registra el valor. Puedes llevar un control más completo de tu salud desde un solo lugar.',
+  typeLabel: 'Tipo de indicador',
+  typePlaceholder: 'Indicador',
+  valueLabel: 'Valor',
+  systolicLabel: 'Sistólica',
+  diastolicLabel: 'Diastólica',
+  dateLabel: 'Fecha',
+  timeLabel: 'Hora',
+  notesLabel: 'Notas (opcional)',
+  submitButton: 'Nuevo indicador',
 } as const;
 
 export const APPOINTMENTS_LABELS = {
@@ -140,11 +148,87 @@ export const APPOINTMENTS_LABELS = {
   reasonPlaceholder: 'Describe brevemente el motivo',
   submit: 'Confirmar cita',
   stepperSteps: ['Especialidad', 'Profesional', 'Fecha', 'Confirmar'],
+  infoTitle: 'Información',
+  placeLabel: 'Lugar',
+  reminderTitle: 'Recordatorio',
+  reminderSubtitle: 'Notificarme antes de esta cita',
+  directionsButton: 'Cómo llegar',
+  cancelButton: 'Cancelar cita',
+  cancelConfirmTitle: '¿Cancelar cita?',
+  cancelConfirmMessage: 'Esta acción no se puede deshacer.',
+  cancelConfirmKeep: 'Mantener cita',
+  cancelError: 'No se pudo cancelar la cita. Intentá de nuevo.',
+  notFound: 'No encontramos esta cita',
 } as const;
 
 export const MEDICATIONS_LABELS = {
   tipTitle: 'Toma tus medicamentos',
   tipSubtitle: '¡No olvides tomar tus medicamentos a tiempo!',
+  addButton: 'Agregar medicamento',
+  empty: 'Aún no tienes medicamentos registrados',
+  nameLabel: 'Nombre del medicamento',
+  namePlaceholder: 'Ej: Losartán',
+  doseLabel: 'Dosis',
+  dosePlaceholder: 'Ej: 50mg',
+  quantityLabel: 'Cantidad por toma',
+  quantityPlaceholder: 'Ej: 1 tableta',
+  timeLabel: 'Hora de la toma',
+  submit: 'Guardar medicamento',
+  createError: 'No se pudo guardar el medicamento. Intentá de nuevo.',
+} as const;
+
+// Roles de `user.role` (types/auth.ts) -> texto visible
+export const ROLE_LABELS: Record<string, string> = {
+  patient: 'Paciente',
+  caregiver: 'Cuidador/a',
+  health_staff: 'Personal de salud',
+  admin: 'Administrador',
+};
+
+// Pantalla "Más". Las entradas sin ruta todavía se muestran con la etiqueta `comingSoon`.
+export const MORE_LABELS = {
+  title: 'Más',
+  fallbackName: 'Usuario',
+  comingSoon: 'Pronto',
+  logout: 'Cerrar sesión',
+  ipcp: {
+    title: 'IPCP · Mi prioridad',
+    description: 'Evaluación ampliada de síntomas, evolución y señales de alerta.',
+    cta: 'Evaluación IPCP',
+  },
+  sections: {
+    health: 'Salud y seguimiento',
+    services: 'Servicios complementarios',
+    accessibility: 'Accesibilidad e inclusión',
+    preferences: 'Preferencias',
+    help: 'Ayuda y seguridad',
+  },
+  items: {
+    reminders: { title: 'Recordatorios', subtitle: 'Medicamentos y citas' },
+    medicalRecord: { title: 'Expediente clínico', subtitle: 'Diagnósticos, alergias y documentos' },
+    indicators: { title: 'Indicadores de salud', subtitle: 'Presión, glucosa, peso y más' },
+    activity: { title: 'Actividad física', subtitle: 'Registra tu ejercicio para el seguimiento' },
+    scanner: { title: 'Escáner de medicamentos', subtitle: 'Identifica caja, uso y advertencias' },
+    voice: { title: 'Asistente por voz', subtitle: 'Habla en lugar de escribir' },
+    referral: {
+      title: 'Sistema de referencia',
+      subtitle: 'Te orienta al centro con el servicio que necesitas',
+    },
+    waitTimes: { title: 'Estimación de espera', subtitle: 'Compara tiempos de atención' },
+    healthMap: {
+      title: 'Mapa de recursos sanitarios',
+      subtitle: 'Hospitales, farmacias y laboratorios',
+    },
+    accessibilityCenter: {
+      title: 'Centro de accesibilidad',
+      subtitle: 'Texto, contraste, movimiento y lectura',
+    },
+    language: { title: 'Idioma', subtitle: 'Español y lenguas de la Costa Caribe' },
+    notifications: { title: 'Notificaciones', subtitle: 'Medicamentos, citas y salud' },
+    privacy: { title: 'Privacidad y seguridad', subtitle: 'Acceso y protección de datos' },
+    emergency: { title: 'Modo emergencia', subtitle: 'Información médica, contactos y ubicación' },
+    support: { title: 'Ayuda y soporte', subtitle: 'Preguntas frecuentes y contacto' },
+  },
 } as const;
 
 // Textos generales reutilizables en toda la app

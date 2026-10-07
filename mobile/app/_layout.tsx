@@ -9,6 +9,7 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { useFonts } from 'expo-font';
 import {
+  Poppins_400Regular,
   Poppins_500Medium,
   Poppins_600SemiBold,
   Poppins_700Bold,
@@ -43,6 +44,7 @@ export default function RootLayout() {
     Poppins_700Bold,
     Poppins_600SemiBold,
     Poppins_500Medium,
+    Poppins_400Regular,
     Inter_400Regular,
     Inter_500Medium,
     Inter_600SemiBold,

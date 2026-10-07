@@ -35,6 +35,7 @@ export const fonts = {
   heading: 'Poppins_700Bold',
   headingSemibold: 'Poppins_600SemiBold',
   headingMedium: 'Poppins_500Medium',
+  headingRegular: 'Poppins_400Regular',
   body: 'Inter_400Regular',
   bodyMedium: 'Inter_500Medium',
   bodySemibold: 'Inter_600SemiBold',
