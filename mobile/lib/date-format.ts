@@ -70,3 +70,36 @@ export function timeLabelToDate(label: string, base: Date = new Date()): Date {
   if (minutes !== null) date.setHours(Math.floor(minutes / 60), minutes % 60, 0, 0);
   return date;
 }
+
+const MONTHS_SHORT = [
+  'ene',
+  'feb',
+  'mar',
+  'abr',
+  'may',
+  'jun',
+  'jul',
+  'ago',
+  'sep',
+  'oct',
+  'nov',
+  'dic',
+];
+
+/**
+ * "2026-05-15" -> Date en hora LOCAL. `new Date('2026-05-15')` se interpreta
+ * como UTC y en zonas con offset negativo (Centroamérica) cae el día anterior.
+ */
+export function parseLocalDate(isoDate: string): Date {
+  const [year, month, day] = isoDate.slice(0, 10).split('-').map(Number);
+  return new Date(year, month - 1, day);
+}
+
+/** Date -> "10 sep 2026" */
+export function formatDateShort(date: Date): string {
+  return `${pad(date.getDate())} ${MONTHS_SHORT[date.getMonth()]} ${date.getFullYear()}`;
+}
+
+/** "2026-09-10" -> "10 sep 2026" */
+export const formatIsoDateShort = (isoDate: string): string =>
+  formatDateShort(parseLocalDate(isoDate));

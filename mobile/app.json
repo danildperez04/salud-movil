@@ -29,7 +29,15 @@
       "expo-status-bar",
       "expo-font",
       "@react-native-community/datetimepicker",
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Salud Móvil necesita acceder a tus fotos para adjuntar documentos y exámenes a tu expediente.",
+          "cameraPermission": "Salud Móvil necesita la cámara para fotografiar documentos y exámenes de tu expediente.",
+          "microphonePermission": false
+        }
+      ]
     ],
     "scheme": "mobile",
     "extra": {

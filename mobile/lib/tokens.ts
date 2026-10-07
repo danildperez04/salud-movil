@@ -31,6 +31,13 @@ export const colors = {
   borderDark: '#135E6D',
 } as const;
 
+/** Colores de estado (éxito / atención / peligro) para íconos, SVG y badges. */
+export const statusColors = {
+  success: '#2DB79A',
+  warning: '#B27A10',
+  danger: '#DC2626',
+} as const;
+
 export const fonts = {
   heading: 'Poppins_700Bold',
   headingSemibold: 'Poppins_600SemiBold',
