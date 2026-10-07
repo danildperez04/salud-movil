@@ -95,6 +95,11 @@ export function parseLocalDate(isoDate: string): Date {
   return new Date(year, month - 1, day);
 }
 
+/** Date -> "9 ago" */
+export function formatShortDayMonth(date: Date): string {
+  return `${date.getDate()} ${MONTHS_SHORT[date.getMonth()]}`;
+}
+
 /** Date -> "10 sep 2026" */
 export function formatDateShort(date: Date): string {
   return `${pad(date.getDate())} ${MONTHS_SHORT[date.getMonth()]} ${date.getFullYear()}`;
