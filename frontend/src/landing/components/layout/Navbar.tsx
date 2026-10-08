@@ -1,9 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router";
 import { LogIn, Menu, X } from "lucide-react";
 import { Logo } from "../ui/Logo";
 import { Button } from "../ui/Button";
-import { navLinks } from "../../data/content";
+import { ScrollProgress } from "../ui/ScrollProgress";
+import { useActiveSection } from "../../hooks/useActiveSection";
+import { useScrolled } from "../../hooks/useScrolled";
+import { navLinks } from "../../data/navigation";
 
 // Nota: el breakpoint 1200px está escrito de forma literal en cada
 // className (min-[1200px]:...) a propósito. Tailwind genera el CSS
@@ -17,22 +20,51 @@ import { navLinks } from "../../data/content";
 
 export function Navbar() {
   const [open, setOpen] = useState(false);
+  const scrolled = useScrolled();
+  const activeId = useActiveSection("main section[id]");
+
+  // Escape cierra el menú móvil.
+  useEffect(() => {
+    if (!open) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setOpen(false);
+    };
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, [open]);
 
   return (
-    <header className="fixed inset-x-0 top-0 z-100 border-b border-line/70 bg-white/85 backdrop-blur-lg">
+    <header
+      className={`fixed inset-x-0 top-0 z-100 border-b backdrop-blur-lg transition duration-300 ${
+        scrolled || open
+          ? "border-line bg-white/95 shadow-soft"
+          : "border-line/70 bg-white/85"
+      }`}
+    >
       <div className="container-x flex h-16.5 items-center justify-between gap-6 landing-sm:h-18.5">
         <Logo />
 
-        <nav className="hidden items-center gap-7 min-[1200px]:flex">
-          {navLinks.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              className="whitespace-nowrap text-[13px] font-medium text-muted transition-colors duration-200 hover:text-mint-dark"
-            >
-              {link.label}
-            </a>
-          ))}
+        <nav
+          aria-label="Principal"
+          className="hidden items-center gap-7 min-[1200px]:flex"
+        >
+          {navLinks.map((link) => {
+            const active = activeId === link.href.slice(1);
+            return (
+              <a
+                key={link.href}
+                href={link.href}
+                aria-current={active ? "location" : undefined}
+                className={`relative whitespace-nowrap py-1 text-[13px] font-medium transition-colors duration-200 after:absolute after:inset-x-0 after:-bottom-0.5 after:h-0.5 after:origin-left after:rounded-full after:bg-mint after:transition-transform after:duration-300 after:ease-out-expo hover:text-mint-dark hover:after:scale-x-100 ${
+                  active
+                    ? "text-mint-dark after:scale-x-100"
+                    : "text-muted after:scale-x-0"
+                }`}
+              >
+                {link.label}
+              </a>
+            );
+          })}
         </nav>
 
         <div className="hidden items-center gap-3 min-[1200px]:flex">
@@ -43,7 +75,7 @@ export function Navbar() {
             <LogIn size={15} />
             Acceso personal de salud
           </Link>
-          <Button href="#descargar" className="shrink-0 whitespace-nowrap">
+          <Button href="#descargar" className="shrink-0">
             Descargar App
           </Button>
         </div>
@@ -54,42 +86,80 @@ export function Navbar() {
           onClick={() => setOpen((v) => !v)}
           aria-label={open ? "Cerrar menú" : "Abrir menú"}
           aria-expanded={open}
-          className="grid h-10 w-10 shrink-0 place-items-center rounded-full text-navy min-[1200px]:hidden"
+          aria-controls="mobile-menu"
+          className="relative grid h-10 w-10 shrink-0 place-items-center rounded-full text-navy transition-colors duration-200 hover:bg-mint-soft min-[1200px]:hidden"
         >
-          {open ? <X size={22} /> : <Menu size={22} />}
+          <Menu
+            size={22}
+            className={`absolute transition duration-300 ${
+              open ? "rotate-90 scale-50 opacity-0" : "rotate-0 opacity-100"
+            }`}
+          />
+          <X
+            size={22}
+            className={`absolute transition duration-300 ${
+              open ? "rotate-0 opacity-100" : "-rotate-90 scale-50 opacity-0"
+            }`}
+          />
         </button>
       </div>
 
-      {open && (
-        <div className="border-t border-line bg-white px-5 pb-6 pt-5 min-[1200px]:hidden">
-          <nav className="flex flex-col gap-4">
-            {navLinks.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                onClick={() => setOpen(false)}
-                className="text-sm font-medium text-navy"
-              >
-                {link.label}
-              </a>
-            ))}
-          </nav>
+      {/* Menú móvil: siempre montado para poder animar la altura (grid 0fr → 1fr).
+          `inert` lo saca del foco y de los lectores de pantalla mientras está cerrado. */}
+      <div
+        id="mobile-menu"
+        inert={!open}
+        className={`grid transition-[grid-template-rows] duration-500 ease-out-expo min-[1200px]:hidden ${
+          open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
+        }`}
+      >
+        <div className="overflow-hidden">
+          <div className="max-h-[calc(100dvh-4.125rem)] overflow-y-auto border-t border-line bg-white px-4 pb-6 pt-4">
+            <nav aria-label="Principal (móvil)" className="flex flex-col gap-1">
+              {navLinks.map((link, index) => {
+                const active = activeId === link.href.slice(1);
+                return (
+                  <a
+                    key={link.href}
+                    href={link.href}
+                    onClick={() => setOpen(false)}
+                    aria-current={active ? "location" : undefined}
+                    style={{ transitionDelay: open ? `${90 + index * 50}ms` : "0ms" }}
+                    className={`rounded-xl px-3 py-2.5 text-sm font-medium transition duration-300 ${
+                      active
+                        ? "bg-mint-soft text-mint-dark"
+                        : "text-navy hover:bg-mint-soft-2"
+                    } ${open ? "translate-y-0 opacity-100" : "-translate-y-2 opacity-0"}`}
+                  >
+                    {link.label}
+                  </a>
+                );
+              })}
+            </nav>
 
-          <div className="mt-5 flex flex-col gap-3 border-t border-line pt-5">
-            <Link
-              to="/login"
-              onClick={() => setOpen(false)}
-              className="flex items-center justify-center gap-1.5 rounded-full border border-line px-4 py-2.5 text-sm font-medium text-navy"
+            <div
+              style={{ transitionDelay: open ? `${90 + navLinks.length * 50}ms` : "0ms" }}
+              className={`mt-4 flex flex-col gap-3 border-t border-line pt-5 transition duration-300 ${
+                open ? "translate-y-0 opacity-100" : "-translate-y-2 opacity-0"
+              }`}
             >
-              <LogIn size={16} />
-              Acceso personal de salud
-            </Link>
-            <Button href="#descargar" className="justify-center">
-              Descargar App
-            </Button>
+              <Link
+                to="/login"
+                onClick={() => setOpen(false)}
+                className="flex items-center justify-center gap-1.5 rounded-full border border-line px-4 py-2.5 text-sm font-medium text-navy transition-colors duration-200 hover:border-mint hover:bg-mint-soft"
+              >
+                <LogIn size={16} />
+                Acceso personal de salud
+              </Link>
+              <Button href="#descargar" className="justify-center">
+                Descargar App
+              </Button>
+            </div>
           </div>
         </div>
-      )}
+      </div>
+
+      <ScrollProgress />
     </header>
   );
 }
