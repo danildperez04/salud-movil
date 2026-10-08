@@ -55,6 +55,10 @@ export class User {
   @Column({ name: 'last_login_at', type: 'timestamp', nullable: true })
   lastLoginAt!: Date | null;
 
+  /** Si está activo, el login exige un código OTP además de la contraseña. */
+  @Column({ name: 'two_factor_enabled', default: false })
+  twoFactorEnabled!: boolean;
+
   @CreateDateColumn({ name: 'created_at' })
   createdAt!: Date;
 

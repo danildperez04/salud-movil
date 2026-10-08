@@ -80,6 +80,7 @@ Configuración actual del servicio:
 | `DB_NAME` | `postgres` | |
 | `JWT_SECRET` | *(cadena aleatoria larga)* | Generar con `openssl rand -base64 48`; nunca usar el valor de desarrollo |
 | `JWT_EXPIRES_IN` | `1d` | |
+| `OTP_EXPIRES_MINUTES` | `5` | Opcional. Vigencia del código OTP de la verificación en dos pasos |
 | `CORS_ORIGIN` | `https://<panel>.onrender.com` | URL final del panel web; actualizar en el paso 6 |
 | `PORT` | *(no definir)* | Render la inyecta automáticamente; `main.ts` la lee |
 
@@ -156,6 +157,8 @@ Sin este paso, el navegador bloquea las peticiones del panel con errores de CORS
 | Pausa de Supabase | Proyectos free se pausan por inactividad | Revisar el dashboard si la API reporta errores de conexión tras días sin uso |
 | Seguridad extra | Helmet activo y rate limiting global con `@nestjs/throttler` (por defecto 100 req/min por IP) | **Resuelto.** Ajustar con `THROTTLE_LIMIT` y `THROTTLE_TTL_MS` |
 | Health check | No existe endpoint público | Agregar `GET /health` en Fase 7 |
+| Código OTP del 2FA | Provisionalmente se escribe en el **log del servidor** (`ConsoleOtpDelivery`): no hay servicio de correo ni SMS | **Pendiente.** Quien pueda leer los logs (p. ej. el panel de Render) y conozca la contraseña puede completar el login de una cuenta con 2FA. Sustituir `OtpDelivery` por un canal real antes de tratar el 2FA como una barrera de seguridad. Es opcional por usuario: ninguna cuenta se ve afectada hasta que su dueño lo active |
+| Migración `AddTwoFactorOtp` | Con `synchronize: true`, el primer arranque ya crea `otp_challenge` y `user.two_factor_enabled` | La migración es idempotente: sobre una base que ya tiene esos objetos solo queda registrada. Tras desplegar, ejecutar una vez `pnpm migration:run` (necesita las devDependencies) y comprobar con `pnpm migration:show`. No se ejecuta sola al arrancar a propósito: `migrationsRun` corre **antes** de `synchronize` y fallaría en una base vacía |
 
 > ⚠️ **`forgot-password` cambió de contrato.** Ya **no devuelve el token** en la
 > respuesta (permitía secuestrar cualquier cuenta con solo conocer el correo) y

@@ -37,6 +37,7 @@ El modelo se basa en el script DDL original y lo **modifica** para cumplir los c
 - `healthcare_worker` — perfil del personal de salud (hereda de `user`).
 - `patient_caregiver` — vínculo entre paciente y cuidador (relación N:M con tipo de parentesco).
 - `password_reset` — token de restablecimiento de contraseña (HU-04).
+- `otp_challenge` — código de un solo uso de la verificación en dos pasos.
 
 ### 3.2 Dominio de centros de salud
 
@@ -90,6 +91,7 @@ El modelo se basa en el script DDL original y lo **modifica** para cumplir los c
 | `healthcare_worker` | Perfil del personal de salud |
 | `patient_caregiver` | Vínculo N:M paciente ↔ cuidador (parentesco y cuidador principal) |
 | `password_reset` | Token de restablecimiento de contraseña (hash, expiración y uso) |
+| `otp_challenge` | Código OTP de un solo uso para la verificación en dos pasos (hash, expiración e intentos) |
 
 **Centros de salud**
 
@@ -343,6 +345,7 @@ El modelo se basa en el script DDL original y lo **modifica** para cumplir los c
 | signup_date | Fecha y hora | Fecha de registro (por defecto, momento actual) |
 | email_verified_at | Fecha y hora (nula) | Fecha en que se verificó el correo electrónico |
 | last_login_at | Fecha y hora (nula) | Fecha del último inicio de sesión |
+| two_factor_enabled | Booleano | Indica si el inicio de sesión exige un código OTP además de la contraseña (por defecto, falso) |
 | is_active | Booleano | Indica si la cuenta está activa (por defecto, verdadero) |
 | created_at | Fecha y hora | Fecha de creación del registro |
 | updated_at | Fecha y hora | Fecha de última modificación |
@@ -353,6 +356,7 @@ El modelo se basa en el script DDL original y lo **modifica** para cumplir los c
 - Cada usuario referencia **un municipio** de residencia (`cat_municipality`); el departamento se obtiene a través de la relación del municipio (modelo normalizado, sin campo duplicado).
 - Un usuario puede tener **como máximo un perfil** de tipo paciente, cuidador o personal de salud (extensión en las tablas `patient`, `caregiver` y `healthcare_worker` respectivamente).
 - Un usuario puede tener **varios tokens de restablecimiento de contraseña** (`password_reset`).
+- Un usuario puede tener **códigos OTP pendientes** (`otp_challenge`), como máximo uno por propósito.
 
 **Reglas:**
 - El correo electrónico y el nombre de usuario (`username`) deben ser únicos.
@@ -728,6 +732,30 @@ El modelo se basa en el script DDL original y lo **modifica** para cumplir los c
 - Único por `(clinical_range_id, value_kind, sequence)`: no puede haber dos bandas con la misma posición en la evaluación.
 - En presión arterial se evalúan las dos: si la diastólica cae en una banda más grave que la sistólica, esa severidad prevalece.
 
+### 5.18 Código OTP de verificación en dos pasos — `otp_challenge`
+
+**Propósito:** guarda el código de un solo uso que se pide, además de la contraseña, a los usuarios con `user.two_factor_enabled`. Solo se almacena el **hash SHA-256** del código (nunca el código en claro). El `id` es opaco y es lo que el cliente devuelve junto con el código; no es un JWT, de modo que no puede usarse como token de acceso.
+
+> ⚠️ **El canal de entrega es provisional.** Mientras no exista un servicio de correo o SMS, el código se escribe en el log del servidor (`ConsoleOtpDelivery`). Quien pueda leer los logs puede verlo y, conociendo la contraseña, completar el inicio de sesión. Ver `docs/Guia_de_Despliegue.md` §7.
+
+| Campo | Tipo | Descripción |
+|---|---|---|
+| id | UUID | Identificador del desafío (generado automáticamente) |
+| user_id | UUID | Usuario al que pertenece el código (FK a `user.id`) |
+| purpose | Texto (20) | `login` (completar el inicio de sesión) o `enable` (confirmar la activación del 2FA) |
+| code_hash | Texto | Hash SHA-256 del código de 6 dígitos |
+| expires_at | Fecha y hora | Vencimiento (por defecto 5 minutos; `OTP_EXPIRES_MINUTES`) |
+| attempts | Entero | Intentos de código ya gastados (por defecto, 0) |
+| created_at | Fecha y hora | Fecha de creación del registro |
+
+**Relaciones:**
+- Cada código pertenece a **un usuario** (`user`). Borrado en cascada al eliminar el usuario.
+
+**Reglas:**
+- Como máximo **una fila por (usuario, propósito)**: emitir un código nuevo borra el anterior, y consumirlo borra la fila (un solo uso).
+- Cada comparación gasta un intento **antes** de verificar el código. Con `attempts` en 5 el desafío deja de aceptar códigos, aunque el correcto llegue después.
+- Un código vencido, agotado o ya usado responde igual que uno incorrecto, para no revelar su estado.
+
 ---
 
 ## 6. Reglas de integridad y restricciones
@@ -752,6 +780,7 @@ El modelo se basa en el script DDL original y lo **modifica** para cumplir los c
 | appointment.patient_id | patient.id | Cascada |
 | appointment_reminder.appointment_id | appointment.id | Cascada |
 | password_reset.user_id | user.id | Cascada |
+| otp_challenge.user_id | user.id | Cascada |
 | patient_caregiver.relationship_type_id | cat_relationship_type.id | Restringido |
 | health_center.health_center_type_id | cat_health_center_type.id | Restringido |
 | health_indicator.type_indicator_id | cat_type_indicator.id | Restringido |
@@ -813,6 +842,7 @@ Los índices agilizan las consultas más frecuentes de la aplicación:
 | medication_schedule | (medicine_id) | Horarios de un medicamento (HU-23) |
 | patient_caregiver | (caregiver_id) | Pacientes vinculados a un cuidador (HU-05) |
 | patient | (health_center_id) | Pacientes asignados a un centro de salud (panel médico) |
+| otp_challenge | (user_id, purpose) | Reemplazar el código anterior al emitir uno nuevo y descartar los pendientes al desactivar el 2FA |
 
 ---
 
@@ -858,6 +888,7 @@ La tabla `cat_role` alimenta el control de acceso basado en roles del backend:
 | 23 | Se añade la tabla **`clinical_range_band`** | Graduar la gravedad clínica (HU-32/33/34). Con un único par min/max no se distingue "levemente fuera de rango" de "en crisis": una glucosa de 150 y otra de 400 daban la misma señal. Las bandas añaden `severity` (`normal`/`alert`/`critical`) y `value_kind` para evaluar la diastólica aparte de la sistólica. ⚠️ **Cortes provisionales, pendientes de validación médica** |
 | 24 | Se añade el índice único `UQ_clinical_range_band (clinical_range_id, value_kind, sequence)` | Las bandas de un tipo de indicador se evalúan en orden y no puede haber dos con la misma posición |
 | 25 | Se documenta que el catálogo de tipos de indicador ya expone la unidad de medida, que el móvil no debe traducir | El mockup de indicadores muestra "Frecuencia cardiaca" y "Peso / IMC", que **no existen** en `cat_type_indicator`; son un desajuste de diseño, no un catálogo faltante |
+| 26 | Se añaden la tabla **`otp_challenge`** y la columna **`user.two_factor_enabled`** (migración `AddTwoFactorOtp`) | Verificación en dos pasos por código OTP de un solo uso: el login con 2FA devuelve un desafío y solo entrega la sesión al verificar el código. El código se guarda como hash, con vencimiento e intentos limitados. La migración es idempotente porque la API aún arranca con `synchronize: true` |
 
 **No aplicados en esta versión** (mejoras futuras, ver sección 10).
 

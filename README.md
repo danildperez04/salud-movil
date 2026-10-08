@@ -108,6 +108,19 @@ salud-móvil/
 | `POST` | `/auth/forgot-password` | Solicitar recuperación (siempre responde 200, sin revelar si el correo existe) | Público |
 | `POST` | `/auth/reset-password` | Restablecer contraseña con token | Público |
 | `POST` | `/auth/change-password` | Cambiar contraseña | Autenticado |
+| `POST` | `/auth/2fa/enable` | Pedir el código para activar la verificación en dos pasos | Autenticado |
+| `POST` | `/auth/2fa/enable/confirm` | Confirmar la activación con el código recibido | Autenticado |
+| `POST` | `/auth/2fa/disable` | Desactivar el 2FA (exige la contraseña) | Autenticado |
+| `POST` | `/auth/2fa/verify` | Completar el login con el código OTP y recibir el JWT | Público |
+| `POST` | `/auth/2fa/resend` | Reenviar el código (espera 30 s entre envíos) | Público |
+
+> **Verificación en dos pasos (opcional por usuario).** Si la cuenta la tiene activa,
+> `POST /auth/login` ya **no** devuelve el JWT: responde
+> `{ requiresTwoFactor: true, challengeId, expiresAt }` y la sesión se obtiene en
+> `POST /auth/2fa/verify` con `{ challengeId, code }` (código de 6 dígitos, vigencia de
+> 5 minutos, 5 intentos). Los clientes distinguen ambos casos por `requiresTwoFactor`.
+> ⚠️ Por ahora el código **se escribe en el log del servidor**, no se envía por correo ni
+> SMS (`ConsoleOtpDelivery`); ver `docs/Guia_de_Despliegue.md` §7.
 
 ### Usuarios (`/users`)
 

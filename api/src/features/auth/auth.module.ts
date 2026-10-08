@@ -10,6 +10,10 @@ import { Caregiver } from '../users/entities/caregiver.entity';
 import { Role } from '../catalogues/entities/role.entity';
 import { Municipality } from '../catalogues/entities/municipality.entity';
 import { PasswordReset } from './entities/password-reset.entity';
+import { OtpChallenge } from './entities/otp-challenge.entity';
+import { TwoFactorController } from './two-factor.controller';
+import { TwoFactorService } from './two-factor.service';
+import { ConsoleOtpDelivery, OtpDelivery } from './otp-delivery';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { APP_GUARD } from '@nestjs/core';
@@ -22,6 +26,7 @@ import { APP_GUARD } from '@nestjs/core';
       Role,
       Municipality,
       PasswordReset,
+      OtpChallenge,
     ]),
     JwtModule.registerAsync({
       inject: [ConfigService],
@@ -34,9 +39,13 @@ import { APP_GUARD } from '@nestjs/core';
       }),
     }),
   ],
-  controllers: [AuthController],
+  controllers: [AuthController, TwoFactorController],
   providers: [
     AuthService,
+    TwoFactorService,
+    // Canal de entrega del OTP. Hoy solo escribe en el log; para enviarlo por
+    // correo o SMS se cambia `useClass` por otra implementación de OtpDelivery.
+    { provide: OtpDelivery, useClass: ConsoleOtpDelivery },
     { provide: APP_GUARD, useClass: JwtAuthGuard },
     { provide: APP_GUARD, useClass: RolesGuard },
   ],
