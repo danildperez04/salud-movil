@@ -8,8 +8,10 @@ import type {
   CreateMedicationPayload,
   CreatePatientPayload,
   CreateStaffPayload,
+  DisableTwoFactorDto,
   HealthCenterItem,
   LinkCaregiverPayload,
+  LoginResponse,
   MunicipalityItem,
   PublicAppointment,
   PublicCaregiver,
@@ -25,6 +27,7 @@ import type {
   PublicPatientLink,
   PublicReminder,
   PublicStaff,
+  TwoFactorChallengeInfo,
   UpdateAppointmentPayload,
   UpdateCaregiverPayload,
   UpdateHealthIndicatorPayload,
@@ -32,6 +35,7 @@ import type {
   UpdateMedicationPayload,
   UpdatePatientPayload,
   UpdateStaffPayload,
+  VerifyTwoFactorDto,
 } from '../types';
 
 const API_URL =
@@ -132,7 +136,7 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
 
 export const api = {
   login(email: string, password: string) {
-    return request<AuthResponse>('/auth/login', {
+    return request<LoginResponse>('/auth/login', {
       method: 'POST',
       body: JSON.stringify({ email, password }),
     });
@@ -169,6 +173,42 @@ export const api = {
     return request<{ message: string }>('/auth/change-password', {
       method: 'POST',
       body: JSON.stringify({ currentPassword, newPassword }),
+    });
+  },
+
+  // --- 2FA ---
+
+  verifyTwoFactor(dto: VerifyTwoFactorDto) {
+    return request<AuthResponse>('/auth/2fa/verify', {
+      method: 'POST',
+      body: JSON.stringify(dto),
+    });
+  },
+
+  enableTwoFactor() {
+    return request<TwoFactorChallengeInfo>('/auth/2fa/enable', {
+      method: 'POST',
+    });
+  },
+
+  confirmEnableTwoFactor(challengeId: string, code: string) {
+    return request<{ twoFactorEnabled: true }>('/auth/2fa/enable/confirm', {
+      method: 'POST',
+      body: JSON.stringify({ challengeId, code }),
+    });
+  },
+
+  disableTwoFactor(password: string) {
+    return request<{ twoFactorEnabled: false }>('/auth/2fa/disable', {
+      method: 'POST',
+      body: JSON.stringify({ password } as DisableTwoFactorDto),
+    });
+  },
+
+  resendTwoFactor(challengeId: string) {
+    return request<TwoFactorChallengeInfo>('/auth/2fa/resend', {
+      method: 'POST',
+      body: JSON.stringify({ challengeId }),
     });
   },
 

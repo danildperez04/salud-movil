@@ -7,6 +7,7 @@ import { Input } from "../components/ui/Input";
 import { Button } from "../components/ui/Button";
 import { Alert } from "../components/ui/Alert";
 import { Logo } from "../components/ui/Logo";
+import { toast } from "sonner";
 
 export default function Login() {
   const login = useAuthStore((s) => s.login);
@@ -25,7 +26,12 @@ export default function Login() {
     }
     setLoading(true);
     try {
-      await login(email, password);
+      const response = await login(email, password);
+      if ('requiresTwoFactor' in response) {
+        toast.info('Se ha enviado un código de verificación. Revisa la consola del backend.');
+        navigate(`/2fa/verify?challengeId=${response.challengeId}&mode=login`, { replace: true });
+        return;
+      }
       navigate("/app", { replace: true });
     } catch (err) {
       setError(

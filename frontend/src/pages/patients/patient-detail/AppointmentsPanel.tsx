@@ -396,6 +396,7 @@ export function AppointmentsPanel({
 
       {toCancel ? (
         <ConfirmDeleteModal
+          isOpen={!!toCancel}
           title="Cancelar cita"
           message={
             <>

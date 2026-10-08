@@ -159,6 +159,7 @@ export default function CaregiversList() {
       </Card>
       {toDelete ? (
         <ConfirmDeleteModal
+          isOpen={!!toDelete}
           title="Eliminar cuidador"
           message={
             <>
