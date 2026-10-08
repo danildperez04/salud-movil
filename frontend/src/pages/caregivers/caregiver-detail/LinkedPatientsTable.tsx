@@ -94,6 +94,7 @@ export function LinkedPatientsTable({
       </Card>
       {toUnlink ? (
         <ConfirmDeleteModal
+          isOpen={!!toUnlink}
           title="Desvincular paciente"
           message={
             <>

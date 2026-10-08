@@ -213,6 +213,7 @@ export default function PatientsList() {
 
       {toDelete ? (
         <ConfirmDeleteModal
+          isOpen={!!toDelete}
           title="Eliminar paciente"
           message={
             <>

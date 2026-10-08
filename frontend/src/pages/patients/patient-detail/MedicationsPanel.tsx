@@ -555,6 +555,7 @@ export function MedicationsPanel({ patientId }: MedicationsPanelProps) {
 
       {toDelete ? (
         <ConfirmDeleteModal
+          isOpen={!!toDelete}
           title="Eliminar medicamento"
           message={
             <>
