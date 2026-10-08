@@ -263,6 +263,22 @@ export const MEDICATIONS_LABELS = {
     `${active} ${active === 1 ? 'activo' : 'activos'} de ${total}`,
   addButton: 'Agregar medicamento',
   empty: 'Aún no tienes medicamentos registrados',
+  doses: {
+    title: 'Tomas de hoy',
+    progress: (taken: number, total: number) =>
+      `${taken} de ${total} ${total === 1 ? 'confirmada' : 'confirmadas'}`,
+    taken: 'Tomé',
+    skipped: 'Omití',
+    status: {
+      taken: 'Tomada',
+      skipped: 'Omitida',
+      pending: 'Pendiente',
+      unconfirmed: 'Sin confirmar',
+    },
+    a11y: (action: string, drugName: string, dose: string, time: string) =>
+      `${action}: ${drugName} ${dose} de las ${time}`,
+    hint: 'Tu IPCP usa estas confirmaciones para saber qué tan bien sigues tu tratamiento.',
+  },
   scan: {
     title: 'Identificar con la cámara',
     description:
