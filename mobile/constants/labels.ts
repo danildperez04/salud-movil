@@ -263,6 +263,22 @@ export const MEDICATIONS_LABELS = {
     `${active} ${active === 1 ? 'activo' : 'activos'} de ${total}`,
   addButton: 'Agregar medicamento',
   empty: 'Aún no tienes medicamentos registrados',
+  doses: {
+    title: 'Tomas de hoy',
+    progress: (taken: number, total: number) =>
+      `${taken} de ${total} ${total === 1 ? 'confirmada' : 'confirmadas'}`,
+    taken: 'Tomé',
+    skipped: 'Omití',
+    status: {
+      taken: 'Tomada',
+      skipped: 'Omitida',
+      pending: 'Pendiente',
+      unconfirmed: 'Sin confirmar',
+    },
+    a11y: (action: string, drugName: string, dose: string, time: string) =>
+      `${action}: ${drugName} ${dose} de las ${time}`,
+    hint: 'Tu IPCP usa estas confirmaciones para saber qué tan bien sigues tu tratamiento.',
+  },
   scan: {
     title: 'Identificar con la cámara',
     description:
@@ -801,7 +817,7 @@ export const VOICE_ASSISTANT_LABELS = {
     { label: '“Buscar centro de salud”', text: 'Necesito encontrar un centro de salud cercano.' },
   ],
   actionsTitle: 'Acciones sugeridas',
-  priorityAction: { title: 'Evaluar prioridad', subtitle: 'Responder IPCP con apoyo de voz' },
+  priorityAction: { title: 'Ver mi prioridad', subtitle: 'Consultar tu IPCP con apoyo de voz' },
   careAction: { title: 'Buscar atención', subtitle: 'Explorar recursos sanitarios' },
 } as const;
 
@@ -1034,8 +1050,8 @@ export const MORE_LABELS = {
   logout: 'Cerrar sesión',
   ipcp: {
     title: 'IPCP · Mi prioridad',
-    description: 'Evaluación ampliada de síntomas, evolución y señales de alerta.',
-    cta: 'Realizar evaluación',
+    description: 'Tu nivel de prioridad, calculado con tus indicadores, medicamentos y citas.',
+    cta: 'Ver mi prioridad',
   },
   sections: {
     health: 'Salud y seguimiento',
@@ -1072,92 +1088,66 @@ export const MORE_LABELS = {
   },
 } as const;
 
-// IPCP · Mi prioridad: evaluación de 10 preguntas y resultado
+// IPCP · Mi prioridad: resultado calculado automáticamente con los datos de la app
 export const IPCP_LABELS = {
-  assessment: {
-    introTitle: 'Evaluación ampliada de prioridad',
-    introDescription:
-      'Responde 10 preguntas sobre intensidad, evolución, respiración, dolor, fiebre, hidratación y condiciones previas. Es una herramienta de priorización: no diagnostica ni sustituye la valoración de un profesional de salud.',
-    progress: (answered: number, total: number) => `${answered} de ${total} respondidas`,
-    progressDone: 'Listo: ya puedes ver tu prioridad',
-    redFlag: 'Señal de alerta',
-    noticeTitle: 'Señales importantes',
-    noticeMessage:
-      'Si tienes una emergencia real, no dependas de esta evaluación: busca atención inmediata por los canales disponibles en tu zona.',
-    submit: 'Ver mi prioridad',
-    submitError: 'No se pudo calcular tu prioridad. Intenta de nuevo.',
-    questionA11y: (position: number, total: number, title: string) =>
-      `Pregunta ${position} de ${total}: ${title}`,
-    optionA11y: (value: number, meaning?: string) =>
-      meaning ? `${value} de 5, ${meaning}` : `${value} de 5`,
-    questions: {
-      intensity: {
-        title: '¿Qué tan intensos son tus síntomas?',
-        low: 'Muy leves',
-        high: 'Muy intensos',
-      },
-      worsening: {
-        title: '¿Tus síntomas han empeorado rápidamente?',
-        low: 'No han cambiado',
-        high: 'Empeoran con rapidez',
-      },
-      breathing: {
-        title: '¿Tienes dificultad para respirar?',
-        low: 'Ninguna',
-        high: 'Dificultad severa',
-      },
-      chestPain: {
-        title: '¿Tienes dolor fuerte en el pecho, desmayo o confusión?',
-        low: 'Nada',
-        high: 'Presente o muy marcado',
-      },
-      pain: {
-        title: '¿Qué tan fuerte es tu dolor o malestar general?',
-        low: 'Mínimo',
-        high: 'Muy fuerte',
-      },
-      fever: {
-        title: '¿Tienes fiebre o escalofríos persistentes?',
-        low: 'No',
-        high: 'Fiebre alta o persistente',
-      },
-      hydration: {
-        title: '¿Puedes comer, beber líquidos y mantenerte hidratado?',
-        low: 'Sin problema',
-        high: 'Casi no puedo hacerlo',
-      },
-      activities: {
-        title: '¿Los síntomas te impiden caminar, dormir o hacer actividades normales?',
-        low: 'Nada',
-        high: 'Completamente',
-      },
-      chronic: {
-        title: '¿Tienes una condición crónica que pueda complicar el cuadro?',
-        low: 'No',
-        high: 'Sí y está descompensada',
-      },
-      concern: {
-        title: '¿Te preocupa que algo sea diferente a lo habitual en tu salud?',
-        low: 'Poco',
-        high: 'Mucho',
-      },
-    },
-  },
   result: {
     riskTitle: 'Nivel de riesgo',
     outOf: '/100',
     scoreA11y: (score: number, level: string) => `Puntaje ${score} de 100, ${level}`,
-    takenAt: (date: string, time: string) => `Evaluación del ${date} · ${time}`,
+    updatedAt: (date: string, time: string) => `Actualizado el ${date} · ${time}`,
     alertSent: 'Ya se mandó una alerta a tu hospital de confianza y cuidador.',
     meaningTitle: '¿Qué significa?',
     recommendationsTitle: 'Recomendaciones para ti',
     disclaimer:
       'El IPCP es una herramienta de priorización y apoyo al seguimiento: no diagnostica ni sustituye la valoración de tu médico.',
-    repeat: 'Repetir evaluación',
-    empty: {
-      title: 'Aún no tienes una evaluación',
-      description: 'Responde las 10 preguntas para conocer tu nivel de prioridad.',
-      action: 'Realizar evaluación',
+    emergencyNotice: {
+      title: 'Señales de alarma',
+      message:
+        'El IPCP solo usa los datos que registras en la app y no conoce tus síntomas. Si tienes dolor de pecho, falta de aire, desmayo o confusión, busca atención de emergencia sin esperar este resultado.',
+    },
+    driversTitle: '¿Qué influye en tu resultado?',
+    noDrivers:
+      'No hay nada preocupante en tus datos recientes. Sigue registrando tus indicadores y confirmando tus tomas.',
+    indicators: {
+      bloodPressure: 'presión arterial',
+      glucose: 'glucosa',
+      temperature: 'temperatura',
+    },
+    drivers: {
+      criticalReading: (indicator: string) =>
+        `Tu ${indicator} tuvo una lectura crítica en las últimas 48 horas.`,
+      elevatedReadings: (indicator: string) =>
+        `Tus lecturas de ${indicator} han estado fuera de rango.`,
+      lowAdherence: (percent: number) =>
+        `Confirmaste el ${percent} % de tus tomas de medicamento en los últimos 14 días.`,
+      worseningTrend: (indicator: string) => `Tu ${indicator} empeoró frente a la semana anterior.`,
+      monitoringLapse: (days: number, indicator: string) =>
+        `Llevas ${days} ${days === 1 ? 'día' : 'días'} sin registrar tu ${indicator}.`,
+      neverRecorded: (indicator: string) => `Aún no has registrado tu ${indicator}.`,
+      missedAppointments: (count: number) =>
+        `Faltaste a ${count} ${count === 1 ? 'cita' : 'citas'} en los últimos 3 meses.`,
+    },
+    trend: {
+      worsening: 'Tus indicadores empeoraron frente a la semana anterior.',
+      stable: 'Tus indicadores se mantienen estables frente a la semana anterior.',
+      improving: 'Tus indicadores mejoraron frente a la semana anterior.',
+    },
+    coverage: (percent: number) =>
+      `Calculado con el ${percent} % de la información posible. Mientras más registres, más preciso será.`,
+    error: {
+      title: 'No se pudo calcular tu prioridad',
+      description: 'Revisa tu conexión e intenta de nuevo.',
+    },
+    insufficient: {
+      title: 'Aún no hay datos suficientes',
+      description:
+        'Tu IPCP se calcula solo, con lo que registras en la app. Registra tus indicadores y confirma tus tomas durante unos días para verlo.',
+      missingTitle: 'Para calcularlo necesitamos',
+      missing: {
+        clinical: 'Registrar tu presión, glucosa o temperatura',
+        adherence: 'Confirmar tus tomas con “Tomé” u “Omití”',
+      },
+      action: 'Registrar un indicador',
     },
     levels: {
       low: {

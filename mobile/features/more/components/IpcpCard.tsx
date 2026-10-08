@@ -6,11 +6,11 @@ import { Text } from '@/components/ui/text';
 import { MORE_LABELS } from '@/constants/labels';
 import { ipcpRoutes } from '@/features/ipcp/routes';
 
-/** Acceso a la evaluación IPCP desde "Más". */
+/** Acceso al IPCP desde "Más". */
 export function IpcpCard() {
   return (
     <Pressable
-      onPress={() => router.push(ipcpRoutes.assessment)}
+      onPress={() => router.push(ipcpRoutes.overview)}
       accessibilityRole="button"
       accessibilityLabel={`${MORE_LABELS.ipcp.title}. ${MORE_LABELS.ipcp.cta}`}
       className="bg-brand-blue gap-4 rounded-3xl p-5 shadow-lg shadow-black/10 active:opacity-90"

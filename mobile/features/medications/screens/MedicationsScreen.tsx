@@ -9,6 +9,7 @@ import { SectionHeader } from '@/components/ui/section-header';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Text } from '@/components/ui/text';
 import { MEDICATIONS_LABELS, SCREEN_TITLES } from '@/constants/labels';
+import { TodayDosesCard } from '@/features/reminders/components/TodayDosesCard';
 import { MedicationCard } from '../components/MedicationCard';
 import { MedicationTipCard } from '../components/MedicationTipCard';
 import { sortMedications } from '../domain/medication-form';
@@ -26,6 +27,8 @@ export default function MedicationsScreen() {
       <ScreenHeader title={SCREEN_TITLES.medications} align="center" />
 
       <ScrollView contentContainerClassName="gap-5 px-6 pt-2 pb-10">
+        <TodayDosesCard />
+
         {isLoading ? (
           <View className="gap-5">
             <Skeleton className="h-36 w-full rounded-3xl" />

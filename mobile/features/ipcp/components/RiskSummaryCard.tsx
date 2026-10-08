@@ -4,21 +4,21 @@ import { Text } from '@/components/ui/text';
 import { ToneBadge } from '@/components/ui/tone-badge';
 import { IPCP_LABELS } from '@/constants/labels';
 import { formatDayMonth, formatTime12h } from '@/lib/date-format';
-import type { IpcpResult } from '../api/mock-ipcp';
+import type { ReadyIpcpReport } from '../api/mock-ipcp';
 import { LEVEL_VISUALS, withAlpha } from './ipcp-visuals';
 import { RiskGauge } from './RiskGauge';
 
 const labels = IPCP_LABELS.result;
 
 type RiskSummaryCardProps = {
-  result: IpcpResult;
+  result: ReadyIpcpReport;
 };
 
 /** Medidor con el puntaje, el nivel de riesgo y su resumen. */
 export function RiskSummaryCard({ result }: RiskSummaryCardProps) {
   const { color, icon } = LEVEL_VISUALS[result.level];
   const content = labels.levels[result.level];
-  const takenAt = new Date(result.takenAt);
+  const computedAt = new Date(result.computedAt);
 
   return (
     <View
@@ -45,7 +45,7 @@ export function RiskSummaryCard({ result }: RiskSummaryCardProps) {
 
       <View className="border-border border-t pt-3">
         <Text className="text-caption font-body text-muted-foreground text-center">
-          {labels.takenAt(formatDayMonth(takenAt), formatTime12h(takenAt))}
+          {labels.updatedAt(formatDayMonth(computedAt), formatTime12h(computedAt))}
         </Text>
       </View>
     </View>

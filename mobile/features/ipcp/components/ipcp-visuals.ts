@@ -1,14 +1,34 @@
 // features/ipcp/components/ipcp-visuals.ts
-import { Activity, CalendarDays, Heart, ShieldCheck, TriangleAlert } from 'lucide-react-native';
+import {
+  Activity,
+  CalendarDays,
+  CalendarX,
+  Clock,
+  Heart,
+  Pill,
+  ShieldCheck,
+  TrendingUp,
+  TriangleAlert,
+} from 'lucide-react-native';
 import type { LucideIcon } from 'lucide-react-native';
 import { statusColors } from '@/lib/tokens';
-import type { IpcpLevel } from '../domain/ipcp-score';
+import type { IpcpDriver, IpcpLevel } from '../domain/ipcp-model';
 
 /** Color e ícono de cada nivel de riesgo (verde, ámbar, rojo). */
 export const LEVEL_VISUALS: Record<IpcpLevel, { color: string; icon: LucideIcon }> = {
   low: { color: '#15803D', icon: ShieldCheck },
   moderate: { color: statusColors.warning, icon: TriangleAlert },
   high: { color: statusColors.danger, icon: TriangleAlert },
+};
+
+/** Ícono de cada motivo que influye en el puntaje. */
+export const DRIVER_ICONS: Record<IpcpDriver['code'], LucideIcon> = {
+  criticalReading: TriangleAlert,
+  elevatedReadings: Activity,
+  lowAdherence: Pill,
+  worseningTrend: TrendingUp,
+  monitoringLapse: Clock,
+  missedAppointments: CalendarX,
 };
 
 /** Íconos de las tres recomendaciones, en el mismo orden que sus textos. */
