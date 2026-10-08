@@ -3,6 +3,7 @@ import { Modal } from "./Modal";
 import { Button } from "./Button";
 
 interface ConfirmDeleteModalProps {
+  isOpen: boolean;
   title: string;
   message: ReactNode;
   onCancel: () => void;
@@ -11,13 +12,8 @@ interface ConfirmDeleteModalProps {
   confirmLabel?: string;
 }
 
-/**
- * Modal "¿Seguro que deseas eliminar...?" genérico. Antes esta misma
- * estructura (Modal + botones Cancelar/Eliminar) estaba duplicada en
- * PatientsList y CaregiversList; ahora cada lista solo pasa el título y el
- * mensaje.
- */
 export function ConfirmDeleteModal({
+  isOpen,
   title,
   message,
   onCancel,
@@ -25,6 +21,8 @@ export function ConfirmDeleteModal({
   loading = false,
   confirmLabel = "Eliminar",
 }: ConfirmDeleteModalProps) {
+  if (!isOpen) return null;
+
   return (
     <Modal
       title={title}
