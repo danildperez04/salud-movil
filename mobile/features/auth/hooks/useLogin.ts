@@ -2,12 +2,9 @@
 import { useMutation } from '@tanstack/react-query';
 import { apiClient, ApiError } from '@/lib/api-client';
 import { useAppStore } from '@/store';
-import type { AuthResponse, LoginDto } from '@/types/auth';
-
-// Mobile es solo para pacientes y cuidadores — admin/personal de salud
-// gestionan desde el panel web. Esto es UX/acceso, no la fuente de verdad:
-// el backend sigue siendo quien realmente autoriza cada endpoint (RolesGuard).
-const ALLOWED_MOBILE_ROLES = ['patient', 'caregiver'];
+import type { LoginDto, LoginResponse } from '@/types/auth';
+import { isMobileRoleAllowed, isTwoFactorChallenge } from '../domain/login-response';
+import { useTwoFactorStore } from '../store/two-factor-store';
 
 export class RoleNotAllowedError extends Error {
   constructor() {
@@ -16,18 +13,28 @@ export class RoleNotAllowedError extends Error {
   }
 }
 
+/**
+ * Inicia sesión. Si la cuenta tiene 2FA la API responde con un desafío en vez de la
+ * sesión: se guarda en memoria y la pantalla navega a la de código. El chequeo de rol
+ * se hace cuando ya hay `user` (acá, o tras `verify`).
+ */
 export function useLogin() {
   const setSession = useAppStore((state) => state.setSession);
+  const setChallenge = useTwoFactorStore((state) => state.setChallenge);
 
-  return useMutation<AuthResponse, ApiError | RoleNotAllowedError, LoginDto>({
+  return useMutation<LoginResponse, ApiError | RoleNotAllowedError, LoginDto>({
     mutationFn: async (dto) => {
-      const data = await apiClient.post<AuthResponse>('/auth/login', dto, { auth: false });
-      if (!ALLOWED_MOBILE_ROLES.includes(data.user.role)) {
+      const data = await apiClient.post<LoginResponse>('/auth/login', dto, { auth: false });
+      if (!isTwoFactorChallenge(data) && !isMobileRoleAllowed(data.user.role)) {
         throw new RoleNotAllowedError();
       }
       return data;
     },
     onSuccess: (data) => {
+      if (isTwoFactorChallenge(data)) {
+        setChallenge(data);
+        return;
+      }
       setSession(data);
     },
   });

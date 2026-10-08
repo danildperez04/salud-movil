@@ -16,6 +16,7 @@ import { LOGIN_LABELS } from '@/constants/labels';
 import { colors, fonts } from '@/lib/tokens';
 import { ApiError } from '@/lib/api-client';
 import { useAppStore } from '@/store';
+import { isTwoFactorChallenge } from '../domain/login-response';
 import { useLogin } from '../hooks/useLogin';
 
 const loginSchema = z.object({
@@ -51,8 +52,13 @@ export default function LoginScreen() {
 
   const onSubmit = (values: LoginFormValues) => {
     login.mutate(values, {
-      onSuccess: () => {
-        router.replace('/(app)');
+      onSuccess: (data) => {
+        // Con 2FA todavía no hay sesión: se sigue con la pantalla del código.
+        if (isTwoFactorChallenge(data)) {
+          router.push('/(auth)/two-factor');
+        } else {
+          router.replace('/(app)');
+        }
       },
     });
   };
@@ -60,6 +66,7 @@ export default function LoginScreen() {
   const errorMessage = (() => {
     if (!login.error) return null;
     if (login.error instanceof ApiError) {
+      // Solo /auth/login: en /auth/2fa/verify un 401 significa código inválido (ver TwoFactorScreen).
       return login.error.status === 401 ? LOGIN_LABELS.invalidCredentials : login.error.message;
     }
     return login.error.message;
