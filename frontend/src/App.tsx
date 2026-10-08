@@ -10,6 +10,7 @@ import Login from "./pages/Login";
 import RecoverPassword from "./pages/RecoverPassword";
 import ResetPassword from "./pages/ResetPassword";
 import Profile from "./pages/Profile";
+import TwoFactorVerify from "./pages/TwoFactorVerify";
 import Home from "./pages/Home";
 import ComingSoon from "./pages/ComingSoon";
 import StaffList from "./pages/staff/StaffList";
@@ -20,7 +21,8 @@ import PatientDetail from "./pages/patients/PatientDetail";
 import CaregiversList from "./pages/caregivers/CaregiversList";
 import CaregiverForm from "./pages/caregivers/CaregiverForm";
 import CaregiverDetail from "./pages/caregivers/CaregiverDetail";
-import PatientRecord from "./pages/patients/PatientRecord"; // ← nuevo
+import PatientRecord from "./pages/patients/PatientRecord";
+import { Toaster } from "sonner";
 
 function App() {
   const bootstrap = useAuthStore((s) => s.bootstrap);
@@ -52,6 +54,9 @@ function App() {
               </RedirectIfAuthed>
             }
           />
+          {/* 2FA verification - pública como /login pero sin RedirectIfAuthed
+              porque el usuario puede llegar aquí tras login con 2FA pendiente */}
+          <Route path="/2fa/verify" element={<TwoFactorVerify />} />
           {/* Último paso de la recuperación: con el token del enlace. Va fuera
               de `RedirectIfAuthed` a propósito: quien restablece su contraseña
               puede haber perdido la sesión y aun así necesita entrar. */}
@@ -129,6 +134,15 @@ function App() {
         </Route>
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          classNames: {
+            toast: 'font-body',
+            description: 'font-body text-sm',
+          },
+        }}
+      />
     </BrowserRouter>
   );
 }
