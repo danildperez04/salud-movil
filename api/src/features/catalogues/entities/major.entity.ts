@@ -5,6 +5,8 @@ export class Major {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column({ length: 100 })
+  // Único: es la identidad lógica del catálogo y lo que hace idempotente
+  // el sembrado (`ON CONFLICT (name) DO NOTHING`).
+  @Column({ length: 100, unique: true })
   name!: string;
 }
