@@ -1,4 +1,11 @@
 {
   "extends": "./tsconfig.json",
-  "exclude": ["node_modules", "test", "dist", "**/*spec.ts"]
+  "//": [
+    "`scripts/` se excluye a propósito. Los archivos .ts fuera de `src/` cambian",
+    "el `rootDir` inferido a la raíz del proyecto, y entonces `nest build` emite",
+    "en `dist/src/` en lugar de `dist/`: `node dist/main` deja de encontrar el",
+    "archivo y la aplicación no arranca. Pasó con el generador del SQL de",
+    "catálogos y también con una migración escrita por error en la raíz."
+  ],
+  "exclude": ["node_modules", "test", "dist", "scripts", "**/*spec.ts"]
 }
