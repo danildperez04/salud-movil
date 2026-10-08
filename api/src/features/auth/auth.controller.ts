@@ -1,5 +1,5 @@
 import { Body, Controller, Get, Post } from '@nestjs/common';
-import { AuthService, AuthResponse } from './auth.service';
+import { AuthService, AuthResponse, LoginResponse } from './auth.service';
 import { RegisterCaregiverDto } from './dto/register-caregiver.dto';
 import { LoginDto } from './dto/login.dto';
 import { ForgotPasswordDto } from './dto/forgot-password.dto';
@@ -21,7 +21,7 @@ export class AuthController {
 
   @Public()
   @Post('login')
-  login(@Body() dto: LoginDto): Promise<AuthResponse> {
+  login(@Body() dto: LoginDto): Promise<LoginResponse> {
     return this.authService.login(dto);
   }
 
