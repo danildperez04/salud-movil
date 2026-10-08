@@ -7,6 +7,7 @@ export interface ApiUser {
   address: string;
   municipalityId: number;
   role: string;
+  twoFactorEnabled: boolean;
   healthcareWorker?: {
     licenseNumber: string;
     employeeId: string;
@@ -39,6 +40,7 @@ export interface HealthCenterItem {
 export interface PublicStaff extends ApiUser {
   dni: string | null;
   isActive: boolean;
+  twoFactorEnabled: boolean;
 }
 
 export interface PublicPatient {
@@ -480,4 +482,28 @@ export interface PublicIpcp {
   exclusions: string[];
   computedFrom: string | null;
   generatedAt: string;
+}
+
+// === 2FA (Two-Factor Authentication) ===
+
+export interface TwoFactorRequiredResponse {
+  requiresTwoFactor: true;
+  challengeId: string;
+  expiresAt: string;
+}
+
+export type LoginResponse = AuthResponse | TwoFactorRequiredResponse;
+
+export interface TwoFactorChallengeInfo {
+  challengeId: string;
+  expiresAt: string;
+}
+
+export interface VerifyTwoFactorDto {
+  challengeId: string;
+  code: string;
+}
+
+export interface DisableTwoFactorDto {
+  password: string;
 }
