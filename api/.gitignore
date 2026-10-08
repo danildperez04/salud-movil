@@ -55,3 +55,10 @@ pids
 
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# Migraciones generadas por error en la raíz de `api/`: si caen ahí, TypeScript
+# las incluye en la compilación y `rootDir` deja de ser `src/`, con lo que el
+# build empieza a emitir en `dist/src/` y `node dist/main` falla. Se versionan
+# solo dentro de `src/database/migrations/`.
+/[0-9]*-*.ts
+/[0-9]*-*.js

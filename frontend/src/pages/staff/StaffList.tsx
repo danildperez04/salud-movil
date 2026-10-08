@@ -22,10 +22,10 @@ export default function StaffList() {
   useEffect(() => {
     let cancelled = false;
     void api
-      .listUsers()
+      .listUsers('health_staff')
       .then((users) => {
         if (!cancelled) {
-          setStaff(users.filter((user) => user.role === 'health_staff'));
+          setStaff(users);
         }
       })
       .catch((err) => {
@@ -49,8 +49,10 @@ export default function StaffList() {
     setLoading(true);
     setError(null);
     try {
-      const users = await api.listUsers();
-      setStaff(users.filter((user) => user.role === 'health_staff'));
+      // El rol se filtra en el servidor: antes descargábamos también pacientes
+      // y cuidadores para descartarlos aquí.
+      const users = await api.listUsers('health_staff');
+      setStaff(users);
     } catch (err) {
       setError(
         err instanceof ApiError ? err.message : 'No se pudo cargar el personal',

@@ -16,6 +16,7 @@ import { AppointmentsModule } from './features/appointments/appointments.module'
 import { MedicationsModule } from './features/medications/medications.module';
 import { RemindersModule } from './features/reminders/reminders.module';
 import { DashboardModule } from './features/dashboard/dashboard.module';
+import { IpcpModule } from './features/ipcp/ipcp.module';
 import { DatabaseModule } from './database/database.module';
 
 @Module({
@@ -41,7 +42,11 @@ import { DatabaseModule } from './database/database.module';
       password: config().db.password,
       database: config().db.database,
       entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: true,
+      // El esquema lo gobiernan las migraciones (`pnpm migration:run`), nunca el
+      // arranque. Con `synchronize: true` cualquier despliegue alteraba la base
+      // de producción sin revisión: es la razón por la que los despliegues
+      // estuvieron aplazados. Ver `docs/Guia_de_Despliegue.md` §7.
+      synchronize: false,
       // El log de SQL imprime valores de pacientes. Solo en desarrollo.
       logging: config().db.logging,
     }),
@@ -55,6 +60,7 @@ import { DatabaseModule } from './database/database.module';
     MedicationsModule,
     RemindersModule,
     DashboardModule,
+    IpcpModule,
     DatabaseModule,
   ],
   controllers: [AppController],

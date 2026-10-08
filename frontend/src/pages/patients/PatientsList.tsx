@@ -1,8 +1,8 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { api, ApiError } from "../../lib/api";
+import { ageOf } from "../../lib/age";
 import { useAuthStore } from "../../store/auth";
-import { getMockIpcp } from "../../lib/ipcp";
 import type { PublicPatient } from "../../types";
 import { Card } from "../../components/ui/Card";
 import { Table } from "../../components/ui/Table";
@@ -11,7 +11,6 @@ import { Button } from "../../components/ui/Button";
 import { Badge } from "../../components/ui/Badge";
 import { Alert } from "../../components/ui/Alert";
 import { ConfirmDeleteModal } from "../../components/ui/ConfirmDeleteModal";
-import { IpcpBadge } from "../../components/patients/IpcpBadge";
 
 /** Espera antes de disparar la búsqueda mientras el usuario sigue escribiendo. */
 const SEARCH_DEBOUNCE_MS = 400;
@@ -75,13 +74,6 @@ export default function PatientsList() {
     return () => clearTimeout(handle);
   }, [query]);
 
-  // IPCP simulado por paciente. Ver src/lib/ipcp.ts para el porqué del mock.
-  const ipcpByPatient = useMemo(() => {
-    const map = new Map<string, ReturnType<typeof getMockIpcp>>();
-    patients.forEach((patient) => map.set(patient.id, getMockIpcp(patient.id)));
-    return map;
-  }, [patients]);
-
   async function confirmDelete() {
     if (!toDelete) {
       return;
@@ -126,15 +118,6 @@ export default function PatientsList() {
       render: (row) => (
         <span className="text-slate-700">{row.healthCenterName}</span>
       ),
-    },
-    {
-      header: "IPCP",
-      render: (row) => {
-        const ipcp = ipcpByPatient.get(row.id);
-        return ipcp ? (
-          <IpcpBadge score={ipcp.score} level={ipcp.level} />
-        ) : null;
-      },
     },
     {
       header: "Estado",
@@ -244,15 +227,4 @@ export default function PatientsList() {
       ) : null}
     </div>
   );
-}
-
-function ageOf(dateOfBirth: string): string {
-  const birth = new Date(`${dateOfBirth.slice(0, 10)}T00:00:00`);
-  const now = new Date();
-  let years = now.getFullYear() - birth.getFullYear();
-  const monthDiff = now.getMonth() - birth.getMonth();
-  if (monthDiff < 0 || (monthDiff === 0 && now.getDate() < birth.getDate())) {
-    years -= 1;
-  }
-  return years >= 0 ? `${years} años` : "—";
 }

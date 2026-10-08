@@ -1,18 +1,41 @@
 /**
+ * ⛔ **MOCK FUERA DEL MVP — NO IMPORTAR.**
+ *
+ * El IPCP **ya existe y es real**: lo calcula `GET /patients/:id/ipcp` y lo
+ * consume la ficha del paciente (`patient-detail/IpcpCard.tsx`) con
+ * `api.getPatientIpcp(id)`. La API devuelve además un desglose por variable,
+ * que este archivo no puede imitar porque no lee ningún dato clínico.
+ *
+ * Este archivo **se conserva a propósito** (no se borra) para dejar registro de
+ * cómo era la maqueta y de qué reemplazó. Está en la lista de *fuera del MVP*
+ * del plan de cierre: se elimina en la limpieza posterior, no antes.
+ *
+ * Por qué importa que no se use: `getMockIpcp` devuelve un hash del UUID del
+ * paciente, o sea **prioridad clínica inventada** para personas reales. Una
+ * lista ordenada por esa columna mezclaría a los pacientes según un número que
+ * no sale de sus datos.
+ *
+ * ⚠️ Bugs conocidos que quedan sin corregir, porque corregir código muerto sería
+ * trabajo desperdiciado:
+ * 1. El nivel y el score se eligen con **partes disjuntas** del mismo hash
+ *    (`hash % 3` y `Math.floor(hash / 3) % span`), así que un paciente puede
+ *    salir "Alta" con score 40, contradiciendo sus propios umbrales.
+ * 2. Los cortes son 1-39 / 40-69 / 70-99, mientras la API usa 0-39 / 40-69 /
+ *    70-100 en inglés (`low` / `moderate` / `high`). Sobrevivió `low`/`moderate`/
+ *    `high` porque es el vocabulario de máquina que usa el resto de la API.
+ *
+ * El flujo de verificación (`pnpm ci:frontend`) falla si alguien importa este
+ * archivo.
+ *
+ * ─── Historial ────────────────────────────────────────────────────────────
  * Mock del Índice de Prioridad de Control del Paciente (IPCP).
  *
- * El PRD ubica el cálculo del IPCP mediante IA dentro de "Funcionalidades
- * futuras" (ver Tabla 1, fila de funcionalidades extra). Mientras esa pieza
- * no exista en el backend, generamos un valor determinístico por paciente
- * para poder maquetar y probar el diseño de la lista de pacientes.
+ * El PRD ubicaba el cálculo del IPCP mediante IA dentro de "Funcionalidades
+ * futuras" (Tabla 1, fila de funcionalidades extra). Se usaba para maquetar la
+ * lista de pacientes.
  *
- * Es determinístico (basado en el id del paciente) a propósito: si fuera
- * puramente aleatorio, el badge cambiaría de color en cada re-render o al
- * volver a cargar la tabla, lo cual se ve como un bug.
- *
- * TODO: eliminar este archivo y consumir el IPCP real desde
- * `api.getPatientIpcp(id)` (o el campo que exponga el backend) cuando esa
- * funcionalidad se implemente.
+ * Nota: el IPCP no es IA. Es una regla explicable y determinista sobre
+ * indicadores medidos, adherencia, cumplimiento de controles y tendencia.
  */
 
 export type IpcpLevel = 'Alta' | 'Moderada' | 'Baja';
@@ -45,7 +68,11 @@ function hashId(id: string): number {
   return Math.abs(hash);
 }
 
-/** Genera un IPCP simulado, estable para un mismo `patientId`. */
+/**
+ * Genera un IPCP simulado, estable para un mismo `patientId`.
+ *
+ * ⛔ No usar. Ver el aviso de la cabecera del archivo.
+ */
 export function getMockIpcp(patientId: string): IpcpMock {
   const hash = hashId(patientId);
   const range = IPCP_RANGES[hash % IPCP_RANGES.length];

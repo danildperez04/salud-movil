@@ -17,6 +17,7 @@ import type {
   PublicCaregiverLink,
   PublicDashboardStats,
   PublicHealthIndicator,
+  PublicIpcp,
   PublicIndicatorSummary,
   PublicMedicalRecord,
   PublicMedication,
@@ -152,6 +153,25 @@ export const api = {
     });
   },
 
+  /**
+   * Cierra el flujo de recuperación de contraseña (HU-04). El `token` llega por
+   * el enlace del correo; la API responde 400 si venció o ya se usó.
+   */
+  resetPassword(token: string, newPassword: string) {
+    return request<{ message: string }>('/auth/reset-password', {
+      method: 'POST',
+      body: JSON.stringify({ token, newPassword }),
+    });
+  },
+
+  /** Cambio de contraseña con la sesión abierta (HU-08). */
+  changePassword(currentPassword: string, newPassword: string) {
+    return request<{ message: string }>('/auth/change-password', {
+      method: 'POST',
+      body: JSON.stringify({ currentPassword, newPassword }),
+    });
+  },
+
   getDepartments() {
     return request<CatalogueItem[]>('/catalogues/departments');
   },
@@ -196,8 +216,12 @@ export const api = {
     return request<PublicCaregiver[]>('/caregivers?q=' + encodeURIComponent(q));
   },
 
-  listUsers() {
-    return request<PublicStaff[]>('/users');
+  /**
+   * `role` filtra en el servidor. Sin él el backend devuelve pacientes y
+   * cuidadores también, que el panel descarta en el navegador.
+   */
+  listUsers(role?: string) {
+    return request<PublicStaff[]>(withQuery('/users', { role }));
   },
 
   getUser(id: string) {
@@ -464,5 +488,9 @@ export const api = {
     return request<PublicReminder[]>(
       withQuery(`/patients/${patientId}/reminders`, { windowDays }),
     );
+  },
+
+  getPatientIpcp(patientId: string) {
+    return request<PublicIpcp>(`/patients/${patientId}/ipcp`);
   },
 };

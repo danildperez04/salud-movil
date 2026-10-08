@@ -3,12 +3,12 @@ import { Link, useParams } from "react-router";
 import { ArrowLeft, FileText, Pencil, Phone } from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa6";
 import { api, ApiError } from "../../lib/api";
-import { getMockIpcp } from "../../lib/ipcp";
 import type { PublicCaregiverLink, PublicPatient } from "../../types";
 import { Alert } from "../../components/ui/Alert";
 import { getButtonClassName } from "../../components/ui/buttonStyles";
 import { PatientOverviewCard } from "./patient-detail/PatientOverviewCard";
 import { HealthIndicatorsCard } from "./patient-detail/HealthIndicatorsCard";
+import { IpcpCard } from "./patient-detail/IpcpCard";
 import { AppointmentsPanel } from "./patient-detail/AppointmentsPanel";
 import { MedicationsPanel } from "./patient-detail/MedicationsPanel";
 import { CaregiverSummaryCard } from "./patient-detail/CaregiverSummaryCard";
@@ -84,11 +84,6 @@ export default function PatientDetail() {
     );
   }
 
-  // MOCK: el IPCP real todavía no existe en el backend (ver lib/ipcp.ts). El
-  // módulo del índice es el Bloque 2.D del plan; hasta entonces la tarjeta de
-  // resumen usa el hash provisional.
-  const ipcp = getMockIpcp(patient.id);
-
   return (
     <div className="flex flex-col gap-6">
       <div>
@@ -146,7 +141,8 @@ export default function PatientDetail() {
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.4fr_1fr]">
         <div className="flex flex-col gap-6">
-          <PatientOverviewCard patient={patient} ipcp={ipcp} />
+          <PatientOverviewCard patient={patient} />
+          <IpcpCard patientId={patient.id} />
           <HealthIndicatorsCard patientId={patient.id} />
           <AppointmentsPanel
             patientId={patient.id}

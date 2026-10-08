@@ -149,7 +149,7 @@ Sin este paso, el navegador bloquea las peticiones del panel con errores de CORS
 
 | Tema | Situación actual | Recomendación |
 |---|---|---|
-| Esquema de BD | `synchronize: true` crea/altera tablas al arrancar | **Pendiente y bloqueante del despliegue de las bandas clínicas** (`clinical_range_band`). Revisar el diff de esquema o migrar antes de desplegar |
+| Esquema de BD | `synchronize: false`. El esquema lo crean las migraciones (`src/database/migrations/`), no el arranque | **Resuelto el 5-oct-2026.** Antes de desplegar: aplicar `pnpm migration:run` contra la base de producción (§4). Si la base nació de `synchronize`, sus tablas ya están y la migración fallará: recrearla con `scripts/migration-baseline.sh` contra una base vacía |
 | Logging SQL | Solo fuera de producción: `logging` depende de `NODE_ENV` y el seed no imprime contraseñas cuando es `production` | **Resuelto.** Configurar `NODE_ENV=production` en Render |
 | Usuario admin | El seed crea `admin@saludmovil.com` / `Admin123!` | Cambiar la contraseña inmediatamente después del primer despliegue |
 | `JWT_SECRET` | Debe ser aleatorio y exclusivo de producción | `openssl rand -base64 48`; rotar ante cualquier sospecha |
@@ -166,11 +166,23 @@ Sin este paso, el navegador bloquea las peticiones del panel con errores de CORS
 > existen. Mientras no haya servicio de correo, el token se registra **únicamente
 > fuera de producción**.
 
+### Migrar la base antes del primer arranque
+
+Con `synchronize: false`, si la base no tiene el esquema la API arranca igual y
+falla en la primera consulta. Hay que migrar **antes**:
+
+```bash
+cd api
+DB_HOST=... DB_USER=... DB_PASSWORD=... DB_NAME=... pnpm run migration:run
+```
+
 ## 8. Checklist post-despliegue
 
 - [ ] `POST /auth/login` con admin responde `accessToken`.
 - [ ] `POST /auth/login` con personal de salud responde `accessToken`.
 - [ ] `GET /catalogues/departments` con token devuelve los 17 departamentos.
+- [ ] `GET /patients/:id/ipcp` con token devuelve `score` y `level`.
+- [ ] La tabla `migrations` de producción registra `InitialSchema`.
 - [ ] El panel web carga y el login funciona desde el navegador (sin errores de CORS en consola).
 - [ ] Crear y editar un paciente desde el panel persiste en Supabase.
 - [ ] La contraseña del admin fue cambiada.
