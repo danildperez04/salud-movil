@@ -30,10 +30,6 @@ import type {
   Severity,
 } from './ipcp-model';
 import { INDICATOR_TYPES } from './ipcp-model';
-import { IPCP_QUESTION_IDS, IPCP_RED_FLAGS, type IpcpAnswers } from './ipcp-questions';
-
-// Lo usa el cuestionario hasta que se reemplace por el cálculo automático.
-export type { IpcpLevel };
 
 export const MAX_SCORE = 100;
 
@@ -364,25 +360,4 @@ export function computeIpcp(snapshot: IpcpSnapshot): IpcpResult {
     trend: trend.trend,
     floorApplied,
   };
-}
-
-// --- Cuestionario (se elimina al pasar al cálculo automático) --------------
-
-const SCALE_MAX = 5;
-/** Una señal de alerta por encima de este valor suma puntos extra. */
-const RED_FLAG_FLOOR = 3;
-const RED_FLAG_WEIGHT = 8;
-
-/**
- * Promedio de las respuestas llevado a 0-100, más un extra por la señal de
- * alerta más alta (dificultad para respirar, dolor de pecho, desmayo).
- */
-export function calculateIpcpScore(answers: IpcpAnswers): number {
-  const total = IPCP_QUESTION_IDS.reduce((sum, id) => sum + answers[id], 0);
-  const average = total / IPCP_QUESTION_IDS.length;
-
-  const worstRedFlag = Math.max(...IPCP_RED_FLAGS.map((id) => answers[id]));
-  const boost = Math.max(0, worstRedFlag - RED_FLAG_FLOOR) * RED_FLAG_WEIGHT;
-
-  return Math.min(MAX_SCORE, Math.round((average / SCALE_MAX) * MAX_SCORE + boost));
 }

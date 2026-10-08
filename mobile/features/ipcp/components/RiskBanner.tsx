@@ -2,13 +2,13 @@
 import { View } from 'react-native';
 import { Text } from '@/components/ui/text';
 import { IPCP_LABELS } from '@/constants/labels';
-import type { IpcpResult } from '../api/mock-ipcp';
+import type { ReadyIpcpReport } from '../api/mock-ipcp';
 import { LEVEL_VISUALS, withAlpha } from './ipcp-visuals';
 
 const labels = IPCP_LABELS.result;
 
 type RiskBannerProps = {
-  result: IpcpResult;
+  result: ReadyIpcpReport;
 };
 
 /** Aviso con el color del nivel: qué hacer ahora según el riesgo. */
