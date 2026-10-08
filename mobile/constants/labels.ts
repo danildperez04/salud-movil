@@ -1035,7 +1035,7 @@ export const MORE_LABELS = {
   ipcp: {
     title: 'IPCP · Mi prioridad',
     description: 'Evaluación ampliada de síntomas, evolución y señales de alerta.',
-    cta: 'Evaluación IPCP',
+    cta: 'Realizar evaluación',
   },
   sections: {
     health: 'Salud y seguimiento',
@@ -1069,6 +1069,142 @@ export const MORE_LABELS = {
     privacy: { title: 'Privacidad y seguridad', subtitle: 'Acceso y protección de datos' },
     emergency: { title: 'Modo emergencia', subtitle: 'Información médica, contactos y ubicación' },
     support: { title: 'Ayuda y soporte', subtitle: 'Preguntas frecuentes y contacto' },
+  },
+} as const;
+
+// IPCP · Mi prioridad: evaluación de 10 preguntas y resultado
+export const IPCP_LABELS = {
+  assessment: {
+    introTitle: 'Evaluación ampliada de prioridad',
+    introDescription:
+      'Responde 10 preguntas sobre intensidad, evolución, respiración, dolor, fiebre, hidratación y condiciones previas. Es una herramienta de priorización: no diagnostica ni sustituye la valoración de un profesional de salud.',
+    progress: (answered: number, total: number) => `${answered} de ${total} respondidas`,
+    progressDone: 'Listo: ya puedes ver tu prioridad',
+    redFlag: 'Señal de alerta',
+    noticeTitle: 'Señales importantes',
+    noticeMessage:
+      'Si tienes una emergencia real, no dependas de esta evaluación: busca atención inmediata por los canales disponibles en tu zona.',
+    submit: 'Ver mi prioridad',
+    submitError: 'No se pudo calcular tu prioridad. Intenta de nuevo.',
+    questionA11y: (position: number, total: number, title: string) =>
+      `Pregunta ${position} de ${total}: ${title}`,
+    optionA11y: (value: number, meaning?: string) =>
+      meaning ? `${value} de 5, ${meaning}` : `${value} de 5`,
+    questions: {
+      intensity: {
+        title: '¿Qué tan intensos son tus síntomas?',
+        low: 'Muy leves',
+        high: 'Muy intensos',
+      },
+      worsening: {
+        title: '¿Tus síntomas han empeorado rápidamente?',
+        low: 'No han cambiado',
+        high: 'Empeoran con rapidez',
+      },
+      breathing: {
+        title: '¿Tienes dificultad para respirar?',
+        low: 'Ninguna',
+        high: 'Dificultad severa',
+      },
+      chestPain: {
+        title: '¿Tienes dolor fuerte en el pecho, desmayo o confusión?',
+        low: 'Nada',
+        high: 'Presente o muy marcado',
+      },
+      pain: {
+        title: '¿Qué tan fuerte es tu dolor o malestar general?',
+        low: 'Mínimo',
+        high: 'Muy fuerte',
+      },
+      fever: {
+        title: '¿Tienes fiebre o escalofríos persistentes?',
+        low: 'No',
+        high: 'Fiebre alta o persistente',
+      },
+      hydration: {
+        title: '¿Puedes comer, beber líquidos y mantenerte hidratado?',
+        low: 'Sin problema',
+        high: 'Casi no puedo hacerlo',
+      },
+      activities: {
+        title: '¿Los síntomas te impiden caminar, dormir o hacer actividades normales?',
+        low: 'Nada',
+        high: 'Completamente',
+      },
+      chronic: {
+        title: '¿Tienes una condición crónica que pueda complicar el cuadro?',
+        low: 'No',
+        high: 'Sí y está descompensada',
+      },
+      concern: {
+        title: '¿Te preocupa que algo sea diferente a lo habitual en tu salud?',
+        low: 'Poco',
+        high: 'Mucho',
+      },
+    },
+  },
+  result: {
+    riskTitle: 'Nivel de riesgo',
+    outOf: '/100',
+    scoreA11y: (score: number, level: string) => `Puntaje ${score} de 100, ${level}`,
+    takenAt: (date: string, time: string) => `Evaluación del ${date} · ${time}`,
+    alertSent: 'Ya se mandó una alerta a tu hospital de confianza y cuidador.',
+    meaningTitle: '¿Qué significa?',
+    recommendationsTitle: 'Recomendaciones para ti',
+    disclaimer:
+      'El IPCP es una herramienta de priorización y apoyo al seguimiento: no diagnostica ni sustituye la valoración de tu médico.',
+    repeat: 'Repetir evaluación',
+    empty: {
+      title: 'Aún no tienes una evaluación',
+      description: 'Responde las 10 preguntas para conocer tu nivel de prioridad.',
+      action: 'Realizar evaluación',
+    },
+    levels: {
+      low: {
+        badge: 'Riesgo bajo',
+        summary: 'Tu resultado indica un bajo nivel de riesgo. ¡Sigue así con tus buenos hábitos!',
+        bannerTitle: 'Todo en orden',
+        bannerText:
+          'Tu nivel de riesgo es bajo. Continúa con tus hábitos saludables y asiste a tus controles de rutina para mantenerte así.',
+        meaning:
+          'Tus indicadores están en buen rango. Mantén tus hábitos saludables y acude a tus controles de rutina.',
+        recommendations: [
+          'Mantén una rutina de ejercicio regular y alimentación equilibrada.',
+          'Acude a tus controles médicos de rutina según el calendario.',
+          'Consulta a tu médico si notas algún cambio inusual en tu salud.',
+        ],
+      },
+      moderate: {
+        badge: 'Riesgo moderado',
+        summary:
+          'Tu resultado indica un riesgo moderado. Es importante mantener tus controles médicos al día.',
+        bannerTitle: 'Atención moderada',
+        bannerText:
+          'Tu nivel de riesgo es moderado. Mantén un seguimiento regular con tu médico y sigue las recomendaciones para evitar que aumente.',
+        meaning:
+          'Algunos indicadores muestran valores que requieren atención. Con los cuidados adecuados puedes mejorar tu estado de salud.',
+        recommendations: [
+          'Agenda tu próxima cita médica y no la pospongas.',
+          'Sigue una alimentación balanceada y mantente activo.',
+          'Toma tus medicamentos según las indicaciones de tu médico.',
+        ],
+      },
+      high: {
+        badge: 'Riesgo alto',
+        summary:
+          'Tu resultado indica una prioridad inmediata para revisión médica y seguimiento cercano.',
+        bannerTitle: 'Atención inmediata',
+        bannerText:
+          'Tu nivel de riesgo es muy alto, requiere atención inmediata y seguimiento médico cercano.',
+        meaning:
+          'Presenta varios factores que pueden afectar tu salud. Es muy importante que sigas las recomendaciones y acudas a tus controles médicos lo antes posible.',
+        recommendations: [
+          'Mantente a la espera de tu cuidador y sigue sus instrucciones.',
+          'Monitorea tus indicadores y estate al pendiente de cualquier cambio.',
+          'No faltes a tus citas médicas y sigue el tratamiento al pie de la letra.',
+        ],
+      },
+    },
   },
 } as const;
 

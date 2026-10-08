@@ -44,7 +44,7 @@ export function Hero() {
               <span key={point} className="flex items-center gap-1.75">
                 <b className="grid h-4.75 w-4.75 place-items-center rounded-full bg-mint-soft text-[11px] font-black text-mint-dark">
                   ✓
-                </b>{" "}
+                </b>
                 {point}
               </span>
             ))}

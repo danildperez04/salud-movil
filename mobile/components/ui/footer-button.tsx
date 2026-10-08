@@ -9,13 +9,20 @@ type FooterButtonProps = {
   onPress: () => void;
   /** muestra un spinner en vez del texto y bloquea el botón */
   isPending?: boolean;
+  /** bloquea el botón sin cambiar su contenido (ej. formulario incompleto) */
+  disabled?: boolean;
 };
 
 /** Botón principal fijo al pie de una pantalla (guardar, agregar, subir…). */
-export function FooterButton({ label, onPress, isPending = false }: FooterButtonProps) {
+export function FooterButton({
+  label,
+  onPress,
+  isPending = false,
+  disabled = false,
+}: FooterButtonProps) {
   return (
     <View className="px-6 pt-2 pb-8">
-      <Button size="lg" className="h-14" onPress={onPress} disabled={isPending}>
+      <Button size="lg" className="h-14" onPress={onPress} disabled={isPending || disabled}>
         {isPending ? (
           <Spinner size="sm" color="#FFFFFF" />
         ) : (
