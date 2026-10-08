@@ -22,6 +22,8 @@ export type AuthSlice = {
   hasHydrated: boolean;
   authNotice: string | null;
   setSession: (session: AuthResponse) => void;
+  /** Mezcla campos en el usuario de la sesión (ej. tras activar/desactivar el 2FA). */
+  updateUser: (patch: Partial<PublicUser>) => void;
   setAccessToken: (token: string | null) => void;
   logout: (reason?: LogoutReason) => void;
   clearAuthNotice: () => void;

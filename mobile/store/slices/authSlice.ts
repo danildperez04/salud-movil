@@ -27,6 +27,8 @@ export const createAuthSlice: StateCreator<AuthSlice> = (set) => ({
     });
   },
 
+  updateUser: (patch) => set((state) => (state.user ? { user: { ...state.user, ...patch } } : {})),
+
   setAccessToken: (token: string | null) => set({ accessToken: token }),
 
   logout: (reason: LogoutReason = 'user') => {
