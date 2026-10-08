@@ -18,8 +18,9 @@ const labels = SECURITY_LABELS.twoFactor;
 export default function TwoFactorSettingsScreen() {
   const status = useTwoFactorStatus();
   const sessionValue = useAppStore((state) => state.user?.twoFactorEnabled);
-  // la sesión guardada puede ser anterior al 2FA (sin el campo): manda lo que diga la API
-  const enabled = status.data?.twoFactorEnabled ?? sessionValue;
+  // El usuario de la sesión se mantiene al día tras activar/desactivar y al consultar /auth/me;
+  // si la sesión guardada es anterior al 2FA (sin el campo), vale lo que responda la API.
+  const enabled = sessionValue ?? status.data?.twoFactorEnabled;
 
   if (enabled === undefined) {
     return (

@@ -1,5 +1,5 @@
 // features/security/hooks/useTwoFactorSettings.ts
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { apiClient, ApiError } from '@/lib/api-client';
 import { useAppStore } from '@/store';
 import type { PublicUser, TwoFactorTicket } from '@/types/auth';
@@ -22,8 +22,14 @@ export function useTwoFactorStatus() {
 
 /** Envía un código al usuario (se vuelve a llamar para "reenviar"). */
 export function useRequestTwoFactorCode() {
+  const queryClient = useQueryClient();
+
   return useMutation<TwoFactorTicket, ApiError>({
     mutationFn: () => apiClient.post<TwoFactorTicket>('/auth/2fa/enable'),
+    // 409: ya estaba activo (otra sesión lo activó); se vuelve a consultar el estado
+    onError: (error) => {
+      if (error.status === 409) queryClient.invalidateQueries({ queryKey: ['auth', 'me'] });
+    },
   });
 }
 

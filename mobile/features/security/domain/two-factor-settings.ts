@@ -22,9 +22,11 @@ export function enableErrorMessage(error: ErrorLike): string {
   return error.message;
 }
 
-/** Pedir (o reenviar) el código: solo el 429 tiene un mensaje propio. */
+/** Pedir (o reenviar) el código: 409 si el 2FA ya estaba activo, 429 por exceso de pedidos. */
 export function requestCodeErrorMessage(error: ErrorLike): string {
-  return error.status === 429 ? errors.tooManyRequests : SECURITY_LABELS.twoFactor.enableError;
+  if (error.status === 409) return errors.alreadyEnabled;
+  if (error.status === 429) return errors.tooManyRequests;
+  return SECURITY_LABELS.twoFactor.enableError;
 }
 
 export function disableErrorMessage(error: ErrorLike): string {

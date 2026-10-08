@@ -747,6 +747,7 @@ export const SECURITY_LABELS = {
     errors: {
       passwordRequired: 'Ingresá tu contraseña',
       wrongCode: 'El código es incorrecto o ya venció. Revisalo o pedí uno nuevo.',
+      alreadyEnabled: 'La verificación en dos pasos ya está activa.',
       wrongPassword: 'La contraseña es incorrecta.',
       tooManyRequests: 'Hiciste demasiados intentos. Esperá un momento y probá de nuevo.',
     },

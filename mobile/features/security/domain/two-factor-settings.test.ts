@@ -29,7 +29,8 @@ describe('enableErrorMessage', () => {
 });
 
 describe('requestCodeErrorMessage', () => {
-  it('429 es demasiados intentos; el resto, el error genérico', () => {
+  it('409 ya activo, 429 demasiados intentos; el resto, el error genérico', () => {
+    assert.equal(requestCodeErrorMessage({ status: 409, message: 'x' }), errors.alreadyEnabled);
     assert.equal(requestCodeErrorMessage({ status: 429, message: 'x' }), errors.tooManyRequests);
     assert.equal(
       requestCodeErrorMessage({ status: 500, message: 'x' }),
