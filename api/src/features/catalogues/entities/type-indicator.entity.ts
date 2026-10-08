@@ -5,7 +5,8 @@ export class TypeIndicator {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column({ length: 255 })
+  // Único: la unidad acompaña al dato, pero no identifica el tipo de indicador.
+  @Column({ length: 255, unique: true })
   name!: string;
 
   @Column({ name: 'measurement_unit', length: 255 })

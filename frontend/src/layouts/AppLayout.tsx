@@ -23,7 +23,11 @@ export default function AppLayout() {
       <Sidebar />
       <div className="flex min-w-0 flex-1 flex-col">
         <header className="flex items-center justify-between border-b border-line bg-white px-6 py-3">
-          <div className="flex items-center gap-3">
+          <Link
+            to="/app/perfil"
+            className="flex items-center gap-3 rounded-lg px-2 py-1 transition hover:bg-surface"
+            aria-label="Mi perfil"
+          >
             <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-mint-soft font-display text-sm font-semibold text-primary-dark">
               {getInitials(user?.name)}
             </span>
@@ -35,7 +39,7 @@ export default function AppLayout() {
                 {roleLabel} · Salud Móvil
               </p>
             </div>
-          </div>
+          </Link>
 
           <div className="flex items-center gap-2">
             <Link

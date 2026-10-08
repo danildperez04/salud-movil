@@ -118,8 +118,11 @@ export class UsersService {
     return this.toPublicUser(user);
   }
 
-  async findAll(): Promise<PublicUser[]> {
+  async findAll(role?: string): Promise<PublicUser[]> {
     const users = await this.userRepository.find({
+      // Sin el filtro, el panel recibía también pacientes y cuidadores para
+      // descartarlos en el navegador.
+      where: role ? { role: { code: role } } : undefined,
       relations: {
         role: true,
         municipality: true,

@@ -436,3 +436,48 @@ export interface PublicDashboardStats {
   attention: PublicPatientAttention[];
   generatedAt: string;
 }
+
+// === IPCP (Índice Prioritario de Control de Pacientes) ===
+//
+// Los pesos, cortes y umbrales son PROVISIONALES, pendientes de validación
+// médica. El índice es una regla determinista y explicable, no IA, y no
+// diagnostica: prioriza y apoya el seguimiento.
+
+export type IpcpLevel = "low" | "moderate" | "high";
+
+export type IpcpComponentKey =
+  | "indicatorDeviation"
+  | "adherence"
+  | "appointmentControl"
+  | "trend";
+
+export interface IpcpIndicatorDetail {
+  typeIndicatorId: number;
+  typeIndicatorName: string;
+  value: number;
+  valueSecondary: number | null;
+  severity: IndicatorSeverity;
+  band: string;
+}
+
+export interface IpcpComponent {
+  key: IpcpComponentKey;
+  label: string;
+  /** `null` cuando la variable no tiene datos y no puntúa. */
+  score: number | null;
+  weight: number;
+  /** Peso aplicado tras renormalizar; menor que `weight` si algo no puntuó. */
+  effectiveWeight: number;
+  unavailableReason: string | null;
+  detail: string;
+  indicators?: IpcpIndicatorDetail[];
+}
+
+export interface PublicIpcp {
+  score: number;
+  level: IpcpLevel;
+  components: IpcpComponent[];
+  exclusions: string[];
+  computedFrom: string | null;
+  generatedAt: string;
+}

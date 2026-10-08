@@ -1,19 +1,13 @@
 import type { PublicPatient } from "../../../types";
-import type { IpcpMock } from "../../../lib/ipcp";
 import { Card } from "../../../components/ui/Card";
-import { IpcpBadge } from "../../../components/patients/IpcpBadge";
 import { getInitials } from "../../../lib/initials";
 import { ageOf } from "../../../lib/age";
 
 interface PatientOverviewCardProps {
   patient: PublicPatient;
-  ipcp: IpcpMock;
 }
 
-export function PatientOverviewCard({
-  patient,
-  ipcp,
-}: PatientOverviewCardProps) {
+export function PatientOverviewCard({ patient }: PatientOverviewCardProps) {
   // Antes eran datos mock ("Última evaluación", "Seguimiento"). Ahora la
   // tarjeta absorbe los campos que vivían en la pestaña "Datos" (eliminada),
   // así que ya no hay placeholders: todo viene del paciente real.
@@ -39,12 +33,10 @@ export function PatientOverviewCard({
         <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-mint-soft font-display text-base font-bold text-primary-dark">
           {getInitials(patient.name)}
         </span>
-        <div>
-          <IpcpBadge score={ipcp.score} level={ipcp.level} />
-          {/* El teléfono ya aparece en la grilla de abajo ("Teléfono"), así
-              que aquí solo dejamos el correo para no repetirlo. */}
-          <p className="mt-1 font-body text-xs text-muted">{patient.email}</p>
-        </div>
+        {/* El nombre ya está en el encabezado de la página y el IPCP lo muestra
+            `IpcpCard` con su desglose. Aquí solo el correo: el teléfono está
+            debajo, en la grilla. */}
+        <p className="font-body text-sm text-muted">{patient.email}</p>
       </div>
 
       <div className="mt-5 grid grid-cols-2 gap-4">
