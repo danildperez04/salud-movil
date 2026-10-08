@@ -15,6 +15,8 @@ export type MedicationReminder = {
   days: number[];
   enabled: boolean;
   repeatIfUnconfirmed: boolean;
+  /** ISO 8601: las tomas anteriores a esta fecha no cuentan como pendientes */
+  createdAt: string;
 };
 
 export type AppointmentReminder = {
@@ -29,6 +31,10 @@ export type AppointmentReminder = {
 
 const EVERY_DAY = [0, 1, 2, 3, 4, 5, 6];
 
+// Fechas relativas a hoy para que el historial de tomas del mock siempre cubra las últimas semanas.
+const daysAgoIso = (days: number) =>
+  new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
+
 let medicationReminders: MedicationReminder[] = [
   {
     id: '1',
@@ -37,6 +43,7 @@ let medicationReminders: MedicationReminder[] = [
     days: EVERY_DAY,
     enabled: true,
     repeatIfUnconfirmed: false,
+    createdAt: daysAgoIso(30),
   },
   {
     id: '2',
@@ -45,6 +52,7 @@ let medicationReminders: MedicationReminder[] = [
     days: EVERY_DAY,
     enabled: true,
     repeatIfUnconfirmed: true,
+    createdAt: daysAgoIso(30),
   },
   {
     id: '3',
@@ -53,6 +61,7 @@ let medicationReminders: MedicationReminder[] = [
     days: [0, 1, 2, 3, 4],
     enabled: false,
     repeatIfUnconfirmed: false,
+    createdAt: daysAgoIso(30),
   },
 ];
 
@@ -70,10 +79,16 @@ export async function fetchMockMedicationReminders(): Promise<MedicationReminder
 
 /** Crea el recordatorio si no trae `id`; si lo trae, lo reemplaza. */
 export async function saveMockMedicationReminder(
-  input: Omit<MedicationReminder, 'id'> & { id?: string },
+  input: Omit<MedicationReminder, 'id' | 'createdAt'> & { id?: string },
 ): Promise<MedicationReminder> {
   await delay(300);
-  const record: MedicationReminder = { ...input, id: input.id ?? String(Date.now()) };
+  const existing = medicationReminders.find((r) => r.id === input.id);
+  const record: MedicationReminder = {
+    ...input,
+    id: input.id ?? String(Date.now()),
+    // editar un recordatorio no reinicia desde cuándo se esperan sus tomas
+    createdAt: existing?.createdAt ?? new Date().toISOString(),
+  };
   medicationReminders = input.id
     ? medicationReminders.map((r) => (r.id === input.id ? record : r))
     : [...medicationReminders, record];

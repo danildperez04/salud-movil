@@ -32,7 +32,7 @@ export function DownloadAppSection() {
               Descarga Salud Móvil para Android y lleva tus herramientas de
               seguimiento de salud siempre contigo.
             </p>
-            <Button href="/SaludMovil.apk" className="mt-4" download>
+            <Button href="/dist/salud_movil.apk" className="mt-4" download>
               Descargar para Android
               <Download size={24} />
             </Button>

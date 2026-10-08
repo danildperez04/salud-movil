@@ -263,6 +263,22 @@ export const MEDICATIONS_LABELS = {
     `${active} ${active === 1 ? 'activo' : 'activos'} de ${total}`,
   addButton: 'Agregar medicamento',
   empty: 'Aún no tienes medicamentos registrados',
+  doses: {
+    title: 'Tomas de hoy',
+    progress: (taken: number, total: number) =>
+      `${taken} de ${total} ${total === 1 ? 'confirmada' : 'confirmadas'}`,
+    taken: 'Tomé',
+    skipped: 'Omití',
+    status: {
+      taken: 'Tomada',
+      skipped: 'Omitida',
+      pending: 'Pendiente',
+      unconfirmed: 'Sin confirmar',
+    },
+    a11y: (action: string, drugName: string, dose: string, time: string) =>
+      `${action}: ${drugName} ${dose} de las ${time}`,
+    hint: 'Tu IPCP usa estas confirmaciones para saber qué tan bien sigues tu tratamiento.',
+  },
   scan: {
     title: 'Identificar con la cámara',
     description:
@@ -801,7 +817,7 @@ export const VOICE_ASSISTANT_LABELS = {
     { label: '“Buscar centro de salud”', text: 'Necesito encontrar un centro de salud cercano.' },
   ],
   actionsTitle: 'Acciones sugeridas',
-  priorityAction: { title: 'Evaluar prioridad', subtitle: 'Responder IPCP con apoyo de voz' },
+  priorityAction: { title: 'Ver mi prioridad', subtitle: 'Consultar tu IPCP con apoyo de voz' },
   careAction: { title: 'Buscar atención', subtitle: 'Explorar recursos sanitarios' },
 } as const;
 
@@ -1034,8 +1050,8 @@ export const MORE_LABELS = {
   logout: 'Cerrar sesión',
   ipcp: {
     title: 'IPCP · Mi prioridad',
-    description: 'Evaluación ampliada de síntomas, evolución y señales de alerta.',
-    cta: 'Evaluación IPCP',
+    description: 'Tu nivel de prioridad, calculado con tus indicadores, medicamentos y citas.',
+    cta: 'Ver mi prioridad',
   },
   sections: {
     health: 'Salud y seguimiento',
@@ -1069,6 +1085,116 @@ export const MORE_LABELS = {
     privacy: { title: 'Privacidad y seguridad', subtitle: 'Acceso y protección de datos' },
     emergency: { title: 'Modo emergencia', subtitle: 'Información médica, contactos y ubicación' },
     support: { title: 'Ayuda y soporte', subtitle: 'Preguntas frecuentes y contacto' },
+  },
+} as const;
+
+// IPCP · Mi prioridad: resultado calculado automáticamente con los datos de la app
+export const IPCP_LABELS = {
+  result: {
+    riskTitle: 'Nivel de riesgo',
+    outOf: '/100',
+    scoreA11y: (score: number, level: string) => `Puntaje ${score} de 100, ${level}`,
+    updatedAt: (date: string, time: string) => `Actualizado el ${date} · ${time}`,
+    alertSent: 'Ya se mandó una alerta a tu hospital de confianza y cuidador.',
+    meaningTitle: '¿Qué significa?',
+    recommendationsTitle: 'Recomendaciones para ti',
+    disclaimer:
+      'El IPCP es una herramienta de priorización y apoyo al seguimiento: no diagnostica ni sustituye la valoración de tu médico.',
+    emergencyNotice: {
+      title: 'Señales de alarma',
+      message:
+        'El IPCP solo usa los datos que registras en la app y no conoce tus síntomas. Si tienes dolor de pecho, falta de aire, desmayo o confusión, busca atención de emergencia sin esperar este resultado.',
+    },
+    driversTitle: '¿Qué influye en tu resultado?',
+    noDrivers:
+      'No hay nada preocupante en tus datos recientes. Sigue registrando tus indicadores y confirmando tus tomas.',
+    indicators: {
+      bloodPressure: 'presión arterial',
+      glucose: 'glucosa',
+      temperature: 'temperatura',
+    },
+    drivers: {
+      criticalReading: (indicator: string) =>
+        `Tu ${indicator} tuvo una lectura crítica en las últimas 48 horas.`,
+      elevatedReadings: (indicator: string) =>
+        `Tus lecturas de ${indicator} han estado fuera de rango.`,
+      lowAdherence: (percent: number) =>
+        `Confirmaste el ${percent} % de tus tomas de medicamento en los últimos 14 días.`,
+      worseningTrend: (indicator: string) => `Tu ${indicator} empeoró frente a la semana anterior.`,
+      monitoringLapse: (days: number, indicator: string) =>
+        `Llevas ${days} ${days === 1 ? 'día' : 'días'} sin registrar tu ${indicator}.`,
+      neverRecorded: (indicator: string) => `Aún no has registrado tu ${indicator}.`,
+      missedAppointments: (count: number) =>
+        `Faltaste a ${count} ${count === 1 ? 'cita' : 'citas'} en los últimos 3 meses.`,
+    },
+    trend: {
+      worsening: 'Tus indicadores empeoraron frente a la semana anterior.',
+      stable: 'Tus indicadores se mantienen estables frente a la semana anterior.',
+      improving: 'Tus indicadores mejoraron frente a la semana anterior.',
+    },
+    coverage: (percent: number) =>
+      `Calculado con el ${percent} % de la información posible. Mientras más registres, más preciso será.`,
+    error: {
+      title: 'No se pudo calcular tu prioridad',
+      description: 'Revisa tu conexión e intenta de nuevo.',
+    },
+    insufficient: {
+      title: 'Aún no hay datos suficientes',
+      description:
+        'Tu IPCP se calcula solo, con lo que registras en la app. Registra tus indicadores y confirma tus tomas durante unos días para verlo.',
+      missingTitle: 'Para calcularlo necesitamos',
+      missing: {
+        clinical: 'Registrar tu presión, glucosa o temperatura',
+        adherence: 'Confirmar tus tomas con “Tomé” u “Omití”',
+      },
+      action: 'Registrar un indicador',
+    },
+    levels: {
+      low: {
+        badge: 'Riesgo bajo',
+        summary: 'Tu resultado indica un bajo nivel de riesgo. ¡Sigue así con tus buenos hábitos!',
+        bannerTitle: 'Todo en orden',
+        bannerText:
+          'Tu nivel de riesgo es bajo. Continúa con tus hábitos saludables y asiste a tus controles de rutina para mantenerte así.',
+        meaning:
+          'Tus indicadores están en buen rango. Mantén tus hábitos saludables y acude a tus controles de rutina.',
+        recommendations: [
+          'Mantén una rutina de ejercicio regular y alimentación equilibrada.',
+          'Acude a tus controles médicos de rutina según el calendario.',
+          'Consulta a tu médico si notas algún cambio inusual en tu salud.',
+        ],
+      },
+      moderate: {
+        badge: 'Riesgo moderado',
+        summary:
+          'Tu resultado indica un riesgo moderado. Es importante mantener tus controles médicos al día.',
+        bannerTitle: 'Atención moderada',
+        bannerText:
+          'Tu nivel de riesgo es moderado. Mantén un seguimiento regular con tu médico y sigue las recomendaciones para evitar que aumente.',
+        meaning:
+          'Algunos indicadores muestran valores que requieren atención. Con los cuidados adecuados puedes mejorar tu estado de salud.',
+        recommendations: [
+          'Agenda tu próxima cita médica y no la pospongas.',
+          'Sigue una alimentación balanceada y mantente activo.',
+          'Toma tus medicamentos según las indicaciones de tu médico.',
+        ],
+      },
+      high: {
+        badge: 'Riesgo alto',
+        summary:
+          'Tu resultado indica una prioridad inmediata para revisión médica y seguimiento cercano.',
+        bannerTitle: 'Atención inmediata',
+        bannerText:
+          'Tu nivel de riesgo es muy alto, requiere atención inmediata y seguimiento médico cercano.',
+        meaning:
+          'Presenta varios factores que pueden afectar tu salud. Es muy importante que sigas las recomendaciones y acudas a tus controles médicos lo antes posible.',
+        recommendations: [
+          'Mantente a la espera de tu cuidador y sigue sus instrucciones.',
+          'Monitorea tus indicadores y estate al pendiente de cualquier cambio.',
+          'No faltes a tus citas médicas y sigue el tratamiento al pie de la letra.',
+        ],
+      },
+    },
   },
 } as const;
 

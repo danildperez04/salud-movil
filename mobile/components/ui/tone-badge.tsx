@@ -1,4 +1,5 @@
 // components/ui/tone-badge.tsx
+import type { LucideIcon } from 'lucide-react-native';
 import { Badge } from '@/components/ui/badge';
 import { Text } from '@/components/ui/text';
 
@@ -10,16 +11,19 @@ type ToneBadgeProps = {
   label: string;
   /** color base (hex de 6 dígitos): se usa para el texto y, atenuado, para el fondo y el borde */
   color: string;
+  /** ícono opcional a la izquierda del texto */
+  icon?: LucideIcon;
 };
 
 /** Píldora de estado (Normal, Revisar, Severa…) con el color de su estado. */
-export function ToneBadge({ label, color }: ToneBadgeProps) {
+export function ToneBadge({ label, color, icon: Icon }: ToneBadgeProps) {
   return (
     <Badge
       variant="outline"
       className="px-3 py-1.5"
       style={{ backgroundColor: color + FILL_ALPHA, borderColor: color + BORDER_ALPHA }}
     >
+      {Icon && <Icon size={14} color={color} />}
       <Text className="text-caption font-body-semibold" style={{ color }}>
         {label}
       </Text>
