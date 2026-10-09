@@ -26,6 +26,7 @@ import type {
   PublicPatient,
   PublicPatientLink,
   PublicReminder,
+  PublicRelease,
   PublicStaff,
   TwoFactorChallengeInfo,
   UpdateAppointmentPayload,
@@ -40,6 +41,11 @@ import type {
 
 const API_URL =
   (import.meta.env.VITE_API_URL as string | undefined) ?? 'http://localhost:3000';
+
+/** Enlace absoluto de descarga a partir del `downloadPath` que devuelve la API. */
+export function releaseDownloadUrl(downloadPath: string): string {
+  return `${API_URL}${downloadPath}`;
+}
 
 let tokenGetter: () => string | null = () => null;
 let unauthorizedHandler: () => void = () => {};
@@ -532,5 +538,12 @@ export const api = {
 
   getPatientIpcp(patientId: string) {
     return request<PublicIpcp>(`/patients/${patientId}/ipcp`);
+  },
+
+  // --- Instaladores (públicos) ---
+
+  /** Última versión publicada de cada plataforma que ya tiene instalable. */
+  getLatestReleases() {
+    return request<PublicRelease[]>('/releases/latest');
   },
 };
