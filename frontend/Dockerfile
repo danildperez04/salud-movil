@@ -34,8 +34,10 @@ FROM nginxinc/nginx-unprivileged:1.27-alpine AS runtime
 # Valores por defecto; se pueden sobrescribir en runtime con `-e`.
 #   API_UPSTREAM  URL interna del API (sin barra final).
 #   DNS_RESOLVER  Resolver de DNS para resolver API_UPSTREAM (Docker: 127.0.0.11).
+#   RELEASE_MAX_MB  Tamaño máximo (MB) al subir un instalable; igual que en el API.
 ENV API_UPSTREAM=http://api:3000 \
-    DNS_RESOLVER=127.0.0.11
+    DNS_RESOLVER=127.0.0.11 \
+    RELEASE_MAX_MB=500
 
 COPY nginx/snippets/ /etc/nginx/snippets/
 COPY nginx/default.conf.template /etc/nginx/templates/default.conf.template
