@@ -1,4 +1,5 @@
 import { IsIn, IsOptional, IsString } from 'class-validator';
+import { ApiPropertyOptional } from '@nestjs/swagger';
 
 /**
  * Filtro de `GET /users`.
@@ -10,6 +11,10 @@ import { IsIn, IsOptional, IsString } from 'class-validator';
  */
 export class ListUsersQueryDto {
   /** Código de `cat_role.code`. */
+  @ApiPropertyOptional({
+    description: 'Filtrar por código de rol',
+    enum: ['admin', 'health_staff', 'patient', 'caregiver'],
+  })
   @IsOptional()
   @IsString()
   @IsIn(['admin', 'health_staff', 'patient', 'caregiver'])

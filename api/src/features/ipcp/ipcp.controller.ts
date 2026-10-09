@@ -1,4 +1,10 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { IpcpService } from './ipcp.service';
 import { IpcpBatchQueryDto } from './dto/ipcp-batch-query.dto';
 import { Roles } from '../../common/decorators/roles.decorator';
@@ -18,6 +24,8 @@ import type { JwtPayload } from '../../common/guards/jwt-payload.interface';
  * en `AppModule` (ahí está comentado). El e2e `test/ipcp.e2e-spec.ts` bloquea
  * esa regresión.
  */
+@ApiTags('ipcp')
+@ApiBearerAuth()
 @Controller('patients')
 export class IpcpController {
   constructor(private readonly ipcpService: IpcpService) {}
@@ -25,6 +33,9 @@ export class IpcpController {
   /** IPCP del propio paciente (HU-34; la pantalla es de jarey). */
   @Get('me/ipcp')
   @Roles('patient')
+  @ApiOperation({ summary: 'Obtener el IPCP del paciente autenticado' })
+  @ApiResponse({ status: 200, description: 'Datos IPCP del propio paciente.' })
+  @ApiResponse({ status: 404, description: 'Paciente no encontrado.' })
   forSelf(@CurrentUser() currentUser: JwtPayload) {
     return this.ipcpService.forSelf(currentUser);
   }
@@ -32,6 +43,13 @@ export class IpcpController {
   /** Listado paginado de IPCP con filtros (HU-32, HU-33). */
   @Get('ipcp')
   @Roles('admin', 'health_staff')
+  @ApiOperation({
+    summary: 'Listar IPCP con filtros y paginación (admin o personal de salud)',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Listado paginado de IPCP con filtros aplicados.',
+  })
   getBatch(
     @CurrentUser() currentUser: JwtPayload,
     @Query() query: IpcpBatchQueryDto,
@@ -42,6 +60,12 @@ export class IpcpController {
   /** IPCP de un paciente (HU-32, HU-33). */
   @Get(':id/ipcp')
   @Roles('admin', 'health_staff')
+  @ApiOperation({
+    summary:
+      'Obtener el IPCP de un paciente específico (admin o personal de salud)',
+  })
+  @ApiResponse({ status: 200, description: 'Datos IPCP del paciente.' })
+  @ApiResponse({ status: 404, description: 'Paciente no encontrado.' })
   forPatient(
     @Param('id') patientId: string,
     @CurrentUser() currentUser: JwtPayload,

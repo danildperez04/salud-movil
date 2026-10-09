@@ -8,6 +8,12 @@ import {
   Post,
   Query,
 } from '@nestjs/common';
+import {
+  ApiBearerAuth,
+  ApiOperation,
+  ApiResponse,
+  ApiTags,
+} from '@nestjs/swagger';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
@@ -25,6 +31,8 @@ export interface PublicCaregiver {
   dni: string | null;
 }
 
+@ApiTags('users')
+@ApiBearerAuth()
 @Controller('caregivers')
 @Roles('admin', 'health_staff')
 export class CaregiversController {
@@ -34,6 +42,13 @@ export class CaregiversController {
   ) {}
 
   @Get()
+  @ApiOperation({
+    summary: 'Buscar cuidadores por nombre, email, usuario o DNI',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Listado de cuidadores que coinciden.',
+  })
   async search(@Query('q') q?: string): Promise<PublicCaregiver[]> {
     const query = this.userRepository
       .createQueryBuilder('user')
@@ -62,26 +77,49 @@ export class CaregiversController {
   }
 
   @Get(':id')
+  @ApiOperation({ summary: 'Obtener un cuidador por su ID' })
+  @ApiResponse({ status: 200, description: 'Datos completos del cuidador.' })
+  @ApiResponse({ status: 404, description: 'Cuidador no encontrado.' })
   findOne(@Param('id') id: string) {
     return this.caregiversService.findOne(id);
   }
 
   @Get(':id/patients')
+  @ApiOperation({ summary: 'Listar pacientes vinculados a un cuidador' })
+  @ApiResponse({ status: 200, description: 'Pacientes del cuidador.' })
+  @ApiResponse({ status: 404, description: 'Cuidador no encontrado.' })
   findPatients(@Param('id') id: string) {
     return this.caregiversService.findPatients(id);
   }
 
   @Post()
+  @ApiOperation({
+    summary: 'Crear una cuenta de cuidador (admin o personal de salud)',
+  })
+  @ApiResponse({ status: 201, description: 'Cuenta de cuidador creada.' })
+  @ApiResponse({
+    status: 400,
+    description: 'Datos inválidos o municipio no encontrado.',
+  })
+  @ApiResponse({ status: 409, description: 'Correo, usuario o DNI ya en uso.' })
   create(@Body() dto: CreateCaregiverDto) {
     return this.caregiversService.create(dto);
   }
 
   @Patch(':id')
+  @ApiOperation({ summary: 'Actualizar datos de un cuidador' })
+  @ApiResponse({ status: 200, description: 'Cuidador actualizado.' })
+  @ApiResponse({ status: 400, description: 'Datos inválidos.' })
+  @ApiResponse({ status: 404, description: 'Cuidador no encontrado.' })
+  @ApiResponse({ status: 409, description: 'Correo, usuario o DNI ya en uso.' })
   update(@Param('id') id: string, @Body() dto: UpdateUserDto) {
     return this.caregiversService.update(id, dto);
   }
 
   @Delete(':id')
+  @ApiOperation({ summary: 'Eliminar un cuidador (soft delete)' })
+  @ApiResponse({ status: 200, description: 'Cuidador marcado como eliminado.' })
+  @ApiResponse({ status: 404, description: 'Cuidador no encontrado.' })
   remove(@Param('id') id: string) {
     return this.caregiversService.remove(id);
   }
