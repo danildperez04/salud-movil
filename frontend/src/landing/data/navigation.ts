@@ -8,6 +8,8 @@ export const navLinks = [
   { href: "#descubre", label: "Conoce la app" },
   { href: "#como-funciona", label: "Cómo funciona" },
   { href: "#sobre-nosotros", label: "Sobre nosotros" },
+  // Corto a propósito: la barra ya va llena a 1200px (ver Navbar.tsx).
+  { href: "#demo", label: "Demo" },
 ];
 
 export const footerProductLinks = [
@@ -16,6 +18,7 @@ export const footerProductLinks = [
   { href: "#como-funciona", label: "Cómo funciona" },
   { href: "#prioridad", label: "Mi prioridad" },
   { href: "#descargar", label: "Descargar" },
+  { href: "#demo", label: "Solicitar demo" },
 ];
 
 export const footerExploreLinks = [

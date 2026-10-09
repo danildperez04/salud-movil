@@ -3,6 +3,7 @@ import type {
   CatalogueItem,
   CreateAppointmentPayload,
   CreateCaregiverPayload,
+  CreateDemoRequestPayload,
   CreateHealthIndicatorPayload,
   CreateMedicalVisitPayload,
   CreateMedicationPayload,
@@ -179,6 +180,15 @@ export const api = {
     return request<{ message: string }>('/auth/change-password', {
       method: 'POST',
       body: JSON.stringify({ currentPassword, newPassword }),
+    });
+  },
+
+  // --- Solicitudes de demo (públicas) ---
+
+  createDemoRequest(payload: CreateDemoRequestPayload) {
+    return request<{ message: string }>('/demo-requests', {
+      method: 'POST',
+      body: JSON.stringify(payload),
     });
   },
 

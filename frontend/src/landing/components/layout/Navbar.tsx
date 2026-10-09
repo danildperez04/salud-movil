@@ -46,7 +46,7 @@ export function Navbar() {
 
         <nav
           aria-label="Principal"
-          className="hidden items-center gap-7 min-[1200px]:flex"
+          className="hidden items-center gap-5 min-[1200px]:flex"
         >
           {navLinks.map((link) => {
             const active = activeId === link.href.slice(1);

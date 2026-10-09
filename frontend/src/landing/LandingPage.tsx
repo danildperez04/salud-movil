@@ -11,6 +11,7 @@ import { CtaSection } from "./components/sections/CtaSection";
 import { FaqSection } from "./components/sections/FaqSection";
 import { AboutTeamSection } from "./components/sections/AboutTeamSection";
 import { DownloadAppSection } from "./components/sections/DownloadAppSection";
+import { DemoRequestSection } from "./components/sections/DemoRequestSection";
 import { ComingSoonSection } from "./components/sections/ComingSoonSection";
 
 // El orden de las secciones es el orden de los enlaces en data/navigation.ts.
@@ -29,6 +30,7 @@ export default function LandingPage() {
         <IpcpSection />
         <AboutTeamSection />
         <DownloadAppSection />
+        <DemoRequestSection />
         <CtaSection />
         <FaqSection />
       </main>

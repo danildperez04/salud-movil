@@ -23,6 +23,20 @@ export interface AuthResponse {
   accessToken: string;
 }
 
+// --- Solicitudes de demo (formulario público de la landing) ---
+
+/** Lo que envía el formulario público de la landing. */
+export interface CreateDemoRequestPayload {
+  name: string;
+  email: string;
+  organization: string;
+  jobTitle?: string;
+  phoneNumber?: string;
+  message?: string;
+  /** Señuelo anti-bots: el formulario lo deja siempre vacío. */
+  website?: string;
+}
+
 export interface CatalogueItem {
   id: number;
   name: string;
