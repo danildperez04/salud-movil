@@ -1,8 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { getRepositoryToken } from '@nestjs/typeorm';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { ForbiddenException } from '@nestjs/common';
 import { IpcpService } from './ipcp.service';
 import {
+  IPCP_CACHE_PREFIX,
   IPCP_LEVEL_CUTS,
   IPCP_SEVERITY_SCORE,
   IPCP_WEIGHTS,
@@ -13,10 +15,13 @@ import { Appointment } from '../appointments/entities/appointment.entity';
 import { MedicationReminder } from '../medications/entities/medication-reminder.entity';
 import { MedicationSchedule } from '../medications/entities/medication-schedule.entity';
 import { ClinicalRangeBandsService } from '../catalogues/clinical-range-bands.service';
+import { Patient } from '../users/entities/patient.entity';
+import { User } from '../users/entities/user.entity';
 import type { JwtPayload } from '../../common/guards/jwt-payload.interface';
 
 const PATIENT_ID = 'e89f308f-130d-4e98-8157-d9bdd8ba30f8';
 const staff: JwtPayload = { sub: 'w-1', email: 's@test', role: 'health_staff' };
+const admin: JwtPayload = { sub: 'u-1', email: 'a@test', role: 'admin' };
 
 describe('IpcpService', () => {
   let service: IpcpService;
@@ -35,10 +40,58 @@ describe('IpcpService', () => {
     ...overrides,
   });
 
+  /** Alcance por defecto: el paciente existe y está en el centro del staff. */
+  const patientsServiceMock = (overrides: Record<string, unknown> = {}) => ({
+    findRecordForScope: jest.fn().mockResolvedValue({ id: PATIENT_ID }),
+    findByUserId: jest.fn().mockResolvedValue({ id: PATIENT_ID }),
+    ...overrides,
+  });
+
   const indicatorRepo = { find: jest.fn() };
   const appointmentRepo = { find: jest.fn() };
   const reminderRepo = { find: jest.fn() };
   const scheduleRepo = { find: jest.fn() };
+  const userRepo = { findOne: jest.fn() };
+  const patientRepo = { createQueryBuilder: jest.fn() };
+
+  /** Cache en memoria: sin él el servicio no arranca y no se prueba el acierto. */
+  const cacheStore = new Map<string, unknown>();
+  const cacheProvider = {
+    provide: CACHE_MANAGER,
+    useValue: {
+      get: jest.fn((key: string) => Promise.resolve(cacheStore.get(key))),
+      set: jest.fn((key: string, value: unknown) => {
+        cacheStore.set(key, value);
+        return Promise.resolve(value);
+      }),
+      del: jest.fn((key: string) => {
+        cacheStore.delete(key);
+        return Promise.resolve(true);
+      }),
+    },
+  };
+
+  /** Ruta de entrada de cualquier test: monta el servicio con todos sus deps. */
+  function baseProviders(): unknown[] {
+    return [
+      IpcpService,
+      { provide: getRepositoryToken(HealthIndicator), useValue: indicatorRepo },
+      { provide: getRepositoryToken(Appointment), useValue: appointmentRepo },
+      {
+        provide: getRepositoryToken(MedicationReminder),
+        useValue: reminderRepo,
+      },
+      {
+        provide: getRepositoryToken(MedicationSchedule),
+        useValue: scheduleRepo,
+      },
+      { provide: getRepositoryToken(Patient), useValue: patientRepo },
+      { provide: getRepositoryToken(User), useValue: userRepo },
+      { provide: ClinicalRangeBandsService, useValue: bandsProvider() },
+      { provide: PatientsService, useValue: patientsServiceMock() },
+      cacheProvider,
+    ];
+  }
 
   /** Bandas reales sembradas: glucosa (2) y PA (1) con secundaria. */
   const bands = new Map([
@@ -144,31 +197,11 @@ describe('IpcpService', () => {
   });
 
   beforeEach(async () => {
+    cacheStore.clear();
+    jest.clearAllMocks();
+
     const moduleFixture: TestingModule = await Test.createTestingModule({
-      providers: [
-        IpcpService,
-        {
-          provide: getRepositoryToken(HealthIndicator),
-          useValue: indicatorRepo,
-        },
-        { provide: getRepositoryToken(Appointment), useValue: appointmentRepo },
-        {
-          provide: getRepositoryToken(MedicationReminder),
-          useValue: reminderRepo,
-        },
-        {
-          provide: getRepositoryToken(MedicationSchedule),
-          useValue: scheduleRepo,
-        },
-        { provide: ClinicalRangeBandsService, useValue: bandsProvider() },
-        {
-          provide: PatientsService,
-          useValue: {
-            findRecordForScope: jest.fn().mockResolvedValue({ id: PATIENT_ID }),
-            findByUserId: jest.fn().mockResolvedValue({ id: PATIENT_ID }),
-          },
-        },
-      ],
+      providers: baseProviders(),
     }).compile();
 
     service = moduleFixture.get(IpcpService);
@@ -524,37 +557,15 @@ describe('IpcpService', () => {
   describe('accesos', () => {
     it('rechaza a un paciente sin ficha asociada', async () => {
       const moduleFixture = await Test.createTestingModule({
-        providers: [
-          IpcpService,
-          {
-            provide: getRepositoryToken(HealthIndicator),
-            useValue: indicatorRepo,
-          },
-          {
-            provide: getRepositoryToken(Appointment),
-            useValue: appointmentRepo,
-          },
-          {
-            provide: getRepositoryToken(MedicationReminder),
-            useValue: reminderRepo,
-          },
-          {
-            provide: getRepositoryToken(MedicationSchedule),
-            useValue: scheduleRepo,
-          },
-          {
-            provide: ClinicalRangeBandsService,
-            useValue: { loadAll: jest.fn().mockResolvedValue(bands) },
-          },
-          {
-            provide: PatientsService,
-            useValue: {
-              findRecordForScope: jest.fn(),
-              findByUserId: jest.fn().mockResolvedValue(null),
-            },
-          },
-        ],
-      }).compile();
+        providers: baseProviders(),
+      })
+        .overrideProvider(PatientsService)
+        .useValue(
+          patientsServiceMock({
+            findByUserId: jest.fn().mockResolvedValue(null),
+          }),
+        )
+        .compile();
       const svc = moduleFixture.get(IpcpService);
 
       await expect(svc.forSelf(staff)).rejects.toThrow(ForbiddenException);
@@ -565,39 +576,278 @@ describe('IpcpService', () => {
         .fn()
         .mockResolvedValue({ id: PATIENT_ID });
       const moduleFixture = await Test.createTestingModule({
-        providers: [
-          IpcpService,
-          {
-            provide: getRepositoryToken(HealthIndicator),
-            useValue: indicatorRepo,
-          },
-          {
-            provide: getRepositoryToken(Appointment),
-            useValue: appointmentRepo,
-          },
-          {
-            provide: getRepositoryToken(MedicationReminder),
-            useValue: reminderRepo,
-          },
-          {
-            provide: getRepositoryToken(MedicationSchedule),
-            useValue: scheduleRepo,
-          },
-          {
-            provide: ClinicalRangeBandsService,
-            useValue: { loadAll: jest.fn().mockResolvedValue(bands) },
-          },
-          {
-            provide: PatientsService,
-            useValue: { findRecordForScope, findByUserId: jest.fn() },
-          },
-        ],
-      }).compile();
+        providers: baseProviders(),
+      })
+        .overrideProvider(PatientsService)
+        .useValue(patientsServiceMock({ findRecordForScope }))
+        .compile();
       const svc = moduleFixture.get(IpcpService);
 
       await svc.forPatient(PATIENT_ID, staff);
 
       expect(findRecordForScope).toHaveBeenCalledWith(PATIENT_ID, staff);
+    });
+  });
+
+  describe('listado por lotes (GET /patients/ipcp)', () => {
+    /** Deja lista la consulta de alcance con las filas indicadas. */
+    function stubScope(
+      rows: Array<{ id: string; name: string; email: string }>,
+    ) {
+      const qb: Record<string, jest.Mock> = {
+        innerJoin: jest.fn(),
+        select: jest.fn(),
+        addSelect: jest.fn(),
+        andWhere: jest.fn(),
+        getRawMany: jest.fn().mockResolvedValue(rows),
+      };
+      for (const key of ['innerJoin', 'select', 'addSelect', 'andWhere']) {
+        qb[key].mockReturnValue(qb);
+      }
+      patientRepo.createQueryBuilder.mockReturnValue(qb);
+      return qb;
+    }
+
+    /** Glucosa crítica solo para el paciente indicado; el resto, sin datos. */
+    function stubScores(perPatient: Record<string, number>) {
+      indicatorRepo.find.mockImplementation(
+        (options: { where: { patient: { id: string } } }) => {
+          const value = perPatient[options.where.patient.id];
+          return Promise.resolve(
+            value === undefined ? [] : [indicator(2, value, 1)],
+          );
+        },
+      );
+    }
+
+    it('devuelve identidad, score y componentes de cada paciente', async () => {
+      stubScope([
+        { id: 'p-high', name: 'Ana Pérez', email: 'ana@test.dev' },
+        { id: 'p-low', name: 'Luis Gómez', email: 'luis@test.dev' },
+      ]);
+      stubScores({ 'p-high': 350 });
+
+      const result = await service.getBatch({});
+
+      expect(result.total).toBe(2);
+      expect(result.page).toBe(1);
+      expect(result.totalPages).toBe(1);
+      expect(result.data.map((row) => row.id)).toEqual(['p-high', 'p-low']);
+      // Antes el listado devolvía `id` y `name` vacíos: la fila no era pintable.
+      expect(result.data[0]).toMatchObject({
+        id: 'p-high',
+        name: 'Ana Pérez',
+        email: 'ana@test.dev',
+        score: 100,
+        level: 'high',
+        deviationScore: 100,
+      });
+      expect(result.data[1]).toMatchObject({
+        id: 'p-low',
+        name: 'Luis Gómez',
+        score: 0,
+        level: 'low',
+        // Sin datos, cada variable es `null`, no un 0 inventado.
+        adherenceScore: null,
+        appointmentScore: null,
+        trendScore: null,
+      });
+    });
+
+    it('filtra por nivel antes de paginar, no después', async () => {
+      stubScope([
+        { id: 'p-high', name: 'Ana Pérez', email: 'ana@test.dev' },
+        { id: 'p-low-1', name: 'Luis Gómez', email: 'luis@test.dev' },
+        { id: 'p-low-2', name: 'María Ruiz', email: 'maria@test.dev' },
+      ]);
+      stubScores({ 'p-high': 350 });
+
+      const page = await service.getBatch({ level: 'low', limit: 1, page: 2 });
+
+      // El total es de la lista filtrada (2), no de la lista completa (3).
+      expect(page.total).toBe(2);
+      expect(page.totalPages).toBe(2);
+      expect(page.data).toHaveLength(1);
+      expect(page.data[0].id).toBe('p-low-2');
+    });
+
+    it('ordena por score descendente por defecto', async () => {
+      stubScope([
+        { id: 'p-low', name: 'Luis Gómez', email: 'luis@test.dev' },
+        { id: 'p-high', name: 'Ana Pérez', email: 'ana@test.dev' },
+      ]);
+      stubScores({ 'p-high': 350 });
+
+      const result = await service.getBatch({});
+
+      expect(result.data.map((row) => row.id)).toEqual(['p-high', 'p-low']);
+    });
+
+    it('ordena por nombre cuando se pide', async () => {
+      stubScope([
+        { id: 'p-1', name: 'Zoe Díaz', email: 'zoe@test.dev' },
+        { id: 'p-2', name: 'Ana Pérez', email: 'ana@test.dev' },
+      ]);
+      stubScores({});
+
+      const result = await service.getBatch({
+        sortBy: 'name',
+        sortOrder: 'asc',
+      });
+
+      expect(result.data.map((row) => row.name)).toEqual([
+        'Ana Pérez',
+        'Zoe Díaz',
+      ]);
+    });
+
+    it('el admin ve todos los centros sin consultar el del usuario', async () => {
+      const qb = stubScope([]);
+
+      await service.getBatchForUser(admin, {});
+
+      expect(userRepo.findOne).not.toHaveBeenCalled();
+      expect(qb.andWhere).not.toHaveBeenCalled();
+    });
+
+    it('el admin puede centrar el listado en un centro concreto', async () => {
+      const qb = stubScope([]);
+
+      await service.getBatchForUser(admin, { healthCenterId: 'hc-9' });
+
+      expect(qb.andWhere).toHaveBeenCalledWith(
+        'patient.health_center_id = :centerId',
+        { centerId: 'hc-9' },
+      );
+    });
+
+    it('el personal de salud ignora el centro pedido en la query', async () => {
+      userRepo.findOne.mockResolvedValue({
+        healthcareWorker: { healthCenter: { id: 'hc-1' } },
+      });
+      const qb = stubScope([]);
+
+      await service.getBatchForUser(staff, { healthCenterId: 'hc-9' });
+
+      expect(qb.andWhere).toHaveBeenCalledWith(
+        'patient.health_center_id = :centerId',
+        { centerId: 'hc-1' },
+      );
+    });
+
+    it('el personal de salud solo ve los pacientes de su centro', async () => {
+      userRepo.findOne.mockResolvedValue({
+        healthcareWorker: { healthCenter: { id: 'hc-1' } },
+      });
+      const qb = stubScope([]);
+
+      await service.getBatchForUser(staff, { search: '  ana  ' });
+
+      expect(userRepo.findOne).toHaveBeenCalledWith({
+        where: { id: staff.sub },
+        relations: { healthcareWorker: { healthCenter: true } },
+      });
+      expect(qb.andWhere).toHaveBeenCalledWith(
+        'patient.health_center_id = :centerId',
+        { centerId: 'hc-1' },
+      );
+      expect(qb.andWhere).toHaveBeenCalledWith(
+        expect.stringContaining('user.name ILIKE :term'),
+        { term: '%ana%' },
+      );
+    });
+
+    it('rechaza al personal sin centro asignado', async () => {
+      userRepo.findOne.mockResolvedValue({
+        healthcareWorker: { healthCenter: null },
+      });
+      stubScope([]);
+
+      await expect(service.getBatchForUser(staff, {})).rejects.toThrow(
+        ForbiddenException,
+      );
+    });
+  });
+
+  describe('cache y precálculo', () => {
+    /** Filas de alcance de un único paciente. */
+    function stubScopeFor(id: string) {
+      const qb: Record<string, jest.Mock> = {
+        innerJoin: jest.fn(),
+        select: jest.fn(),
+        addSelect: jest.fn(),
+        andWhere: jest.fn(),
+        getRawMany: jest
+          .fn()
+          .mockResolvedValue([
+            { id, name: 'Ana Pérez', email: 'ana@test.dev' },
+          ]),
+      };
+      for (const key of ['innerJoin', 'select', 'addSelect', 'andWhere']) {
+        qb[key].mockReturnValue(qb);
+      }
+      patientRepo.createQueryBuilder.mockReturnValue(qb);
+    }
+
+    it('calcula una vez y reutiliza la entrada en cache', async () => {
+      const compute = jest.spyOn(service, 'compute').mockResolvedValue({
+        score: 42,
+        level: 'moderate',
+        components: [],
+        exclusions: [],
+        computedFrom: null,
+        generatedAt: new Date().toISOString(),
+      });
+
+      await service.getCachedOrCompute(PATIENT_ID);
+      await service.getCachedOrCompute(PATIENT_ID);
+
+      expect(compute).toHaveBeenCalledTimes(1);
+      expect(cacheProvider.useValue.set).toHaveBeenCalledWith(
+        `${IPCP_CACHE_PREFIX}${PATIENT_ID}`,
+        expect.objectContaining({ score: 42 }),
+        expect.any(Number),
+      );
+    });
+
+    it('invalida la entrada del paciente afectado', async () => {
+      await service.getCachedOrCompute(PATIENT_ID);
+      expect(cacheStore.has(`${IPCP_CACHE_PREFIX}${PATIENT_ID}`)).toBe(true);
+
+      await service.invalidateCache(PATIENT_ID);
+
+      expect(cacheStore.has(`${IPCP_CACHE_PREFIX}${PATIENT_ID}`)).toBe(false);
+    });
+
+    it('el cron fuerza el recálculo en vez de leer el cache', async () => {
+      stubScopeFor(PATIENT_ID);
+      const compute = jest.spyOn(service, 'compute').mockResolvedValue({
+        score: 70,
+        level: 'high',
+        components: [],
+        exclusions: [],
+        computedFrom: null,
+        generatedAt: new Date().toISOString(),
+      });
+
+      await service.getCachedOrCompute(PATIENT_ID);
+      compute.mockClear();
+
+      await service.recalculateAllIpcp();
+
+      // Si el cron leyera el cache, el índice envejecería hasta expirar.
+      expect(compute).toHaveBeenCalledWith(PATIENT_ID);
+    });
+
+    it('una página vacía sigue reportando totalPages ≥ 1', async () => {
+      stubScopeFor(PATIENT_ID);
+
+      const result = await service.getBatch({ level: 'high' });
+
+      expect(result.total).toBe(0);
+      // Con totalPages en 0 el botón "Siguiente" quedaría habilitado.
+      expect(result.totalPages).toBe(1);
+      expect(result.data).toEqual([]);
     });
   });
 });

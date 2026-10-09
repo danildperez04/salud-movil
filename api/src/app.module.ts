@@ -12,6 +12,7 @@ import { AuthModule } from './features/auth/auth.module';
 import { CatalogueModule } from './features/catalogues/catalogue.module';
 import { PatientsModule } from './features/patients/patients.module';
 import { MedicalRecordsModule } from './features/medical-records/medical-records.module';
+import { IpcpModule } from './features/ipcp/ipcp.module';
 import { HealthIndicatorsModule } from './features/health-indicators/health-indicators.module';
 import { AppointmentsModule } from './features/appointments/appointments.module';
 import { MedicationsModule } from './features/medications/medications.module';
@@ -56,6 +57,12 @@ import { DatabaseModule } from './database/database.module';
     UsersModule,
     AuthModule,
     CatalogueModule,
+    // IpcpModule va antes que PatientsModule a propósito: ambas montan rutas
+    // bajo `patients` y Express resuelve en orden de registro, así que el
+    // literal `GET /patients/ipcp` debe registrarse antes que `GET
+    // /patients/:id`. Si se reordenan estos imports, `:id` captura "ipcp" y
+    // el endpoint responde 500 con "invalid input syntax for type uuid".
+    IpcpModule,
     PatientsModule,
     MedicalRecordsModule,
     HealthIndicatorsModule,

@@ -16,6 +16,8 @@ import type {
   DemoRequestStatus,
   DisableTwoFactorDto,
   HealthCenterItem,
+  IpcpBatchFilters,
+  IpcpBatchResponse,
   LinkCaregiverPayload,
   LoginResponse,
   MunicipalityItem,

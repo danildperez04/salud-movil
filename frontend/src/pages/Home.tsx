@@ -16,7 +16,7 @@ import { Alert } from "../components/ui/Alert";
 import { useAuthStore } from "../store/auth";
 import { api, ApiError } from "../lib/api";
 import { formatDateTime } from "../lib/date";
-import type { PublicDashboardStats } from "../types";
+import type { PublicDashboardStats, IpcpLevel } from "../types";
 
 interface StatCard {
   label: string;
@@ -44,42 +44,40 @@ const SEVERITY_LABELS: Record<"alert" | "critical", string> = {
 };
 
 /**
- * Las tarjetas se derivan de `/dashboard/stats`.
+ * Las tarjetas se derivan de `/dashboard/stats` y `/patients/ipcp`.
  *
- * ⚠️ No son prioridades de IPCP: el índice todavía no existe en la API. Se cuenta
- * por gravedad clínica del último indicador de cada paciente, que es lo que hoy
- * sí se puede afirmar con datos reales. Cuando exista el IPCP, estas tarjetas
- * pasarán a consumir su `level`.
+ * Dos tarjetas usan niveles IPCP (Prioridad Alta / Moderada),
+ * dos usan stats operativos existentes (Próximas citas / Pacientes activos).
  */
-function buildStatCards(stats: PublicDashboardStats): StatCard[] {
-  const critical = stats.attention.filter((a) => a.severity === "critical").length;
-  const alert = stats.attention.filter((a) => a.severity === "alert").length;
-
+function buildStatCards(
+  stats: PublicDashboardStats | null,
+  ipcpCounts: Record<IpcpLevel, number>,
+): StatCard[] {
   return [
     {
-      label: "En estado crítico",
-      value: critical,
-      caption: "Último indicador crítico",
+      label: "Prioridad Alta",
+      value: ipcpCounts.high,
+      caption: "Pacientes con IPCP alto",
       icon: AlertTriangle,
       tone: "high",
     },
     {
-      label: "Fuera de rango",
-      value: alert,
-      caption: "Último indicador en alerta",
+      label: "Prioridad Moderada",
+      value: ipcpCounts.moderate,
+      caption: "Pacientes con IPCP moderado",
       icon: AlertCircle,
       tone: "moderate",
     },
     {
       label: "Próximas citas",
-      value: stats.upcomingAppointments,
+      value: stats?.upcomingAppointments ?? 0,
       caption: "En los próximos 7 días",
       icon: CalendarClock,
       tone: "neutral",
     },
     {
       label: "Pacientes activos",
-      value: stats.activePatients,
+      value: stats?.activePatients ?? 0,
       caption: "Con seguimiento activo",
       icon: Users,
       tone: "low",
@@ -123,15 +121,30 @@ export default function Home() {
   const navigate = useNavigate();
   const user = useAuthStore((s) => s.user);
   const [stats, setStats] = useState<PublicDashboardStats | null>(null);
+  const [ipcpCounts, setIpcpCounts] = useState<Record<IpcpLevel, number>>({
+    high: 0,
+    moderate: 0,
+    low: 0,
+  });
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     let active = true;
-    api
-      .getDashboardStats()
-      .then((data) => {
-        if (active) setStats(data);
+
+    Promise.all([
+      api.getDashboardStats(),
+      api.getPatientsIpcp({ limit: 1000 }), // obtener todos para conteos
+    ])
+      .then(([dashboardStats, ipcpBatch]) => {
+        if (!active) return;
+        setStats(dashboardStats);
+
+        const counts: Record<IpcpLevel, number> = { high: 0, moderate: 0, low: 0 };
+        for (const patient of ipcpBatch.data) {
+          counts[patient.level]++;
+        }
+        setIpcpCounts(counts);
       })
       .catch((err) => {
         if (active) {
@@ -145,14 +158,14 @@ export default function Home() {
       .finally(() => {
         if (active) setLoading(false);
       });
+
     return () => {
       active = false;
     };
   }, []);
 
-  const statCards = stats ? buildStatCards(stats) : [];
-  const criticalCount =
-    stats?.attention.filter((a) => a.severity === "critical").length ?? 0;
+  const statCards = stats ? buildStatCards(stats, ipcpCounts) : [];
+  const criticalCount = ipcpCounts.high;
 
   return (
     <div className="flex flex-col gap-6">
@@ -189,7 +202,7 @@ export default function Home() {
               <>
                 Hay{" "}
                 <span className="font-semibold text-red-600">
-                  {criticalCount} pacientes en estado crítico
+                  {criticalCount} pacientes en prioridad alta
                 </span>{" "}
                 que requieren seguimiento cercano.
               </>
