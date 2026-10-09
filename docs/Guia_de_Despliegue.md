@@ -156,6 +156,8 @@ Sin este paso, el navegador bloquea las peticiones del panel con errores de CORS
 | Usuario admin | El seed crea `admin@saludmovil.com` / `Admin123!` | Cambiar la contraseña inmediatamente después del primer despliegue |
 | `JWT_SECRET` | Debe ser aleatorio y exclusivo de producción | `openssl rand -base64 48`; rotar ante cualquier sospecha |
 | Cold starts | El plan Free de Render duerme el servicio tras ~15 min sin tráfico (~50 s en despertar) | Aceptable para demos; evitar en producción real |
+| Instaladores subidos desde el panel | La API los guarda en disco (`RELEASES_DIR`, por defecto `./storage/releases`). El disco del plan Free de Render es **efímero**: se borra en cada despliegue o reinicio, y las versiones quedarían registradas en la base sin archivo (la descarga responde 404) | En Render usa un disco persistente (plan de pago) o despliega con Docker (volumen `release-data`, ver [`Docker.md`](Docker.md)). Alternativa: implementar `ReleaseStorage` sobre S3/Supabase Storage |
+| Solicitudes de demo | Se guardan en la base y se consultan en el panel (*Sitio web → Solicitudes de demo*); no hay envío de correo | Revisar el panel periódicamente, o añadir un aviso por correo cuando exista un servicio de envío |
 | Pausa de Supabase | Proyectos free se pausan por inactividad | Revisar el dashboard si la API reporta errores de conexión tras días sin uso |
 | Seguridad extra | Helmet activo y rate limiting global con `@nestjs/throttler` (por defecto 100 req/min por IP) | **Resuelto.** Ajustar con `THROTTLE_LIMIT` y `THROTTLE_TTL_MS` |
 | Health check | `GET /health` (público, sin límite de peticiones) responde `{"status":"ok"}` si la API alcanza la base; 503 si no | **Resuelto.** Usarlo como Health Check Path en Render o en Docker |

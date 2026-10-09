@@ -48,6 +48,7 @@ iniciales (ver [Cuentas iniciales](#cuentas-iniciales)).
 | `frontend/Dockerfile` | Compila la SPA y la sirve con nginx |
 | `frontend/nginx/default.conf.template` | Reverse proxy `/api/`, SPA, caché y compresión |
 | `frontend/nginx/snippets/security-headers.conf` | Cabeceras de seguridad de la SPA |
+| `frontend/nginx/snippets/api-proxy.conf` | Cabeceras comunes del proxy hacia la API |
 
 ## CORS
 
@@ -76,6 +77,7 @@ imprescindibles:
 | `HTTP_PORT` | Puerto del host donde se publica nginx (por defecto `80`) |
 | `PUBLIC_URL` | URL pública del panel; sirve de `CORS_ORIGIN` por defecto |
 | `TRUST_PROXY` | Nº de proxies delante de la API (por defecto `1` = nginx) |
+| `RELEASE_MAX_MB` | Tamaño máximo de un instalable subido desde el panel (por defecto `500`). Lo aplican el API y nginx |
 
 > **`TRUST_PROXY` importa para la seguridad.** La API limita las peticiones por
 > IP (`THROTTLE_LIMIT`). Detrás de un proxy sin `TRUST_PROXY`, todos los usuarios
@@ -86,6 +88,38 @@ imprescindibles:
 
 `VITE_API_URL` (por defecto `/api`) se **incrusta al compilar** el panel; cambiarla
 exige `docker compose build web`. Solo cámbiala si la API vive en otro dominio.
+
+## Sitio público: descargas y solicitudes de demo
+
+La landing (`/`) ofrece la descarga de la app y un formulario para pedir una
+demostración. Ambos se gestionan desde el panel, con una cuenta **administradora**
+(las secciones *Sitio web → Solicitudes de demo* e *Instaladores* del menú).
+
+**Instaladores.** El admin sube el APK (Android), EXE (Windows) o DMG (macOS) de
+cada versión. Para cada plataforma la landing ofrece la versión *publicada más
+reciente*; si no hay ninguna, muestra «Disponible pronto». El API valida la
+extensión y la firma del archivo (un `.apk` debe ser un ZIP, un `.exe` debe
+empezar por `MZ`) y guarda su SHA-256.
+
+- Los archivos viven en el volumen **`release-data`** (`/data/releases` en el
+  contenedor), no en la base de datos. **Inclúyelo en tus copias de seguridad**,
+  junto con `pg_dump`: restaurar solo la base dejaría versiones sin archivo.
+- nginx deja pasar hasta `RELEASE_MAX_MB` (500 MB por defecto) únicamente en
+  `POST /api/admin/releases`; el resto de la API sigue limitada a 2 MB. Si usas
+  otro proxy o CDN delante de nginx, súbele también el límite de cuerpo ahí.
+- Para guardar los archivos en S3 u otro servicio, basta una subclase de
+  `ReleaseStorage` (`api/src/features/releases/release-storage.ts`).
+
+```bash
+# Copia de seguridad del volumen de instaladores
+docker run --rm -v salud-movil_release-data:/data -v "$PWD":/backup alpine   tar czf /backup/releases.tgz -C /data .
+```
+
+**Solicitudes de demo.** `POST /api/demo-requests` es público y está limitado a
+5 envíos por hora por IP (de ahí la importancia de `TRUST_PROXY`); un correo que
+ya tiene una solicitud pendiente de las últimas 24 h no genera otra. Las
+solicitudes se leen y gestionan solo desde el panel: **no se envía ningún
+correo de aviso**, así que conviene revisar el panel con regularidad.
 
 ## Cuentas iniciales
 
@@ -146,7 +180,8 @@ docker compose up -d --build               # actualizar tras un git pull
 docker compose down                        # parar (conserva los datos)
 docker compose down -v                     # parar y BORRAR la base de datos
 
-# Copia de seguridad / restauración
+# Copia de seguridad / restauración (la base; los instaladores, ver
+# «Sitio público» más arriba)
 docker compose exec -T db pg_dump -U salud_movil salud_movil > backup.sql
 docker compose exec -T db psql -U salud_movil salud_movil < backup.sql
 ```
