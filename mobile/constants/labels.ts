@@ -536,6 +536,7 @@ export const MEDICAL_RECORD_LABELS = {
   history: {
     personal: 'Personales',
     family: 'Familiares',
+    recordTitle: 'Antecedentes médicos',
     emptyPersonal: 'Sin antecedentes personales registrados',
     emptyFamily: 'Sin antecedentes familiares registrados',
     add: 'Agregar',
@@ -776,6 +777,8 @@ export const SECURITY_LABELS = {
     confirmLabel: 'Confirmar nueva contraseña',
     save: 'Guardar contraseña',
     saveError: 'No se pudo actualizar la contraseña. Intentá de nuevo.',
+    currentIncorrect: 'La contraseña actual es incorrecta.',
+    tooManyRequests: 'Hiciste demasiados intentos. Esperá un momento y probá de nuevo.',
     successTitle: 'Contraseña actualizada',
     successMessage: 'Usa tu nueva contraseña la próxima vez que inicies sesión.',
     ok: 'Aceptar',
@@ -821,11 +824,8 @@ export const PROFILE_LABELS = {
     bloodType: 'Tipo de sangre',
     phone: 'Teléfono',
     email: 'Correo',
-    caregiver: 'Cuidador',
-    disability: 'Discapacidad',
   },
   notRegistered: 'No registrado',
-  noDisability: 'Ninguna registrada',
 } as const;
 
 export const EMERGENCY_RELATION_LABELS = {

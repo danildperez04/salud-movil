@@ -1,41 +1,35 @@
 // features/profile/hooks/useAccountProfile.ts
-import { useQuery } from '@tanstack/react-query';
 import type { InfoTileData } from '@/components/ui/info-tile';
 import { MORE_LABELS, PROFILE_LABELS, ROLE_LABELS } from '@/constants/labels';
 import { usePatientProfile } from '@/features/medical-record/hooks/useMedicalRecord';
 import { getInitials } from '@/features/more/domain/user-initials';
 import { formatIsoDateShort } from '@/lib/date-format';
 import { useAppStore } from '@/store';
-import { fetchMockAccountExtras } from '../api/mock-account';
+import { usePatientMe } from './usePatientMe';
 
-const { fields, notRegistered, noDisability } = PROFILE_LABELS;
+const { fields, notRegistered } = PROFILE_LABELS;
 
-/** Datos personales de la cuenta: sesión, perfil clínico y datos extra. */
+/** Datos personales de la cuenta: sesión, ficha del paciente y perfil clínico. */
 export function useAccountProfile() {
   const user = useAppStore((state) => state.user);
   const logout = useAppStore((state) => state.logout);
-  const { data: patient } = usePatientProfile();
-  const { data: extras } = useQuery({
-    queryKey: ['account', 'extras'],
-    queryFn: fetchMockAccountExtras,
-  });
+  const { data: patient } = usePatientMe();
+  const { data: profile } = usePatientProfile();
 
   const name = user?.name ?? MORE_LABELS.fallbackName;
   const role = user ? (ROLE_LABELS[user.role] ?? user.role) : '';
 
   const tiles: InfoTileData[] = [
     { id: 'name', label: fields.name, value: name },
-    { id: 'nup', label: fields.nup, value: extras?.nup ?? notRegistered },
+    { id: 'nup', label: fields.nup, value: patient?.dni || notRegistered },
     {
       id: 'birth-date',
       label: fields.birthDate,
-      value: patient ? formatIsoDateShort(patient.birthDate) : notRegistered,
+      value: profile ? formatIsoDateShort(profile.birthDate) : notRegistered,
     },
-    { id: 'blood-type', label: fields.bloodType, value: patient?.bloodType || notRegistered },
+    { id: 'blood-type', label: fields.bloodType, value: profile?.bloodType || notRegistered },
     { id: 'phone', label: fields.phone, value: user?.phoneNumber || notRegistered },
     { id: 'email', label: fields.email, value: user?.email || notRegistered },
-    { id: 'caregiver', label: fields.caregiver, value: extras?.caregiver ?? notRegistered },
-    { id: 'disability', label: fields.disability, value: extras?.disability ?? noDisability },
   ];
 
   return {

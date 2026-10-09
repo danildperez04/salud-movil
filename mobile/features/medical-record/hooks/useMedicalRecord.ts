@@ -1,38 +1,80 @@
 // features/medical-record/hooks/useMedicalRecord.ts
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { loadPatientMe } from '@/features/profile/hooks/usePatientMe';
+import { useIsPatient } from '@/hooks/useIsPatient';
+import { queryClient as sharedQueryClient } from '@/lib/query-client';
+import { fetchMedicalRecord } from '../api/medical-record-api';
 import {
   createMockAllergy,
   createMockDiagnosis,
   createMockDocument,
   createMockHistoryEntry,
   createMockLab,
-  fetchMockAllergies,
-  fetchMockDiagnoses,
   fetchMockDocuments,
-  fetchMockHistory,
   fetchMockLabs,
-  fetchMockPatientProfile,
+  withLocalAllergies,
+  withLocalDiagnoses,
+  withLocalHistory,
 } from '../api/mock-medical-record';
 import type { DocumentCategory } from '../domain/record-catalogs';
+import {
+  allergiesFrom,
+  diagnosesFrom,
+  historyFrom,
+  toPatientProfile,
+} from '../domain/record-from-api';
 
 const RECORD_KEY = ['medical-record'] as const;
+const SERVER_RECORD_KEY = [...RECORD_KEY, 'server'] as const;
 
-// TODO: reemplazar los mocks por apiClient cuando el backend exponga el endpoint.
+/** Expediente del backend; las varias consultas de una pantalla comparten una sola petición. */
+const loadRecord = () =>
+  sharedQueryClient.fetchQuery({
+    queryKey: SERVER_RECORD_KEY,
+    queryFn: fetchMedicalRecord,
+    staleTime: 30 * 1000,
+  });
+
+// Perfil, diagnósticos, antecedentes y alergias salen del expediente real. Lo que el paciente
+// agrega es local (ver mock-medical-record.ts). Documentos y laboratorios no existen en la API.
 
 export function usePatientProfile() {
-  return useQuery({ queryKey: [...RECORD_KEY, 'profile'], queryFn: fetchMockPatientProfile });
+  const enabled = useIsPatient();
+  return useQuery({
+    queryKey: [...RECORD_KEY, 'profile'],
+    queryFn: async () => {
+      const [patient, record] = await Promise.all([loadPatientMe(), loadRecord()]);
+      return toPatientProfile(patient, record);
+    },
+    enabled,
+  });
 }
 
 export function useAllergies() {
-  return useQuery({ queryKey: [...RECORD_KEY, 'allergies'], queryFn: fetchMockAllergies });
+  const enabled = useIsPatient();
+  return useQuery({
+    queryKey: [...RECORD_KEY, 'allergies'],
+    queryFn: async () => withLocalAllergies(allergiesFrom(await loadRecord())),
+    enabled,
+  });
 }
 
 export function useHistoryEntries() {
-  return useQuery({ queryKey: [...RECORD_KEY, 'history'], queryFn: fetchMockHistory });
+  const enabled = useIsPatient();
+  return useQuery({
+    queryKey: [...RECORD_KEY, 'history'],
+    queryFn: async () => withLocalHistory(historyFrom(await loadRecord())),
+    enabled,
+  });
 }
 
 export function useDiagnoses() {
-  return useQuery({ queryKey: [...RECORD_KEY, 'diagnoses'], queryFn: fetchMockDiagnoses });
+  const enabled = useIsPatient();
+  return useQuery({
+    queryKey: [...RECORD_KEY, 'diagnoses'],
+    queryFn: async () => withLocalDiagnoses(diagnosesFrom(await loadRecord())),
+    enabled,
+  });
 }
 
 /** Documentos, del más reciente al más antiguo; de una categoría si se indica. */
@@ -67,10 +109,7 @@ export function useLab(id: string | undefined) {
   });
 }
 
-/**
- * Crear un registro invalida todo el expediente: la lista cambia y también la
- * fecha de "última actualización" del resumen.
- */
+/** Crear un registro invalida todo el expediente: la lista cambia y también el resumen. */
 function useCreateRecord<TInput, TResult>(mutationFn: (input: TInput) => Promise<TResult>) {
   const queryClient = useQueryClient();
   return useMutation({

@@ -1,15 +1,12 @@
 // features/security/hooks/useSecurity.ts
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import {
-  changeMockPassword,
-  closeMockOtherSessions,
-  closeMockSession,
-  fetchMockSessions,
-} from '../api/mock-security';
+import { ApiError } from '@/lib/api-client';
+import { closeMockOtherSessions, closeMockSession, fetchMockSessions } from '../api/mock-security';
+import { changePassword, type ChangePasswordInput } from '../api/security-api';
 
 const SESSIONS_KEY = ['security', 'sessions'] as const;
 
-// TODO: reemplazar los mocks por apiClient cuando el backend exponga el endpoint.
+// TODO: las sesiones son un mock hasta que el backend las exponga.
 
 export function useDeviceSessions() {
   return useQuery({ queryKey: SESSIONS_KEY, queryFn: fetchMockSessions });
@@ -32,5 +29,5 @@ export function useCloseOtherSessions() {
 }
 
 export function useChangePassword() {
-  return useMutation({ mutationFn: changeMockPassword });
+  return useMutation<void, ApiError, ChangePasswordInput>({ mutationFn: changePassword });
 }

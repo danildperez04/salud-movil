@@ -1,48 +1,15 @@
 // features/medical-record/api/mock-medical-record.ts
 //
-// Mock temporal — el backend no expone el expediente clínico todavía. Cuando
-// existan los endpoints, reemplazar estas funciones por apiClient sin tocar
-// las pantallas. Las fechas son "YYYY-MM-DD".
-// TODO: subir los archivos adjuntos (fotos y PDF) al backend; hoy solo se
-// guarda la URI local del archivo.
-import { toLocalIsoDate } from '@/lib/date-format';
-import type {
-  AllergySeverity,
-  AllergyType,
-  DiagnosisStatus,
-  DocumentCategory,
-  HistoryCategory,
-  HistoryKind,
-  LabStatus,
-} from '../domain/record-catalogs';
-
-export type Allergy = {
-  id: string;
-  type: AllergyType;
-  name: string;
-  reaction?: string;
-  severity: AllergySeverity;
-  notes?: string;
-};
-
-export type HistoryEntry = {
-  id: string;
-  kind: HistoryKind;
-  category: HistoryCategory;
-  title: string;
-  /** fecha o año en texto libre (ej. "2018") */
-  period?: string;
-  detail?: string;
-};
-
-export type Diagnosis = {
-  id: string;
-  name: string;
-  status: DiagnosisStatus;
-  diagnosedAt?: string;
-  provider?: string;
-  notes?: string;
-};
+// Mock temporal de lo que el backend todavía no tiene en el expediente:
+// - Documentos y resultados de laboratorio: no existen en la API. Los datos de abajo son de
+//   ejemplo. TODO: subir los archivos adjuntos (fotos y PDF); hoy solo se guarda la URI local.
+// - Alergias, antecedentes y diagnósticos: el expediente real solo lo edita el personal de salud
+//   (PUT /patients/:id/medical-record). Lo que el paciente agrega queda solo en el dispositivo y
+//   se superpone a lo real (ver useMedicalRecord).
+// Las fechas son "YYYY-MM-DD".
+import { createLocalOverlay, newLocalId } from '@/lib/local-overlay';
+import type { DocumentCategory, LabStatus } from '../domain/record-catalogs';
+import type { Allergy, Diagnosis, HistoryEntry } from '../domain/record-types';
 
 export type MedicalDocument = {
   id: string;
@@ -65,63 +32,6 @@ export type LabResult = {
   notes?: string;
   imageUri?: string;
 };
-
-export type PatientProfile = {
-  /** "YYYY-MM-DD" */
-  birthDate: string;
-  bloodType: string;
-  /** última vez que se modificó el expediente */
-  updatedAt: string;
-};
-
-let allergies: Allergy[] = [];
-
-let history: HistoryEntry[] = [
-  {
-    id: '1',
-    kind: 'personal',
-    category: 'surgery',
-    title: 'Cirugías previas',
-    detail: 'Apendicectomía',
-    period: '2018',
-  },
-  {
-    id: '2',
-    kind: 'personal',
-    category: 'hospitalization',
-    title: 'Hospitalizaciones',
-    detail: 'Ninguna reciente',
-  },
-  {
-    id: '3',
-    kind: 'personal',
-    category: 'habits',
-    title: 'Hábitos',
-    detail: 'No fuma · Actividad física moderada',
-  },
-  { id: '4', kind: 'family', category: 'hereditary', title: 'Diabetes', detail: 'Madre' },
-  { id: '5', kind: 'family', category: 'hereditary', title: 'Hipertensión', detail: 'Padre' },
-];
-
-let diagnoses: Diagnosis[] = [
-  {
-    id: '1',
-    name: 'Hipertensión arterial',
-    status: 'active',
-    diagnosedAt: '2025-03-12',
-    provider: 'Medicina Interna',
-    notes: 'Seguimiento y control de la presión arterial.',
-  },
-  {
-    id: '2',
-    name: 'Diabetes mellitus tipo 2',
-    status: 'active',
-    diagnosedAt: '2025-01-08',
-    provider: 'Endocrinología',
-    notes: 'Control metabólico periódico.',
-  },
-  { id: '3', name: 'Gastritis', status: 'history', notes: 'Resuelta en 2024.' },
-];
 
 let documents: MedicalDocument[] = [
   {
@@ -201,68 +111,42 @@ let labs: LabResult[] = [
   { id: '3', name: 'Perfil lipídico', issuedAt: '2026-08-25', status: 'normal' },
 ];
 
-let profile: PatientProfile = {
-  birthDate: '2003-03-10',
-  bloodType: 'O+',
-  updatedAt: '2026-09-11',
-};
+const localAllergies = createLocalOverlay<Allergy>();
+const localHistory = createLocalOverlay<HistoryEntry>();
+const localDiagnoses = createLocalOverlay<Diagnosis>();
 
-const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+export const withLocalAllergies = (remote: Allergy[]) => localAllergies.apply(remote);
+export const withLocalHistory = (remote: HistoryEntry[]) => localHistory.apply(remote);
 
 /** Más reciente primero; los registros sin fecha van al final. */
 const newestFirst = <T>(items: T[], dateOf: (item: T) => string | undefined): T[] =>
   [...items].sort((a, b) => (dateOf(b) ?? '').localeCompare(dateOf(a) ?? ''));
 
-const newId = () => String(Date.now());
+export const withLocalDiagnoses = (remote: Diagnosis[]) =>
+  newestFirst(localDiagnoses.apply(remote), (diagnosis) => diagnosis.diagnosedAt);
 
-/** Marca el expediente como modificado hoy. */
-const touch = () => {
-  profile = { ...profile, updatedAt: toLocalIsoDate(new Date()) };
-};
-
-export async function fetchMockPatientProfile(): Promise<PatientProfile> {
-  await delay(200);
-  return profile;
-}
-
-export async function fetchMockAllergies(): Promise<Allergy[]> {
-  await delay(250);
-  return allergies;
-}
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 export async function createMockAllergy(input: Omit<Allergy, 'id'>): Promise<Allergy> {
   await delay(300);
-  const record: Allergy = { ...input, id: newId() };
-  allergies = [...allergies, record];
-  touch();
+  const record: Allergy = { ...input, id: newLocalId() };
+  localAllergies.upsert(record);
   return record;
-}
-
-export async function fetchMockHistory(): Promise<HistoryEntry[]> {
-  await delay(250);
-  return history;
 }
 
 export async function createMockHistoryEntry(
   input: Omit<HistoryEntry, 'id'>,
 ): Promise<HistoryEntry> {
   await delay(300);
-  const record: HistoryEntry = { ...input, id: newId() };
-  history = [...history, record];
-  touch();
+  const record: HistoryEntry = { ...input, id: newLocalId() };
+  localHistory.upsert(record);
   return record;
-}
-
-export async function fetchMockDiagnoses(): Promise<Diagnosis[]> {
-  await delay(250);
-  return newestFirst(diagnoses, (diagnosis) => diagnosis.diagnosedAt);
 }
 
 export async function createMockDiagnosis(input: Omit<Diagnosis, 'id'>): Promise<Diagnosis> {
   await delay(300);
-  const record: Diagnosis = { ...input, id: newId() };
-  diagnoses = [...diagnoses, record];
-  touch();
+  const record: Diagnosis = { ...input, id: newLocalId() };
+  localDiagnoses.upsert(record);
   return record;
 }
 
@@ -275,9 +159,8 @@ export async function createMockDocument(
   input: Omit<MedicalDocument, 'id'>,
 ): Promise<MedicalDocument> {
   await delay(400);
-  const record: MedicalDocument = { ...input, id: newId() };
+  const record: MedicalDocument = { ...input, id: String(Date.now()) };
   documents = [...documents, record];
-  touch();
   return record;
 }
 
@@ -288,8 +171,7 @@ export async function fetchMockLabs(): Promise<LabResult[]> {
 
 export async function createMockLab(input: Omit<LabResult, 'id'>): Promise<LabResult> {
   await delay(400);
-  const record: LabResult = { ...input, id: newId() };
+  const record: LabResult = { ...input, id: String(Date.now()) };
   labs = [...labs, record];
-  touch();
   return record;
 }

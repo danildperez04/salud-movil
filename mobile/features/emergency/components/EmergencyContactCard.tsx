@@ -5,7 +5,7 @@ import { ListItemCard } from '@/components/ui/list-item-card';
 import { EMERGENCY_LABELS, EMERGENCY_RELATION_LABELS } from '@/constants/labels';
 import { joinParts } from '@/lib/text-format';
 import { colors } from '@/lib/tokens';
-import type { EmergencyContact } from '../api/mock-emergency';
+import type { EmergencyContact } from '../domain/emergency-contact';
 
 type EmergencyContactCardProps = {
   contact: EmergencyContact;
