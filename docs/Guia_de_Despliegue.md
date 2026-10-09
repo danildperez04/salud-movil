@@ -3,6 +3,8 @@
 **Última actualización:** 24 de agosto de 2026
 **Estado:** API desplegada en Render + PostgreSQL en Supabase · Panel web pendiente de desplegar
 
+> Alternativa autocontenida: el stack completo (panel + API + PostgreSQL + nginx) se despliega con Docker en cualquier entorno. Ver [`Docker.md`](Docker.md).
+
 ## 1. Arquitectura de despliegue
 
 ```
@@ -89,7 +91,7 @@ Configuración actual del servicio:
 - `PORT`: `main.ts` escucha en `process.env.PORT ?? 3000`, así que respeta el puerto que asigna Render.
 - **bcrypt nativo:** el archivo `api/pnpm-workspace.yaml` aprueba los scripts de compilación de `bcrypt` (`allowBuilds`). Sin esa aprobación, pnpm ≥ 10 no compila el binario nativo y el build falla.
 - **Primer arranque:** el seed idempotente crea roles, catálogos (17 departamentos, 150 municipios) y usuarios iniciales, entre ellos `admin@saludmovil.com` con contraseña `Admin123!`.
-- No hay endpoint público de health check (`GET /` responde 404). En Render puede dejarse el Health Check Path vacío; agregar `GET /health` queda pendiente para la Fase 7.
+- Health check: `GET /health` verifica la conexión a la base. Úsalo como Health Check Path en Render.
 
 **Verificación rápida:**
 
@@ -156,7 +158,7 @@ Sin este paso, el navegador bloquea las peticiones del panel con errores de CORS
 | Cold starts | El plan Free de Render duerme el servicio tras ~15 min sin tráfico (~50 s en despertar) | Aceptable para demos; evitar en producción real |
 | Pausa de Supabase | Proyectos free se pausan por inactividad | Revisar el dashboard si la API reporta errores de conexión tras días sin uso |
 | Seguridad extra | Helmet activo y rate limiting global con `@nestjs/throttler` (por defecto 100 req/min por IP) | **Resuelto.** Ajustar con `THROTTLE_LIMIT` y `THROTTLE_TTL_MS` |
-| Health check | No existe endpoint público | Agregar `GET /health` en Fase 7 |
+| Health check | `GET /health` (público, sin límite de peticiones) responde `{"status":"ok"}` si la API alcanza la base; 503 si no | **Resuelto.** Usarlo como Health Check Path en Render o en Docker |
 | Código OTP del 2FA | Provisionalmente se escribe en el **log del servidor** (`ConsoleOtpDelivery`): no hay servicio de correo ni SMS | **Pendiente.** Quien pueda leer los logs (p. ej. el panel de Render) y conozca la contraseña puede completar el login de una cuenta con 2FA. Sustituir `OtpDelivery` por un canal real antes de tratar el 2FA como una barrera de seguridad. Es opcional por usuario: ninguna cuenta se ve afectada hasta que su dueño lo active |
 | Migración `AddTwoFactorOtp` | Con `synchronize: true`, el primer arranque ya crea `otp_challenge` y `user.two_factor_enabled` | La migración es idempotente: sobre una base que ya tiene esos objetos solo queda registrada. Tras desplegar, ejecutar una vez `pnpm migration:run` (necesita las devDependencies) y comprobar con `pnpm migration:show`. No se ejecuta sola al arrancar a propósito: `migrationsRun` corre **antes** de `synchronize` y fallaría en una base vacía |
 
