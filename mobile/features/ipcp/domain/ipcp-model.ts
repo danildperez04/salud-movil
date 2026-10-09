@@ -1,72 +1,22 @@
 // features/ipcp/domain/ipcp-model.ts
-// Tipos del IPCP: lo que entra al cálculo (IpcpSnapshot) y lo que sale (IpcpResult).
-// Son independientes de React y de los mocks: el backend podrá reutilizarlos tal cual.
+// Lo que muestra la pantalla del IPCP, ya convertido desde la respuesta de la API
+// (ver ipcp-report.ts). El cálculo vive en el backend; aquí solo se presenta.
+// Sin dependencias de React.
 
 export type IpcpLevel = 'low' | 'moderate' | 'high';
 
-/** Gravedad de una lectura según las bandas clínicas (clinical_range_band). */
-export type Severity = 'normal' | 'alert' | 'critical';
+export const MAX_SCORE = 100;
 
-/** Indicadores con bandas de gravedad. El peso queda fuera: necesita la estatura para el IMC. */
-export const INDICATOR_TYPES = ['bloodPressure', 'glucose', 'temperature'] as const;
-export type IndicatorType = (typeof INDICATOR_TYPES)[number];
+/** Indicadores con bandas de gravedad. El peso queda fuera: no tiene bandas en el backend. */
+export type IndicatorType = 'bloodPressure' | 'glucose' | 'temperature';
 
-export const CONDITIONS = ['hypertension', 'diabetes'] as const;
-export type Condition = (typeof CONDITIONS)[number];
-
-// --- Entrada ---------------------------------------------------------------
-
-export type IpcpReading = {
-  type: IndicatorType;
-  severity: Severity;
-  /** ISO 8601 */
-  recordedAt: string;
-};
-
-/** `pending`: el paciente no respondió; pasada la gracia cuenta como dosis perdida. */
-export type DoseStatus = 'taken' | 'skipped' | 'pending';
-
-export type IpcpDose = {
-  /** ISO 8601, hora programada de la toma */
-  scheduledAt: string;
-  status: DoseStatus;
-};
-
-export type AppointmentOutcome = 'upcoming' | 'completed' | 'noShow' | 'cancelled';
-
-export type IpcpAppointment = {
-  /** ISO 8601 */
-  date: string;
-  outcome: AppointmentOutcome;
-};
-
-export type IpcpBackground = {
-  /** Diagnósticos crónicos activos. */
-  conditions: Condition[];
-  /** Antecedentes familiares de las mismas enfermedades. */
-  familyHistory: Condition[];
-  ageYears?: number;
-};
-
-/** Foto de los datos del paciente en un momento dado. `now` va dentro para que el cálculo sea determinista. */
-export type IpcpSnapshot = {
-  /** ISO 8601 */
-  now: string;
-  readings: IpcpReading[];
-  doses: IpcpDose[];
-  appointments: IpcpAppointment[];
-  background: IpcpBackground;
-};
-
-// --- Salida ----------------------------------------------------------------
-
-export type IpcpComponentId = 'clinical' | 'adherence' | 'trend' | 'followUp' | 'background';
+export type IpcpComponentId = 'clinical' | 'adherence' | 'followUp' | 'trend';
 
 export type IpcpComponent = {
   id: IpcpComponentId;
   /** Peso nominal sobre 100. */
   weight: number;
-  /** 0-100. null: no hay datos para calcularlo (no es lo mismo que 0). */
+  /** 0-100, mayor es peor. null: no hay datos para calcularlo (no es lo mismo que 0). */
   points: number | null;
   /** Puntos que aporta al total, ya con los pesos repartidos entre los componentes con datos. */
   contribution: number;
@@ -76,25 +26,25 @@ export type IpcpComponent = {
 export type IpcpDriver =
   | { code: 'criticalReading'; indicator: IndicatorType }
   | { code: 'elevatedReadings'; indicator: IndicatorType }
-  | { code: 'lowAdherence'; /** 0-1 */ rate: number }
-  | { code: 'worseningTrend'; indicator: IndicatorType }
-  /** `days`: días desde la última lectura; null si nunca se registró. */
-  | { code: 'monitoringLapse'; indicator: IndicatorType; days: number | null }
-  | { code: 'missedAppointments'; count: number };
+  /** `rate`: 0-1, parte de las tomas confirmadas. */
+  | { code: 'lowAdherence'; rate: number }
+  /** `rate`: 0-1, parte de las citas pasadas a las que no asistió o canceló. */
+  | { code: 'missedAppointments'; rate: number }
+  | { code: 'worseningTrend' };
 
 export type IpcpTrend = 'worsening' | 'stable' | 'improving' | 'unknown';
 
-type IpcpResultBase = {
-  /** ISO 8601, igual a `snapshot.now` */
+type IpcpReportBase = {
+  /** ISO 8601 */
   computedAt: string;
   /** 0-1: parte del peso total que tuvo datos. */
   coverage: number;
   components: IpcpComponent[];
 };
 
-export type IpcpResult =
-  | (IpcpResultBase & { status: 'insufficient' })
-  | (IpcpResultBase & {
+export type IpcpReport =
+  | (IpcpReportBase & { status: 'insufficient' })
+  | (IpcpReportBase & {
       status: 'ready';
       /** 0-100 */
       score: number;
@@ -102,6 +52,6 @@ export type IpcpResult =
       /** De mayor a menor influencia. */
       drivers: IpcpDriver[];
       trend: IpcpTrend;
-      /** true cuando una lectura crítica reciente subió el puntaje por encima de lo que daba la suma. */
-      floorApplied: boolean;
     });
+
+export type ReadyIpcpReport = Extract<IpcpReport, { status: 'ready' }>;

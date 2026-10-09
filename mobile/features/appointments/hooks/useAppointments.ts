@@ -1,33 +1,40 @@
 // features/appointments/hooks/useAppointments.ts
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useIsPatient } from '@/hooks/useIsPatient';
+import { fetchAppointments } from '../api/appointments-api';
 import { fetchMockProfessionals, fetchMockSpecialties } from '../api/mock-appointment-catalog';
 import {
   cancelMockAppointment,
   createMockAppointment,
-  fetchMockAppointmentById,
-  fetchMockAppointments,
+  withLocalAppointments,
 } from '../api/mock-appointments';
 
 const APPOINTMENTS_QUERY_KEY = ['appointments'] as const;
 
-// TODO: reemplazar los mocks por apiClient cuando el backend exponga el endpoint.
+const loadAppointments = async () => withLocalAppointments(await fetchAppointments());
+
 export function useAppointments() {
-  return useQuery({ queryKey: APPOINTMENTS_QUERY_KEY, queryFn: fetchMockAppointments });
+  const enabled = useIsPatient();
+  return useQuery({ queryKey: APPOINTMENTS_QUERY_KEY, queryFn: loadAppointments, enabled });
 }
 
+/** Una cita por id; `null` si no existe. La API no tiene detalle: sale de la lista. */
 export function useAppointment(id: string) {
+  const enabled = useIsPatient();
   return useQuery({
-    queryKey: [...APPOINTMENTS_QUERY_KEY, id],
-    queryFn: () => fetchMockAppointmentById(id),
+    queryKey: APPOINTMENTS_QUERY_KEY,
+    queryFn: loadAppointments,
+    select: (appointments) => appointments.find((appointment) => appointment.id === id) ?? null,
+    enabled,
   });
 }
 
-export function useCancelAppointment(id: string) {
+// TODO: cancelar y agendar son locales hasta que el backend los exponga al paciente.
+export function useCancelAppointment() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: () => cancelMockAppointment(id),
-    // invalida la lista y el detalle (comparten el prefijo de la key)
+    mutationFn: cancelMockAppointment,
     onSuccess: () => queryClient.invalidateQueries({ queryKey: APPOINTMENTS_QUERY_KEY }),
   });
 }

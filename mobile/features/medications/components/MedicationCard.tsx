@@ -4,6 +4,7 @@ import { View } from 'react-native';
 import { Switch } from '@/components/ui/switch';
 import { Text } from '@/components/ui/text';
 import { FREQUENCY_LABELS } from '@/constants/labels';
+import { joinParts } from '@/lib/text-format';
 import { cn } from '@/lib/utils';
 
 const ICON_SIZE = 56;
@@ -13,8 +14,8 @@ const ICON_BG_INACTIVE = 'rgba(217, 217, 217, 0.6)';
 type MedicationCardProps = {
   drugName: string;
   dose: string;
-  /** cantidad por toma, ej "1 tableta" — viene de medication_schedule, no de medication */
-  quantityLabel: string;
+  /** ej "Vía oral" o, en los creados en el dispositivo, "1 tableta" */
+  detail?: string;
   /** valor de cat_frequency.name (ej "Every 12 hours") */
   frequency?: string;
   time: string;
@@ -25,16 +26,14 @@ type MedicationCardProps = {
 export function MedicationCard({
   drugName,
   dose,
-  quantityLabel,
+  detail,
   frequency,
   time,
   active,
   onToggleActive,
 }: MedicationCardProps) {
-  // "1 tableta · Cada 12 horas"
-  const details = [quantityLabel, frequency && (FREQUENCY_LABELS[frequency] ?? frequency)]
-    .filter(Boolean)
-    .join(' · ');
+  // "Vía oral · Todos los días"
+  const details = joinParts([detail, frequency && (FREQUENCY_LABELS[frequency] ?? frequency)]);
 
   return (
     <View className="bg-card border-border flex-row items-start gap-4 rounded-3xl border p-5 shadow-lg shadow-black/5">

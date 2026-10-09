@@ -52,7 +52,7 @@ export function useClinicalSummary() {
   return {
     isLoading: loadingProfile || loadingDiagnoses || loadingMedications || loadingContacts,
     patientName: user?.name ?? MORE_LABELS.fallbackName,
-    updatedAt: profile ? formatIsoDateShort(profile.updatedAt) : undefined,
+    updatedAt: profile?.updatedAt ? formatIsoDateShort(profile.updatedAt) : undefined,
     rows,
     emergencyContact: emergencyContact && {
       name: emergencyContact.name,

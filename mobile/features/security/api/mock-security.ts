@@ -1,7 +1,7 @@
 // features/security/api/mock-security.ts
 //
-// Mock temporal — el backend no expone sesiones ni cambio de contraseña desde la
-// app móvil todavía. Cuando existan, reemplazar por apiClient sin tocar las pantallas.
+// Mock temporal — el backend no expone las sesiones activas todavía. Cuando existan,
+// reemplazar por apiClient sin tocar las pantallas.
 export type DeviceSession = {
   id: string;
   name: string;
@@ -51,13 +51,4 @@ export async function closeMockSession(id: string): Promise<void> {
 export async function closeMockOtherSessions(): Promise<void> {
   await delay(300);
   sessions = sessions.filter((session) => session.isCurrent);
-}
-
-export async function changeMockPassword(input: {
-  currentPassword: string;
-  newPassword: string;
-}): Promise<void> {
-  // TODO: PATCH /auth/password. El mock no valida la contraseña actual.
-  void input;
-  await delay(500);
 }

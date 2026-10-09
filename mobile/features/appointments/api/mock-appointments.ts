@@ -1,72 +1,24 @@
 // features/appointments/api/mock-appointments.ts
 //
-// Mock temporal — el módulo appointments del backend tiene "entidades
-// definidas, sin controlador/servicio" (README). Cuando exista el endpoint
-// real, reemplazar estas funciones por apiClient.get('/appointments'),
-// apiClient.get(`/appointments/${id}`), apiClient.post('/appointments', ...) y
-// apiClient.patch(...), sin tocar las pantallas.
+// Mock temporal de lo que el paciente todavía no puede hacer en el backend: las citas las
+// crea y cancela el personal de salud (POST /patients/:id/appointments, solo staff). Estos
+// cambios quedan solo en el dispositivo y se superponen a las citas reales.
+// TODO: reemplazar por apiClient cuando exista el endpoint para pacientes.
+import { createLocalOverlay, newLocalId } from '@/lib/local-overlay';
 import { compareAppointments } from '../domain/appointment-date';
+import type { AppointmentRecord } from '../domain/appointment-record';
 
-export type AppointmentRecord = {
-  id: string;
-  date: string; // YYYY-MM-DD
-  specialty: string;
-  doctorName: string;
-  time: string;
-  /** valor tal cual viene de cat_appointment_state.name (ej "Scheduled") */
-  status: string;
-  location: string;
-  /** motivo de la consulta, escrito por el paciente al agendar */
-  reason?: string;
-};
-
-let mockAppointments: AppointmentRecord[] = [
-  {
-    id: '1',
-    date: '2026-05-15',
-    specialty: 'Medicina General',
-    doctorName: 'Dr. Juan Pérez',
-    time: '10:00 AM',
-    status: 'Scheduled',
-    location: 'Hospital Regional',
-  },
-  {
-    id: '2',
-    date: '2026-05-22',
-    specialty: 'Cardiología',
-    doctorName: 'Dra. Ana Gómez',
-    time: '09:30 AM',
-    status: 'Pending', // ⚠️ mock, ver nota en constants/labels.ts
-    location: 'Clínica del Corazón',
-  },
-  {
-    id: '3',
-    date: '2026-06-05',
-    specialty: 'Medicina General',
-    doctorName: 'Dr. Juan Pérez',
-    time: '11:00 AM',
-    status: 'Scheduled',
-    location: 'Hospital Regional',
-  },
-];
+const localChanges = createLocalOverlay<AppointmentRecord>();
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
-export async function fetchMockAppointments(): Promise<AppointmentRecord[]> {
-  await delay(300);
-  return [...mockAppointments].sort(compareAppointments);
-}
+/** Las citas reales con los cambios locales aplicados, en orden cronológico. */
+export const withLocalAppointments = (remote: AppointmentRecord[]) =>
+  localChanges.apply(remote).sort(compareAppointments);
 
-export async function fetchMockAppointmentById(id: string): Promise<AppointmentRecord | null> {
+export async function cancelMockAppointment(appointment: AppointmentRecord): Promise<void> {
   await delay(300);
-  return mockAppointments.find((appointment) => appointment.id === id) ?? null;
-}
-
-export async function cancelMockAppointment(id: string): Promise<void> {
-  await delay(300);
-  mockAppointments = mockAppointments.map((appointment) =>
-    appointment.id === id ? { ...appointment, status: 'Cancelled' } : appointment,
-  );
+  localChanges.upsert({ ...appointment, status: 'Cancelled' });
 }
 
 export type CreateAppointmentPayload = Omit<AppointmentRecord, 'id' | 'status'>;
@@ -76,7 +28,7 @@ export async function createMockAppointment(
   payload: CreateAppointmentPayload,
 ): Promise<AppointmentRecord> {
   await delay(400);
-  const record: AppointmentRecord = { ...payload, id: String(Date.now()), status: 'Scheduled' };
-  mockAppointments = [...mockAppointments, record];
+  const record: AppointmentRecord = { ...payload, id: newLocalId(), status: 'Scheduled' };
+  localChanges.upsert(record);
   return record;
 }

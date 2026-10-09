@@ -27,10 +27,11 @@ import {
 import { useDateTimePicker } from '@/hooks/useDateTimePicker';
 import { formatTime12h, timeLabelToDate } from '@/lib/date-format';
 import { colors } from '@/lib/tokens';
-import type { MedicationRecord } from '@/features/medications/api/mock-medications';
+import type { MedicationRecord } from '@/features/medications/domain/medication-record';
+import { joinParts } from '@/lib/text-format';
 import { useMedications } from '@/features/medications/hooks/useMedications';
 import { WeekdayPicker } from '../components/WeekdayPicker';
-import type { MedicationReminder } from '../api/mock-reminders';
+import type { MedicationReminder } from '../domain/reminder-records';
 import {
   ALL_DAYS,
   FREQUENCY_PRESETS,
@@ -158,6 +159,7 @@ function MedicationReminderForm({
     saveReminder.mutate(
       {
         id: reminder?.id,
+        createdAt: reminder?.createdAt,
         medicationId: form.medicationId,
         time: formatTime12h(form.time),
         days: form.days,
@@ -336,8 +338,10 @@ function MedicationSummary({ medication }: { medication: MedicationRecord }) {
           {medication.drugName} {medication.dose}
         </Text>
         <Text className="text-small font-body text-muted-foreground">
-          {medication.quantityLabel} ·{' '}
-          {MEDICATIONS_LABELS.treatment[medication.active ? 'active' : 'inactive']}
+          {joinParts([
+            medication.detail,
+            MEDICATIONS_LABELS.treatment[medication.active ? 'active' : 'inactive'],
+          ])}
         </Text>
       </View>
     </View>

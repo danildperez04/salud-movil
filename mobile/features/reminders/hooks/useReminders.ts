@@ -1,21 +1,51 @@
 // features/reminders/hooks/useReminders.ts
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import {
+  loadMedications,
+  MEDICATIONS_QUERY_KEY,
+} from '@/features/medications/hooks/useMedications';
+import { useIsPatient } from '@/hooks/useIsPatient';
+import { queryClient as sharedQueryClient } from '@/lib/query-client';
+import { fetchReminderFeed } from '../api/reminders-api';
+import {
   deleteMockAppointmentReminder,
   deleteMockMedicationReminder,
-  fetchMockAppointmentReminders,
-  fetchMockMedicationReminders,
   saveMockAppointmentReminder,
   saveMockMedicationReminder,
+  withLocalAppointmentReminders,
+  withLocalMedicationReminders,
 } from '../api/mock-reminders';
+import { appointmentRemindersFrom, medicationRemindersFrom } from '../domain/reminder-records';
 
 const MEDICATION_REMINDERS_KEY = ['reminders', 'medications'] as const;
 const APPOINTMENT_REMINDERS_KEY = ['reminders', 'appointments'] as const;
+export const REMINDER_FEED_KEY = ['reminders', 'feed'] as const;
 
-// TODO: reemplazar los mocks por apiClient cuando el backend exponga el endpoint.
+/** Feed de avisos de la API; las varias consultas de una pantalla comparten una sola petición. */
+export const loadReminderFeed = (staleTime = 30 * 1000) =>
+  sharedQueryClient.fetchQuery({
+    queryKey: REMINDER_FEED_KEY,
+    queryFn: fetchReminderFeed,
+    staleTime,
+  });
+
+// Los recordatorios de medicamento salen de los horarios de los medicamentos; los de cita, del
+// feed de la API. Crear, editar o borrar es local (ver mock-reminders.ts).
 
 export function useMedicationReminders() {
-  return useQuery({ queryKey: MEDICATION_REMINDERS_KEY, queryFn: fetchMockMedicationReminders });
+  const enabled = useIsPatient();
+  return useQuery({
+    queryKey: MEDICATION_REMINDERS_KEY,
+    queryFn: async () => {
+      const medications = await sharedQueryClient.fetchQuery({
+        queryKey: MEDICATIONS_QUERY_KEY,
+        queryFn: loadMedications,
+        staleTime: 30 * 1000,
+      });
+      return withLocalMedicationReminders(medicationRemindersFrom(medications));
+    },
+    enabled,
+  });
 }
 
 export function useSaveMedicationReminder() {
@@ -35,7 +65,13 @@ export function useDeleteMedicationReminder() {
 }
 
 export function useAppointmentReminders() {
-  return useQuery({ queryKey: APPOINTMENT_REMINDERS_KEY, queryFn: fetchMockAppointmentReminders });
+  const enabled = useIsPatient();
+  return useQuery({
+    queryKey: APPOINTMENT_REMINDERS_KEY,
+    queryFn: async () =>
+      withLocalAppointmentReminders(appointmentRemindersFrom(await loadReminderFeed())),
+    enabled,
+  });
 }
 
 export function useSaveAppointmentReminder() {

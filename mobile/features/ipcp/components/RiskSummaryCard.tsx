@@ -4,7 +4,7 @@ import { Text } from '@/components/ui/text';
 import { ToneBadge } from '@/components/ui/tone-badge';
 import { IPCP_LABELS } from '@/constants/labels';
 import { formatDayMonth, formatTime12h } from '@/lib/date-format';
-import type { ReadyIpcpReport } from '../api/mock-ipcp';
+import type { ReadyIpcpReport } from '../domain/ipcp-model';
 import { LEVEL_VISUALS, withAlpha } from './ipcp-visuals';
 import { RiskGauge } from './RiskGauge';
 
