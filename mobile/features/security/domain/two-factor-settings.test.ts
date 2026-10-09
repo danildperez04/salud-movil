@@ -1,7 +1,7 @@
 // features/security/domain/two-factor-settings.test.ts
 import assert from 'node:assert/strict';
 import { describe, it } from 'node:test';
-import { SECURITY_LABELS } from '@/constants/labels';
+import { COMMON_LABELS, SECURITY_LABELS } from '@/constants/labels';
 import {
   disableErrorMessage,
   disableTwoFactorSchema,
@@ -10,6 +10,7 @@ import {
 } from './two-factor-settings';
 
 const { errors } = SECURITY_LABELS.twoFactor;
+const { unavailable, network } = COMMON_LABELS.errors;
 
 describe('disableTwoFactorSchema', () => {
   it('exige la contraseña', () => {
@@ -24,7 +25,7 @@ describe('enableErrorMessage', () => {
   it('400 es código incorrecto y 429 demasiados intentos', () => {
     assert.equal(enableErrorMessage({ status: 400, message: 'x' }), errors.wrongCode);
     assert.equal(enableErrorMessage({ status: 429, message: 'x' }), errors.tooManyRequests);
-    assert.equal(enableErrorMessage({ status: 500, message: 'Error 500' }), 'Error 500');
+    assert.equal(enableErrorMessage({ status: 500, message: unavailable }), unavailable);
   });
 });
 
@@ -43,9 +44,6 @@ describe('disableErrorMessage', () => {
   it('400 es contraseña incorrecta y 429 demasiados intentos', () => {
     assert.equal(disableErrorMessage({ status: 400, message: 'x' }), errors.wrongPassword);
     assert.equal(disableErrorMessage({ status: 429, message: 'x' }), errors.tooManyRequests);
-    assert.equal(
-      disableErrorMessage({ message: 'Network request failed' }),
-      'Network request failed',
-    );
+    assert.equal(disableErrorMessage({ status: 0, message: network }), network);
   });
 });
