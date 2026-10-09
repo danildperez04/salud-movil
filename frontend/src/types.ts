@@ -538,4 +538,6 @@ export interface IpcpBatchFilters {
   limit?: number;
   sortBy?: 'score' | 'level' | 'name';
   sortOrder?: 'asc' | 'desc';
+  /** Solo el admin lo aplica: al personal de salud se lo fija el servidor. */
+  healthCenterId?: string;
 }
