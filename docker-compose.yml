@@ -55,6 +55,19 @@ services:
       JWT_SECRET: ${JWT_SECRET:?Define JWT_SECRET en .env (openssl rand -base64 48)}
       JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-1d}
       OTP_EXPIRES_MINUTES: ${OTP_EXPIRES_MINUTES:-5}
+      # Swagger UI: habilitado con SWAGGER_ENABLED=true (por defecto: solo fuera de producción)
+      SWAGGER_ENABLED: ${SWAGGER_ENABLED:-false}
+      # ──────────────────────────────────────────────────────────────────────
+      # Email (Nodemailer) – para envío de códigos 2FA
+      # ──────────────────────────────────────────────────────────────────────
+      MAIL_HOST: ${MAIL_HOST:-}
+      MAIL_PORT: ${MAIL_PORT:-587}
+      MAIL_USER: ${MAIL_USER:-}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-}
+      MAIL_FROM: ${MAIL_FROM:-}
+      MAIL_TLS: ${MAIL_TLS:-true}
+      MAIL_IGNORE_TLS: ${MAIL_IGNORE_TLS:-false}
+      # ──────────────────────────────────────────────────────────────────────
       # Orígenes que pueden llamar al API desde un navegador, separados por
       # coma. Con el panel servido por nginx (mismo origen) no hace falta, pero
       # se deja el origen público por defecto. La app móvil no usa CORS.
