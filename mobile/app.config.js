@@ -19,6 +19,11 @@ module.exports = ({ config }) => ({
   },
   plugins: [
     ...(config.plugins ?? []),
+    // Si la API se sirve por HTTP (sin TLS), Android bloquea la conexión: se permite solo hacia
+    // ese host. Solo en release: los builds de desarrollo ya permiten HTTP para llegar a Metro.
+    ...(isReleaseBuild
+      ? [['./plugins/with-cleartext-api-host', { apiUrl: process.env.EXPO_PUBLIC_API_URL }]]
+      : []),
     [
       'expo-build-properties',
       {

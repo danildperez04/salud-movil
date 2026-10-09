@@ -70,7 +70,7 @@
     "web": "expo start --web",
     "lint": "expo lint",
     "typecheck": "tsc --noEmit",
-    "test": "tsx --test \"features/**/*.test.ts\" \"lib/**/*.test.ts\"",
+    "test": "tsx --test \"features/**/*.test.ts\" \"lib/**/*.test.ts\" \"plugins/**/*.test.js\"",
     "prepare": "husky"
   },
   "lint-staged": {
