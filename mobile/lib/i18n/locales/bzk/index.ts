@@ -2,7 +2,8 @@
 import type { es } from '../es';
 import { accessibility } from './accessibility';
 import { common } from './common';
+import { home } from './home';
 import { language } from './language';
 import { navigation } from './navigation';
 
-export const bzk: typeof es = { accessibility, common, language, navigation };
+export const bzk: typeof es = { accessibility, common, home, language, navigation };

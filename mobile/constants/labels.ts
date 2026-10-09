@@ -104,20 +104,6 @@ export const LOGIN_LABELS = {
   },
 } as const;
 
-// Texto exacto del Figma (pantalla Home)
-export const HOME_LABELS = {
-  greetingPrefix: 'Hola,',
-  statusTitle: 'Tu estado de hoy',
-  statusHeadline: '¡Vas por buen camino!',
-  statusSubtitle: 'Sigue así, mantén tus hábitos saludables',
-  quickActions: {
-    appointments: { title: 'Citas', subtitle: 'Agenda y gestión' },
-    medications: { title: 'Medicamentos', subtitle: 'Control y recetas' },
-    indicators: { title: 'Indicadores', subtitle: 'Métricas de salud' },
-    medicalRecord: { title: 'Expediente', subtitle: 'Historial clínico' },
-  },
-} as const;
-
 export const HEALTH_INDICATORS_LABELS = {
   registerButton: 'Registrar nuevo indicador',
   currentStatus: 'Estado actual',
