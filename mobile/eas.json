@@ -8,19 +8,19 @@
       "developmentClient": true,
       "distribution": "internal",
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://salud-movil.onrender.com"
+        "EXPO_PUBLIC_API_URL": "http://158.23.21.222/api"
       }
     },
     "preview": {
       "distribution": "internal",
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://salud-movil.onrender.com"
+        "EXPO_PUBLIC_API_URL": "http://158.23.21.222/api"
       }
     },
     "production": {
       "autoIncrement": true,
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://salud-movil.onrender.com"
+        "EXPO_PUBLIC_API_URL": "http://158.23.21.222/api"
       }
     },
     "apk": {
@@ -29,7 +29,7 @@
         "buildType": "apk"
       },
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://salud-movil.onrender.com"
+        "EXPO_PUBLIC_API_URL": "http://158.23.21.222/api"
       }
     }
   },
