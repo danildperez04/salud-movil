@@ -11,6 +11,7 @@ import { Button } from "../../components/ui/Button";
 import { Badge } from "../../components/ui/Badge";
 import { Alert } from "../../components/ui/Alert";
 import { ConfirmDeleteModal } from "../../components/ui/ConfirmDeleteModal";
+import { IpcpBadge } from "../../components/patients/IpcpBadge";
 
 /** Espera antes de disparar la búsqueda mientras el usuario sigue escribiendo. */
 const SEARCH_DEBOUNCE_MS = 400;
@@ -21,6 +22,7 @@ export default function PatientsList() {
   const isAdmin = user?.role === "admin";
 
   const [patients, setPatients] = useState<PublicPatient[]>([]);
+  const [ipcpMap, setIpcpMap] = useState<Record<string, { score: number; level: "high" | "moderate" | "low" }>>({});
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -42,6 +44,15 @@ export default function PatientsList() {
       const data = await api.listPatients(search);
       if (requestIdRef.current === requestId) {
         setPatients(data);
+        // Cargar IPCP para los pacientes cargados
+        if (data.length > 0) {
+          const ipcpBatch = await api.getPatientsIpcp({ limit: 1000 });
+          const map: Record<string, { score: number; level: "high" | "moderate" | "low" }> = {};
+          for (const p of ipcpBatch.data) {
+            map[p.id] = { score: p.score, level: p.level };
+          }
+          setIpcpMap(map);
+        }
       }
     } catch (err) {
       if (requestIdRef.current === requestId) {
@@ -118,6 +129,14 @@ export default function PatientsList() {
       render: (row) => (
         <span className="text-slate-700">{row.healthCenterName}</span>
       ),
+    },
+    {
+      header: "IPCP",
+      render: (row) => {
+        const ipcp = ipcpMap[row.id];
+        if (!ipcp) return <span className="text-slate-400 text-xs">—</span>;
+        return <IpcpBadge score={ipcp.score} level={ipcp.level} />;
+      },
     },
     {
       header: "Estado",

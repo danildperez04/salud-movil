@@ -18,6 +18,8 @@ import StaffForm from "./pages/staff/StaffForm";
 import PatientsList from "./pages/patients/PatientsList";
 import PatientForm from "./pages/patients/PatientForm";
 import PatientDetail from "./pages/patients/PatientDetail";
+import PriorityPage from "./pages/patients/PriorityPage";
+import PriorityMapPage from "./pages/patients/PriorityMapPage";
 import CaregiversList from "./pages/caregivers/CaregiversList";
 import CaregiverForm from "./pages/caregivers/CaregiverForm";
 import CaregiverDetail from "./pages/caregivers/CaregiverDetail";
@@ -107,6 +109,8 @@ function App() {
             <Route path="patients/:id" element={<PatientDetail />} />
             <Route path="patients/:id/edit" element={<PatientForm />} />
             <Route path="patients/:id/record" element={<PatientRecord />} />
+            <Route path="priority" element={<PriorityPage />} />
+            <Route path="priority-map" element={<PriorityMapPage />} />
           </Route>
           <Route
             element={
@@ -116,15 +120,6 @@ function App() {
               />
             }
           >
-            {/* TODO: reemplazar cada ComingSoon por la página real cuando exista */}
-            <Route
-              path="priority"
-              element={<ComingSoon title="Prioridad IPCP" />}
-            />
-            <Route
-              path="priority-map"
-              element={<ComingSoon title="Mapa de prioridad" />}
-            />
             <Route path="alerts" element={<ComingSoon title="Alertas" />} />
             <Route
               path="notifications"

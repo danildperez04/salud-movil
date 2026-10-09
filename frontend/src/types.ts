@@ -507,3 +507,37 @@ export interface VerifyTwoFactorDto {
 export interface DisableTwoFactorDto {
   password: string;
 }
+
+// === IPCP Batch ===
+
+export interface IpcpSummary {
+  id: string;
+  name: string;
+  email: string;
+  score: number;
+  level: IpcpLevel;
+  deviationScore: number | null;
+  adherenceScore: number | null;
+  appointmentScore: number | null;
+  trendScore: number | null;
+  updatedAt: string;
+}
+
+export interface IpcpBatchResponse {
+  data: IpcpSummary[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
+export interface IpcpBatchFilters {
+  level?: IpcpLevel;
+  search?: string;
+  page?: number;
+  limit?: number;
+  sortBy?: 'score' | 'level' | 'name';
+  sortOrder?: 'asc' | 'desc';
+  /** Solo el admin lo aplica: al personal de salud se lo fija el servidor. */
+  healthCenterId?: string;
+}

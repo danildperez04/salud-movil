@@ -47,6 +47,17 @@ export const IPCP_TREND_SCORE = {
   worsening: 100,
 } as const;
 
+/**
+ * TTL del cache de IPCP, en **milisegundos** (así lo interpreta
+ * `CacheModule.register`). Se alinea con el cron de refresco: el valor en cache
+ * nunca vive más que el intervalo en que se recalcula, de modo que la pantalla
+ * nunca muestra un índice más viejo que 30 minutos.
+ */
+export const IPCP_CACHE_TTL_MS = 10 * 60 * 1000;
+
+/** Prefijo de las claves de cache. Una por paciente: `ipcp:<patientId>`. */
+export const IPCP_CACHE_PREFIX = 'ipcp:';
+
 /** Ventanas de observación de cada variable. */
 export const IPCP_WINDOWS = {
   /** Tomas de medicamento. */
