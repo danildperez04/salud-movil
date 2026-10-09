@@ -8,4 +8,5 @@ export const securityRoutes = {
   password: `${BASE}/password` as Href,
   biometric: `${BASE}/biometric` as Href,
   devices: `${BASE}/devices` as Href,
+  twoFactor: `${BASE}/two-factor` as Href,
 };

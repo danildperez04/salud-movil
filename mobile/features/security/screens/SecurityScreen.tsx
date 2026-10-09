@@ -1,6 +1,12 @@
 // features/security/screens/SecurityScreen.tsx
 import { router, type Href } from 'expo-router';
-import { FingerprintPattern, Lock, Smartphone, type LucideIcon } from 'lucide-react-native';
+import {
+  FingerprintPattern,
+  Lock,
+  ShieldCheck,
+  Smartphone,
+  type LucideIcon,
+} from 'lucide-react-native';
 import { ScrollView, View } from 'react-native';
 import { ListItemCard } from '@/components/ui/list-item-card';
 import { ScreenHeader } from '@/components/ui/screen-header';
@@ -13,6 +19,7 @@ const ITEMS: { id: string; icon: LucideIcon; title: string; subtitle: string; hr
   { id: 'password', icon: Lock, ...menu.password, href: securityRoutes.password },
   { id: 'biometric', icon: FingerprintPattern, ...menu.biometric, href: securityRoutes.biometric },
   { id: 'devices', icon: Smartphone, ...menu.devices, href: securityRoutes.devices },
+  { id: 'twoFactor', icon: ShieldCheck, ...menu.twoFactor, href: securityRoutes.twoFactor },
 ];
 
 export default function SecurityScreen() {
