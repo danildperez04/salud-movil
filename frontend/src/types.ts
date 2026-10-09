@@ -37,6 +37,44 @@ export interface CreateDemoRequestPayload {
   website?: string;
 }
 
+export type DemoRequestStatus =
+  | 'pending'
+  | 'contacted'
+  | 'scheduled'
+  | 'completed'
+  | 'discarded';
+
+/** Solicitud de demo tal como la ve el administrador. */
+export interface DemoRequest {
+  id: string;
+  name: string;
+  email: string;
+  organization: string;
+  jobTitle: string | null;
+  phoneNumber: string | null;
+  message: string | null;
+  status: DemoRequestStatus;
+  adminNotes: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface DemoRequestPage {
+  items: DemoRequest[];
+  total: number;
+  page: number;
+  pageSize: number;
+}
+
+/** Cuántas solicitudes hay en cada estado. */
+export type DemoRequestStats = Record<DemoRequestStatus, number>;
+
+export interface UpdateDemoRequestPayload {
+  status?: DemoRequestStatus;
+  /** Cadena vacía borra las notas. */
+  adminNotes?: string;
+}
+
 export interface CatalogueItem {
   id: number;
   name: string;
@@ -536,4 +574,23 @@ export interface PublicRelease {
   publishedAt: string;
   /** Ruta relativa a la API; usar `releaseDownloadUrl` para armar el enlace. */
   downloadPath: string;
+}
+
+/** Versión de la app tal como la ve el administrador (`GET /admin/releases`). */
+export interface AdminRelease {
+  id: string;
+  platform: ReleasePlatform;
+  version: string;
+  notes: string | null;
+  fileName: string;
+  sizeBytes: number;
+  sha256: string;
+  isPublished: boolean;
+  downloadCount: number;
+  createdAt: string;
+}
+
+export interface UpdateReleasePayload {
+  notes?: string;
+  isPublished?: boolean;
 }

@@ -1,4 +1,5 @@
 import type {
+  AdminRelease,
   AuthResponse,
   CatalogueItem,
   CreateAppointmentPayload,
@@ -9,6 +10,10 @@ import type {
   CreateMedicationPayload,
   CreatePatientPayload,
   CreateStaffPayload,
+  DemoRequest,
+  DemoRequestPage,
+  DemoRequestStats,
+  DemoRequestStatus,
   DisableTwoFactorDto,
   HealthCenterItem,
   LinkCaregiverPayload,
@@ -32,9 +37,11 @@ import type {
   TwoFactorChallengeInfo,
   UpdateAppointmentPayload,
   UpdateCaregiverPayload,
+  UpdateDemoRequestPayload,
   UpdateHealthIndicatorPayload,
   UpdateMedicalRecordPayload,
   UpdateMedicationPayload,
+  UpdateReleasePayload,
   UpdatePatientPayload,
   UpdateStaffPayload,
   VerifyTwoFactorDto,
@@ -548,6 +555,97 @@ export const api = {
 
   getPatientIpcp(patientId: string) {
     return request<PublicIpcp>(`/patients/${patientId}/ipcp`);
+  },
+
+  // --- Solicitudes de demo (administración) ---
+
+  listDemoRequests(query: {
+    status?: DemoRequestStatus;
+    search?: string;
+    page?: number;
+    pageSize?: number;
+  }) {
+    return request<DemoRequestPage>(withQuery('/admin/demo-requests', query));
+  },
+
+  getDemoRequestStats() {
+    return request<DemoRequestStats>('/admin/demo-requests/stats');
+  },
+
+  updateDemoRequest(id: string, payload: UpdateDemoRequestPayload) {
+    return request<DemoRequest>(`/admin/demo-requests/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    });
+  },
+
+  deleteDemoRequest(id: string) {
+    return request<void>(`/admin/demo-requests/${id}`, { method: 'DELETE' });
+  },
+
+  // --- Instaladores (administración) ---
+
+  listReleases() {
+    return request<AdminRelease[]>('/admin/releases');
+  },
+
+  updateRelease(id: string, payload: UpdateReleasePayload) {
+    return request<AdminRelease>(`/admin/releases/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    });
+  },
+
+  deleteRelease(id: string) {
+    return request<void>(`/admin/releases/${id}`, { method: 'DELETE' });
+  },
+
+  /**
+   * Sube un instalable. Usa XMLHttpRequest en vez de `fetch` porque `fetch`
+   * no informa del progreso de subida, y un DMG pesa cientos de MB.
+   */
+  uploadRelease(
+    form: FormData,
+    options: { onProgress?: (fraction: number) => void; signal?: AbortSignal } = {},
+  ) {
+    return new Promise<AdminRelease>((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', `${API_URL}/admin/releases`);
+      const token = tokenGetter();
+      if (token) xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+
+      xhr.upload.onprogress = (event) => {
+        if (event.lengthComputable) options.onProgress?.(event.loaded / event.total);
+      };
+      xhr.onerror = () => reject(new ApiError('No se pudo conectar con el servidor', 0));
+      xhr.onabort = () => reject(new ApiError('Subida cancelada', 0));
+      xhr.onload = () => {
+        if (xhr.status === 401) unauthorizedHandler();
+        let body: (AdminRelease & ApiErrorBody) | null = null;
+        try {
+          body = JSON.parse(xhr.responseText) as AdminRelease & ApiErrorBody;
+        } catch {
+          // Respuesta sin JSON (p. ej. 413 de nginx): se usa un mensaje por estado.
+        }
+        if (xhr.status >= 200 && xhr.status < 300 && body) {
+          resolve(body);
+          return;
+        }
+        const message = Array.isArray(body?.message) ? body.message.join('. ') : body?.message;
+        reject(
+          new ApiError(
+            message ??
+              (xhr.status === 413
+                ? 'El archivo supera el tamaño máximo permitido'
+                : 'No se pudo subir el instalable'),
+            xhr.status,
+          ),
+        );
+      };
+
+      options.signal?.addEventListener('abort', () => xhr.abort());
+      xhr.send(form);
+    });
   },
 
   // --- Instaladores (públicos) ---
