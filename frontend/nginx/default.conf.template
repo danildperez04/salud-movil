@@ -29,6 +29,11 @@ server {
     server_tokens off;
     client_max_body_size 2m;
 
+    # Sin esto, nginx construye los 308 con el puerto interno del contenedor
+    # (8080) y el navegador sería redirigido a un puerto cerrado en el
+    # balanceador. Relativos, conservan el origen con el que se hizo la petición.
+    absolute_redirect off;
+
     gzip on;
     gzip_vary on;
     gzip_proxied any;
