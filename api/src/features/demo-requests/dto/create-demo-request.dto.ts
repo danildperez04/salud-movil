@@ -7,6 +7,7 @@ import {
   Matches,
   MaxLength,
 } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 /** Recorta espacios; deja pasar lo que no es texto para que lo rechace el validador. */
 const trim = ({ value }: { value: unknown }): unknown =>
@@ -19,27 +20,43 @@ const trimOrUndefined = ({ value }: { value: unknown }): unknown => {
 };
 
 export class CreateDemoRequestDto {
+  @ApiProperty({ description: 'Nombre completo', minLength: 2, maxLength: 120 })
   @Transform(trim)
   @IsString()
   @Length(2, 120)
   name!: string;
 
+  @ApiProperty({
+    description: 'Correo electrónico',
+    format: 'email',
+    maxLength: 160,
+  })
   @Transform(trim)
   @IsEmail({}, { message: 'Ingresa un correo válido' })
   @MaxLength(160)
   email!: string;
 
+  @ApiProperty({
+    description: 'Organización o empresa',
+    minLength: 2,
+    maxLength: 160,
+  })
   @Transform(trim)
   @IsString()
   @Length(2, 160)
   organization!: string;
 
+  @ApiPropertyOptional({
+    description: 'Cargo en la organización',
+    maxLength: 120,
+  })
   @IsOptional()
   @Transform(trimOrUndefined)
   @IsString()
   @MaxLength(120)
   jobTitle?: string;
 
+  @ApiPropertyOptional({ description: 'Teléfono de contacto', maxLength: 28 })
   @IsOptional()
   @Transform(trimOrUndefined)
   @IsString()
@@ -48,6 +65,7 @@ export class CreateDemoRequestDto {
   })
   phoneNumber?: string;
 
+  @ApiPropertyOptional({ description: 'Mensaje o consulta', maxLength: 1000 })
   @IsOptional()
   @Transform(trimOrUndefined)
   @IsString()

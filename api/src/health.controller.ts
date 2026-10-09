@@ -6,6 +6,7 @@ import {
 } from '@nestjs/common';
 import { SkipThrottle } from '@nestjs/throttler';
 import { DataSource } from 'typeorm';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Public } from './common/decorators/public.decorator';
 
 /**
@@ -16,6 +17,7 @@ import { Public } from './common/decorators/public.decorator';
  * del límite por IP porque las sondas la consultan cada pocos segundos. No
  * devuelve detalles del fallo para no filtrar información de la infraestructura.
  */
+@ApiTags('system')
 @Controller('health')
 export class HealthController {
   private readonly logger = new Logger(HealthController.name);
@@ -25,6 +27,9 @@ export class HealthController {
   @Public()
   @SkipThrottle()
   @Get()
+  @ApiOperation({ summary: 'Health check de la API y base de datos' })
+  @ApiResponse({ status: 200, description: 'API y base de datos operativas.' })
+  @ApiResponse({ status: 503, description: 'Base de datos no disponible.' })
   async check(): Promise<{ status: 'ok' }> {
     try {
       await this.dataSource.query('SELECT 1');

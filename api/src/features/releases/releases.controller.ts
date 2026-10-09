@@ -7,11 +7,13 @@ import {
   StreamableFile,
 } from '@nestjs/common';
 import { Throttle } from '@nestjs/throttler';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { Public } from '../../common/decorators/public.decorator';
 import { RELEASE_PLATFORMS, type ReleasePlatform } from './release-platform';
 import { PublicRelease, ReleasesService } from './releases.service';
 
 /** Parte pública: lo que muestra la landing y la descarga de los instaladores. */
+@ApiTags('releases')
 @Controller('releases')
 export class ReleasesController {
   constructor(private readonly releasesService: ReleasesService) {}
@@ -20,6 +22,13 @@ export class ReleasesController {
   @Get('latest')
   // Un minuto de caché basta para que la landing no golpee la base en cada visita.
   @Header('Cache-Control', 'public, max-age=60')
+  @ApiOperation({
+    summary: 'Obtener los últimos instaladores publicados (público)',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Lista de instaladores por plataforma.',
+  })
   latest(): Promise<PublicRelease[]> {
     return this.releasesService.findLatestPublished();
   }
@@ -28,6 +37,23 @@ export class ReleasesController {
   // Un instalable pesa decenas de MB: se limita más que el resto del API.
   @Throttle({ default: { limit: 20, ttl: 60_000 } })
   @Get(':platform/download')
+  @ApiOperation({
+    summary: 'Descargar el último instalador de una plataforma (público)',
+  })
+  @ApiResponse({
+    status: 200,
+    description: 'Archivo binario del instalador (APK, DMG o EXE).',
+    headers: {
+      'Content-Disposition': {
+        description: 'Nombre del archivo',
+        schema: { type: 'string' },
+      },
+    },
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'Plataforma no soportada o sin instalador publicado.',
+  })
   async download(
     @Param(
       'platform',
