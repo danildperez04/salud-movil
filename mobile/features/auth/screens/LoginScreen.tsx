@@ -15,6 +15,7 @@ import { Text } from '@/components/ui/text';
 import { LOGIN_LABELS } from '@/constants/labels';
 import { colors, fonts } from '@/lib/tokens';
 import { ApiError } from '@/lib/api-client';
+import { userMessage } from '@/lib/error-messages';
 import { useAppStore } from '@/store';
 import { isTwoFactorChallenge } from '../domain/login-response';
 import { useLogin } from '../hooks/useLogin';
@@ -65,11 +66,11 @@ export default function LoginScreen() {
 
   const errorMessage = (() => {
     if (!login.error) return null;
-    if (login.error instanceof ApiError) {
-      // Solo /auth/login: en /auth/2fa/verify un 401 significa código inválido (ver TwoFactorScreen).
-      return login.error.status === 401 ? LOGIN_LABELS.invalidCredentials : login.error.message;
+    // Solo /auth/login: en /auth/2fa/verify un 401 significa código inválido (ver TwoFactorScreen).
+    if (login.error instanceof ApiError && login.error.status === 401) {
+      return LOGIN_LABELS.invalidCredentials;
     }
-    return login.error.message;
+    return userMessage(login.error);
   })();
 
   return (

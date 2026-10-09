@@ -11,6 +11,7 @@ import { Spinner } from '@/components/ui/spinner';
 import { Text } from '@/components/ui/text';
 import { LOGIN_LABELS } from '@/constants/labels';
 import { ApiError } from '@/lib/api-client';
+import { userMessage } from '@/lib/error-messages';
 import { useAppStore } from '@/store';
 import { OtpCodeField } from '../components/OtpCodeField';
 import { otpCodeSchema, type OtpCodeValues } from '../domain/otp-code';
@@ -76,7 +77,7 @@ export default function TwoFactorScreen() {
   const verifyError = verify.error
     ? verify.error instanceof ApiError
       ? verifyErrorMessage(verify.error)
-      : verify.error.message
+      : userMessage(verify.error)
     : null;
 
   return (

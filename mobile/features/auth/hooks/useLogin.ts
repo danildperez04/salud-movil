@@ -1,12 +1,13 @@
 // features/auth/hooks/useLogin.ts
 import { useMutation } from '@tanstack/react-query';
 import { apiClient, ApiError } from '@/lib/api-client';
+import { UserFacingError } from '@/lib/error-messages';
 import { useAppStore } from '@/store';
 import type { LoginDto, LoginResponse } from '@/types/auth';
 import { isMobileRoleAllowed, isTwoFactorChallenge } from '../domain/login-response';
 import { useTwoFactorStore } from '../store/two-factor-store';
 
-export class RoleNotAllowedError extends Error {
+export class RoleNotAllowedError extends UserFacingError {
   constructor() {
     super('Esta cuenta no tiene acceso a la app móvil. Ingresá desde el panel web.');
     this.name = 'RoleNotAllowedError';
