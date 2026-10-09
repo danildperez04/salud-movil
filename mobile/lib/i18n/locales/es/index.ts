@@ -5,6 +5,7 @@ import { accessibility } from './accessibility';
 import { common } from './common';
 import { home } from './home';
 import { language } from './language';
+import { more } from './more';
 import { navigation } from './navigation';
 
-export const es = { accessibility, common, home, language, navigation };
+export const es = { accessibility, common, home, language, more, navigation };

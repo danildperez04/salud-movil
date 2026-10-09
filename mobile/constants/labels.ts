@@ -1000,59 +1000,10 @@ export const ACTIVITY_LABELS = {
   },
 } as const;
 
-// Roles de `user.role` (types/auth.ts) -> texto visible
-export const ROLE_LABELS: Record<string, string> = {
-  patient: 'Paciente',
-  caregiver: 'Cuidador/a',
-  health_staff: 'Personal de salud',
-  admin: 'Administrador',
-};
-
-// Pantalla "Más". Las entradas sin ruta todavía se muestran con la etiqueta `comingSoon`.
-export const MORE_LABELS = {
-  title: 'Más',
-  fallbackName: 'Usuario',
-  comingSoon: 'Pronto',
-  logout: 'Cerrar sesión',
-  ipcp: {
-    title: 'IPCP · Mi prioridad',
-    description: 'Tu nivel de prioridad, calculado con tus indicadores, medicamentos y citas.',
-    cta: 'Ver mi prioridad',
-  },
-  sections: {
-    health: 'Salud y seguimiento',
-    services: 'Servicios complementarios',
-    accessibility: 'Accesibilidad e inclusión',
-    preferences: 'Preferencias',
-    help: 'Ayuda y seguridad',
-  },
-  items: {
-    reminders: { title: 'Recordatorios', subtitle: 'Medicamentos y citas' },
-    medicalRecord: { title: 'Expediente clínico', subtitle: 'Diagnósticos, alergias y documentos' },
-    indicators: { title: 'Indicadores de salud', subtitle: 'Presión, glucosa, peso y más' },
-    activity: { title: 'Actividad física', subtitle: 'Registra tu ejercicio para el seguimiento' },
-    scanner: { title: 'Escáner de medicamentos', subtitle: 'Identifica caja, uso y advertencias' },
-    voice: { title: 'Asistente por voz', subtitle: 'Habla en lugar de escribir' },
-    referral: {
-      title: 'Sistema de referencia',
-      subtitle: 'Te orienta al centro con el servicio que necesitas',
-    },
-    waitTimes: { title: 'Estimación de espera', subtitle: 'Compara tiempos de atención' },
-    healthMap: {
-      title: 'Mapa de recursos sanitarios',
-      subtitle: 'Hospitales, farmacias y laboratorios',
-    },
-    accessibilityCenter: {
-      title: 'Centro de accesibilidad',
-      subtitle: 'Texto, contraste, movimiento y lectura',
-    },
-    language: { title: 'Idioma', subtitle: 'Español y lenguas de la Costa Caribe' },
-    notifications: { title: 'Notificaciones', subtitle: 'Medicamentos, citas y salud' },
-    privacy: { title: 'Privacidad y seguridad', subtitle: 'Acceso y protección de datos' },
-    emergency: { title: 'Modo emergencia', subtitle: 'Información médica, contactos y ubicación' },
-    support: { title: 'Ayuda y soporte', subtitle: 'Preguntas frecuentes y contacto' },
-  },
-} as const;
+// Roles y pantalla "Más". Viven en lib/i18n/locales (ya se traducen); estos alias en español son
+// para las pantallas que todavía no se migran a i18n (perfil, resumen clínico).
+export const ROLE_LABELS: Record<string, string> = es.common.roles;
+export const MORE_LABELS = es.more;
 
 // IPCP · Mi prioridad: resultado calculado automáticamente con los datos de la app
 export const IPCP_LABELS = {

@@ -2,16 +2,17 @@
 import { router } from 'expo-router';
 import { ChevronRight } from '@/lib/icons';
 import { Fragment } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Pressable, View } from 'react-native';
 import { Text } from '@/components/ui/text';
-import { MORE_LABELS } from '@/constants/labels';
 import { cn } from '@/lib/utils';
 import type { MenuItem, MenuSection as MenuSectionData } from '../domain/menu-sections';
 
 const ICON_COLOR = { default: '#2DB79A', danger: '#DC2626' } as const;
 
 function MenuRow({ item }: { item: MenuItem }) {
-  const { icon: Icon, title, subtitle, href, tone = 'default' } = item;
+  const { t } = useTranslation('more');
+  const { id, icon: Icon, href, tone = 'default' } = item;
   const isDanger = tone === 'danger';
 
   return (
@@ -32,9 +33,11 @@ function MenuRow({ item }: { item: MenuItem }) {
       </View>
 
       <View className="flex-1 gap-0.5">
-        <Text className="text-small font-heading-semibold text-foreground">{title}</Text>
+        <Text className="text-small font-heading-semibold text-foreground">
+          {t(`items.${id}.title`)}
+        </Text>
         <Text className="text-caption font-body text-muted-foreground" numberOfLines={2}>
-          {subtitle}
+          {t(`items.${id}.subtitle`)}
         </Text>
       </View>
 
@@ -43,7 +46,7 @@ function MenuRow({ item }: { item: MenuItem }) {
       ) : (
         <View className="bg-muted/40 rounded-full px-2.5 py-1">
           <Text className="text-caption font-body-semibold text-muted-foreground">
-            {MORE_LABELS.comingSoon}
+            {t('comingSoon')}
           </Text>
         </View>
       )}
@@ -52,10 +55,12 @@ function MenuRow({ item }: { item: MenuItem }) {
 }
 
 export function MenuSection({ section }: { section: MenuSectionData }) {
+  const { t } = useTranslation('more');
+
   return (
     <View className="gap-3">
       <Text className="text-caption font-body-semibold text-muted-foreground px-1 tracking-widest uppercase">
-        {section.title}
+        {t(`sections.${section.id}`)}
       </Text>
 
       <View className="bg-card border-border overflow-hidden rounded-3xl border shadow-lg shadow-black/5">
