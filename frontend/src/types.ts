@@ -23,6 +23,58 @@ export interface AuthResponse {
   accessToken: string;
 }
 
+// --- Solicitudes de demo (formulario público de la landing) ---
+
+/** Lo que envía el formulario público de la landing. */
+export interface CreateDemoRequestPayload {
+  name: string;
+  email: string;
+  organization: string;
+  jobTitle?: string;
+  phoneNumber?: string;
+  message?: string;
+  /** Señuelo anti-bots: el formulario lo deja siempre vacío. */
+  website?: string;
+}
+
+export type DemoRequestStatus =
+  | 'pending'
+  | 'contacted'
+  | 'scheduled'
+  | 'completed'
+  | 'discarded';
+
+/** Solicitud de demo tal como la ve el administrador. */
+export interface DemoRequest {
+  id: string;
+  name: string;
+  email: string;
+  organization: string;
+  jobTitle: string | null;
+  phoneNumber: string | null;
+  message: string | null;
+  status: DemoRequestStatus;
+  adminNotes: string | null;
+  createdAt: string;
+  updatedAt: string;
+}
+
+export interface DemoRequestPage {
+  items: DemoRequest[];
+  total: number;
+  page: number;
+  pageSize: number;
+}
+
+/** Cuántas solicitudes hay en cada estado. */
+export type DemoRequestStats = Record<DemoRequestStatus, number>;
+
+export interface UpdateDemoRequestPayload {
+  status?: DemoRequestStatus;
+  /** Cadena vacía borra las notas. */
+  adminNotes?: string;
+}
+
 export interface CatalogueItem {
   id: number;
   name: string;
@@ -508,36 +560,37 @@ export interface DisableTwoFactorDto {
   password: string;
 }
 
-// === IPCP Batch ===
+// --- Instaladores de la app ---
 
-export interface IpcpSummary {
+export type ReleasePlatform = 'android' | 'macos' | 'windows';
+
+/** Última versión publicada de una plataforma (`GET /releases/latest`). */
+export interface PublicRelease {
+  platform: ReleasePlatform;
+  version: string;
+  notes: string | null;
+  sizeBytes: number;
+  sha256: string;
+  publishedAt: string;
+  /** Ruta relativa a la API; usar `releaseDownloadUrl` para armar el enlace. */
+  downloadPath: string;
+}
+
+/** Versión de la app tal como la ve el administrador (`GET /admin/releases`). */
+export interface AdminRelease {
   id: string;
-  name: string;
-  email: string;
-  score: number;
-  level: IpcpLevel;
-  deviationScore: number | null;
-  adherenceScore: number | null;
-  appointmentScore: number | null;
-  trendScore: number | null;
-  updatedAt: string;
+  platform: ReleasePlatform;
+  version: string;
+  notes: string | null;
+  fileName: string;
+  sizeBytes: number;
+  sha256: string;
+  isPublished: boolean;
+  downloadCount: number;
+  createdAt: string;
 }
 
-export interface IpcpBatchResponse {
-  data: IpcpSummary[];
-  total: number;
-  page: number;
-  limit: number;
-  totalPages: number;
-}
-
-export interface IpcpBatchFilters {
-  level?: IpcpLevel;
-  search?: string;
-  page?: number;
-  limit?: number;
-  sortBy?: 'score' | 'level' | 'name';
-  sortOrder?: 'asc' | 'desc';
-  /** Solo el admin lo aplica: al personal de salud se lo fija el servidor. */
-  healthCenterId?: string;
+export interface UpdateReleasePayload {
+  notes?: string;
+  isPublished?: boolean;
 }

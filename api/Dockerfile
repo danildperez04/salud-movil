@@ -29,8 +29,13 @@ FROM node:${NODE_VERSION}-alpine AS runtime
 # tini hace de PID 1: reenvía SIGTERM a Node y recoge procesos zombi, de modo
 # que `docker stop` cierra la API limpiamente en lugar de esperar 10 s al SIGKILL.
 RUN apk add --no-cache tini
+# Los instaladores subidos desde el panel viven en RELEASES_DIR, que en compose
+# es un volumen. La carpeta se crea aquí, con dueño `node`, para que un volumen
+# nuevo la herede y la API (que no corre como root) pueda escribir en ella.
 ENV NODE_ENV=production \
-    PORT=3000
+    PORT=3000 \
+    RELEASES_DIR=/data/releases
+RUN mkdir -p /data/releases && chown -R node:node /data
 WORKDIR /app
 
 COPY --from=build --chown=node:node /app/node_modules ./node_modules

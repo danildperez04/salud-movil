@@ -30,13 +30,18 @@ export function CtaSection() {
           Menos información dispersa. Más claridad para organizar tus citas,
           medicamentos, indicadores y expediente.
         </p>
-        <Button href="#inicio">
-          Tu salud, en tus manos
-          <ArrowRight
-            size={18}
-            className="transition-transform duration-300 group-hover:translate-x-1"
-          />
-        </Button>
+        <div className="flex flex-col items-center justify-center gap-3 landing-sm:flex-row">
+          <Button href="#inicio">
+            Tu salud, en tus manos
+            <ArrowRight
+              size={18}
+              className="transition-transform duration-300 group-hover:translate-x-1"
+            />
+          </Button>
+          <Button href="#demo" variant="secondary">
+            Solicitar una demo
+          </Button>
+        </div>
       </FadeInOnScroll>
     </section>
   );

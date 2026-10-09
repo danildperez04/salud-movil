@@ -23,6 +23,8 @@ import PriorityMapPage from "./pages/patients/PriorityMapPage";
 import CaregiversList from "./pages/caregivers/CaregiversList";
 import CaregiverForm from "./pages/caregivers/CaregiverForm";
 import CaregiverDetail from "./pages/caregivers/CaregiverDetail";
+import Releases from "./pages/admin/Releases";
+import DemoRequests from "./pages/admin/DemoRequests";
 import PatientRecord from "./pages/patients/PatientRecord";
 import { Toaster } from "sonner";
 
@@ -82,6 +84,8 @@ function App() {
             {/* TODO: reemplazar por la página real de Reportes */}
             <Route path="perfil" element={<Profile />} />
             <Route path="reports" element={<ComingSoon title="Reportes" />} />
+            <Route path="demo-requests" element={<DemoRequests />} />
+            <Route path="releases" element={<Releases />} />
           </Route>
           <Route
             element={

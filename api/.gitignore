@@ -62,3 +62,6 @@ report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 # solo dentro de `src/database/migrations/`.
 /[0-9]*-*.ts
 /[0-9]*-*.js
+
+# Instaladores subidos desde el panel (RELEASES_DIR)
+/storage
