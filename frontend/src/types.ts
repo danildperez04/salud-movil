@@ -507,3 +507,19 @@ export interface VerifyTwoFactorDto {
 export interface DisableTwoFactorDto {
   password: string;
 }
+
+// --- Instaladores de la app ---
+
+export type ReleasePlatform = 'android' | 'macos' | 'windows';
+
+/** Última versión publicada de una plataforma (`GET /releases/latest`). */
+export interface PublicRelease {
+  platform: ReleasePlatform;
+  version: string;
+  notes: string | null;
+  sizeBytes: number;
+  sha256: string;
+  publishedAt: string;
+  /** Ruta relativa a la API; usar `releaseDownloadUrl` para armar el enlace. */
+  downloadPath: string;
+}
