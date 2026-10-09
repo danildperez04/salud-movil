@@ -32,6 +32,7 @@
     "@nestjs/jwt": "^11.0.2",
     "@nestjs/platform-express": "^11.0.1",
     "@nestjs/schedule": "^12.0.2",
+    "@nestjs/swagger": "^12.0.2",
     "@nestjs/throttler": "^6.7.1",
     "@nestjs/typeorm": "^11.0.3",
     "bcrypt": "^6.0.0",
@@ -42,6 +43,7 @@
     "dotenv": "^18.0.5",
     "helmet": "^8.3.0",
     "multer": "^2.2.0",
+    "nodemailer": "^10.0.16",
     "pg": "^8.22.0",
     "reflect-metadata": "^0.2.2",
     "rxjs": "^7.8.1",
@@ -58,6 +60,7 @@
     "@types/jest": "^30.0.0",
     "@types/multer": "^2.3.0",
     "@types/node": "^24.0.0",
+    "@types/nodemailer": "^8.0.2",
     "@types/supertest": "^7.0.0",
     "eslint": "^9.18.0",
     "eslint-config-prettier": "^10.0.1",
@@ -91,7 +94,7 @@
     "coverageDirectory": "../coverage",
     "testEnvironment": "node",
     "transformIgnorePatterns": [
-      "^(?!.*node_modules/(@nestjs/schedule|@nestjs/cache-manager)/).*node_modules"
+      "^(?!.*node_modules/(@nestjs/schedule|@nestjs/cache-manager|@nestjs/swagger)/).*node_modules"
     ]
   },
   "packageManager": "pnpm@11.20.0+sha512.9a6f330a95b66446ea088faf1521405a8a01f07fde7124cc9958dfed52d4bb436737e65b08f85f37b46fcba375092558ac51262b816844b22f63406ed166bfee"

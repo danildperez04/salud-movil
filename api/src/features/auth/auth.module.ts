@@ -13,7 +13,7 @@ import { PasswordReset } from './entities/password-reset.entity';
 import { OtpChallenge } from './entities/otp-challenge.entity';
 import { TwoFactorController } from './two-factor.controller';
 import { TwoFactorService } from './two-factor.service';
-import { ConsoleOtpDelivery, OtpDelivery } from './otp-delivery';
+import { EmailOtpDelivery, OtpDelivery } from './otp-delivery';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { APP_GUARD } from '@nestjs/core';
@@ -43,9 +43,8 @@ import { APP_GUARD } from '@nestjs/core';
   providers: [
     AuthService,
     TwoFactorService,
-    // Canal de entrega del OTP. Hoy solo escribe en el log; para enviarlo por
-    // correo o SMS se cambia `useClass` por otra implementación de OtpDelivery.
-    { provide: OtpDelivery, useClass: ConsoleOtpDelivery },
+    // Canal de entrega del OTP por correo (Nodemailer). Ver variables MAIL_* en .env.
+    { provide: OtpDelivery, useClass: EmailOtpDelivery },
     { provide: APP_GUARD, useClass: JwtAuthGuard },
     { provide: APP_GUARD, useClass: RolesGuard },
   ],
