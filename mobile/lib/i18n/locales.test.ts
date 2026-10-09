@@ -21,15 +21,21 @@ function flatten(tree: Tree, prefix = ''): Record<string, string> {
 const es = flatten(resources[LANGUAGE_PROFILES.es.locale] as Tree);
 const bzk = flatten(resources[LANGUAGE_PROFILES.bzk.locale] as Tree);
 
-/** Textos que por su naturaleza se escriben igual en español y en criollo. */
-const SAME_IN_BOTH: readonly RegExp[] = [
-  /^[\d\s:.,+\-/A-Za-z%{}()]*$/, // solo cifras, siglas, símbolos o marcadores: "000000", "A+", "{{count}}"
-  /\.(brand|codePlaceholder|emailPlaceholder)$/, // nombre de la marca y ejemplos de formato
-  /\.(cancel|confirm|admin)$/, // palabras que el criollo toma tal cual del inglés y del español
+/** Textos que se escriben igual en español y en criollo: por su contenido... */
+const SAME_TEXT: readonly RegExp[] = [
+  /^[^\p{L}]*$/u, // sin letras: "000000", "42"
+  /^A\+*$/, // muestras del tamaño de texto: "A", "A+", "A++"
+];
+
+/** ...o por la clave: nombre de la marca, ejemplos de formato y palabras ya compartidas. */
+const SAME_KEY: readonly RegExp[] = [
+  /(^|\.)brand$/,
+  /\.(codePlaceholder|emailPlaceholder)$/,
+  /^navigation\.tabs\.home$/, // "Home" es la palabra de uso común en los dos idiomas
 ];
 
 /** Textos del criollo que conservan una letra del español (nombres propios). */
-const SPANISH_LETTERS_OK: readonly RegExp[] = [/\.brand$/, /\.waitTitle$/];
+const SPANISH_LETTERS_OK: readonly RegExp[] = [/(^|\.)brand$/];
 
 const placeholders = (text: string) =>
   [...text.matchAll(/{{\s*(\w+)\s*}}/g)].map((m) => m[1]).sort();
@@ -54,7 +60,9 @@ describe('textos del criollo', () => {
   it('no son una copia del español (salvo los textos que se escriben igual)', () => {
     const copied = Object.keys(es).filter(
       (key) =>
-        bzk[key] === es[key] && !SAME_IN_BOTH.some((same) => same.test(es[key]) || same.test(key)),
+        bzk[key] === es[key] &&
+        !SAME_TEXT.some((same) => same.test(es[key])) &&
+        !SAME_KEY.some((same) => same.test(key)),
     );
     assert.deepEqual(copied, [], 'textos sin traducir al criollo');
   });

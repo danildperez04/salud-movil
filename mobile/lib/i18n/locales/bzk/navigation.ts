@@ -1,0 +1,70 @@
+// lib/i18n/locales/bzk/navigation.ts
+// Inglés criollo de Nicaragua. Convenciones y glosario: docs/i18n-creole.md
+import type { navigation as spanish } from '../es/navigation';
+
+export const navigation: typeof spanish = {
+  tabs: {
+    home: 'Home',
+    appointments: 'Appointments',
+    medications: 'Medicine',
+    more: 'More',
+  },
+
+  screens: {
+    healthIndicators: 'Health Indicators',
+    indicatorHistory: 'Indicators History',
+    indicatorEvolution: 'Progress',
+    appointments: 'Medical Appointments',
+    appointmentDetail: 'Appointment Details',
+    appointmentForm: 'Book Appointment',
+    medications: 'Medicine',
+    medicationForm: 'Add Medicine',
+    medicationScanner: 'Medicine Scanner',
+    reminders: 'Reminders',
+    medicationReminder: 'Medicine Reminder',
+    appointmentReminder: 'Appointment Reminder',
+    // expediente clínico
+    medicalRecord: 'Health Record',
+    clinicalSummary: 'Health Summary',
+    diagnosis: 'Diagnosis',
+    diagnosisForm: 'Add Diagnosis',
+    history: 'Health History',
+    historyForm: 'Add Health History',
+    allergies: 'Allergies',
+    allergyForm: 'Add Allergy',
+    documents: 'Documents',
+    documentDetail: 'Document',
+    documentUpload: 'Upload Document',
+    labs: 'Lab Tests',
+    labScan: 'Scan Lab Test',
+    labDetail: 'Scanned Test',
+    // cuenta y preferencias
+    register: 'Create Account',
+    profile: 'Mi Account',
+    notifications: 'Notifications',
+    notificationSettings: 'Notifications',
+    security: 'Privacy an Security',
+    twoFactor: 'Two-Step Verification',
+    changePassword: 'Change Password',
+    biometric: 'Biometric Access',
+    devices: 'Linked Devices',
+    accessibility: 'Accessibility',
+    language: 'Languages',
+    // servicios complementarios
+    activity: 'Exercise',
+    voiceAssistant: 'Voice Assistant',
+    ipcp: 'IPCP · Mi Priority',
+    referral: 'Referral System',
+    hospitalGuide: 'Guide Inside di Hospital',
+    waitTimes: 'Waiting Time',
+    healthMap: 'Health Resources',
+    healthResource: 'Health Resource',
+    // ayuda y seguridad
+    emergency: 'Emergency Mode',
+    emergencyContactForm: 'Add Contact',
+    help: 'Help an Support',
+    faq: 'Common Questions',
+    supportChat: 'Support',
+    reportProblem: 'Report Problem',
+  },
+};
