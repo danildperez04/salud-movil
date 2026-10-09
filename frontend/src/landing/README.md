@@ -17,7 +17,7 @@ landing/
 
 ## Reglas para mantenerla ordenada
 
-- **El copy va en `data/`, no en el JSX.** Un archivo por tema: `navigation`, `hero`, `features`, `showcase`, `faq`, `team`, `social`.
+- **El copy va en `data/`, no en el JSX.** Un archivo por tema: `navigation`, `hero`, `features`, `showcase`, `faq`, `team`, `social`, `demo`.
 - **Los iconos se registran en `data/icons.ts`** (`ICONS`, familia lucide). Los datos guardan solo la clave (`icon: "citas"`). No uses glifos Unicode (`◷ ✚ ⌁`): cada fuente los dibuja distinto.
 - **El orden de `navLinks` y de los enlaces del footer sigue el orden de las secciones** en `LandingPage.tsx` (arriba → abajo). Si mueves una sección, reordena también los enlaces.
 - **Cada sección con `id` salta bien bajo el header fijo** gracias a `scroll-margin-top` en `landing.css`; el Navbar resalta la sección activa leyendo `main section[id]`.
