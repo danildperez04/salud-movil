@@ -1,0 +1,17 @@
+node_modules
+dist
+coverage
+test
+scripts
+.git
+.vscode
+.idea
+
+# Nunca debe entrar un .env al contexto de build ni a la imagen.
+.env
+.env.*
+!.env.example
+
+*.log
+Dockerfile
+.dockerignore

@@ -1,0 +1,18 @@
+node_modules
+dist
+dist-ssr
+.git
+.vscode
+.idea
+
+# Nunca debe entrar un .env al contexto de build ni a la imagen.
+.env
+.env.*
+!.env.example
+
+# Lockfile obsoleto: la imagen usa pnpm-lock.yaml.
+package-lock.json
+
+*.log
+Dockerfile
+.dockerignore
