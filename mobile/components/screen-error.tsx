@@ -1,8 +1,8 @@
 // components/screen-error.tsx
+import { useTranslation } from 'react-i18next';
 import { View } from 'react-native';
 import { EmptyStateCard } from '@/components/ui/empty-state-card';
 import { FooterButton } from '@/components/ui/footer-button';
-import { COMMON_LABELS } from '@/constants/labels';
 import { TriangleAlert } from '@/lib/icons';
 
 /**
@@ -10,7 +10,7 @@ import { TriangleAlert } from '@/lib/icons';
  * Expo Router, que está en inglés y muestra el texto del error. Nunca recibe ni muestra el error.
  */
 export function ScreenError({ onRetry }: { onRetry: () => void }) {
-  const { title, description } = COMMON_LABELS.errors.screenCrash;
+  const { t } = useTranslation();
 
   return (
     <View className="bg-background flex-1 justify-center">
@@ -18,11 +18,11 @@ export function ScreenError({ onRetry }: { onRetry: () => void }) {
         <EmptyStateCard
           icon={TriangleAlert}
           tone="danger"
-          title={title}
-          description={description}
+          title={t('errors.screenCrash.title')}
+          description={t('errors.screenCrash.description')}
         />
       </View>
-      <FooterButton label={COMMON_LABELS.retry} onPress={onRetry} />
+      <FooterButton label={t('retry')} onPress={onRetry} />
     </View>
   );
 }

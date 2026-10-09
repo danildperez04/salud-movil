@@ -3,7 +3,7 @@
 // universales (https) siempre que se puede: así no hace falta declarar esquemas
 // en la configuración nativa.
 import { Alert, Linking, Platform } from 'react-native';
-import { COMMON_LABELS } from '@/constants/labels';
+import { i18n } from '@/lib/i18n';
 
 const enc = encodeURIComponent;
 const digitsOnly = (phone: string) => phone.replace(/\D/g, '');
@@ -27,6 +27,6 @@ export async function openExternalLink(url: string | undefined) {
   try {
     await Linking.openURL(url);
   } catch {
-    Alert.alert(COMMON_LABELS.externalLinkErrorTitle, COMMON_LABELS.externalLinkErrorMessage);
+    Alert.alert(i18n.t('externalLinkErrorTitle'), i18n.t('externalLinkErrorMessage'));
   }
 }

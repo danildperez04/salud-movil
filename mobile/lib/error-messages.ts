@@ -1,7 +1,5 @@
 // lib/error-messages.ts
-import { COMMON_LABELS } from '@/constants/labels';
-
-const messages = COMMON_LABELS.errors;
+import { i18n } from '@/lib/i18n';
 
 /**
  * Error cuyo `message` ya está escrito para la persona que usa la app: sin códigos, sin texto
@@ -10,31 +8,34 @@ const messages = COMMON_LABELS.errors;
  */
 export class UserFacingError extends Error {}
 
-/** Mensaje en lenguaje natural para un código HTTP de error. */
+/**
+ * Mensaje en lenguaje natural para un código HTTP de error, en el idioma activo al momento de
+ * llamar (por eso se traduce acá y no al cargar el módulo).
+ */
 export function messageForStatus(status: number): string {
-  if (status >= 500) return messages.unavailable;
+  if (status >= 500) return i18n.t('errors.unavailable');
   switch (status) {
     case 400:
     case 422:
-      return messages.invalidData;
+      return i18n.t('errors.invalidData');
     case 401:
-      return messages.unauthorized;
+      return i18n.t('errors.unauthorized');
     case 403:
-      return messages.forbidden;
+      return i18n.t('errors.forbidden');
     case 404:
-      return messages.notFound;
+      return i18n.t('errors.notFound');
     case 409:
-      return messages.conflict;
+      return i18n.t('errors.conflict');
     case 413:
-      return messages.tooLarge;
+      return i18n.t('errors.tooLarge');
     case 429:
-      return messages.tooManyRequests;
+      return i18n.t('errors.tooManyRequests');
     default:
-      return messages.unexpected;
+      return i18n.t('errors.unexpected');
   }
 }
 
 /** Texto seguro para mostrar de cualquier error capturado (`unknown`). */
 export function userMessage(error: unknown): string {
-  return error instanceof UserFacingError ? error.message : messages.unexpected;
+  return error instanceof UserFacingError ? error.message : i18n.t('errors.unexpected');
 }

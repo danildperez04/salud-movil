@@ -1,6 +1,6 @@
 // lib/api-client.ts
-import { COMMON_LABELS } from '@/constants/labels';
 import { messageForStatus, UserFacingError } from '@/lib/error-messages';
+import { i18n } from '@/lib/i18n';
 import { RequestTimeoutError, withTimeout } from '@/lib/fetch-with-timeout';
 import { useAppStore } from '@/store';
 
@@ -76,16 +76,16 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
         return JSON.parse(text) as T;
       } catch {
         // 200 con un cuerpo que no es JSON (ej. la página de error de un proxy)
-        throw new ApiError(response.status, COMMON_LABELS.errors.unexpected);
+        throw new ApiError(response.status, i18n.t('errors.unexpected'));
       }
     });
   } catch (error) {
     if (error instanceof ApiError) throw error;
     if (error instanceof RequestTimeoutError) {
-      throw new ApiError(0, COMMON_LABELS.errors.timeout);
+      throw new ApiError(0, i18n.t('errors.timeout'));
     }
     // fetch falla con TypeError ("Network request failed") cuando no hay conexión
-    if (error instanceof TypeError) throw new ApiError(0, COMMON_LABELS.errors.network);
+    if (error instanceof TypeError) throw new ApiError(0, i18n.t('errors.network'));
     throw error;
   }
 }
