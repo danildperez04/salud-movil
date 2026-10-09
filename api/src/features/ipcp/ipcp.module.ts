@@ -12,17 +12,19 @@ import { ClinicalRange } from '../catalogues/entities/clinical-range.entity';
 import { ClinicalRangeBand } from '../catalogues/entities/clinical-range-band.entity';
 import { ClinicalRangeBandsService } from '../catalogues/clinical-range-bands.service';
 import { PatientsModule } from '../patients/patients.module';
-import { User } from '../users/entities/user.entity';
 import { Patient } from '../users/entities/patient.entity';
-import { TypeIndicator } from '../catalogues/entities/type-indicator.entity';
+import { User } from '../users/entities/user.entity';
+import { IPCP_CACHE_TTL_MS } from './ipcp.constants';
 
 @Module({
   imports: [
+    // El cron de `recalculateAllIpcp` es el que mantiene precalculado el
+    // índice; sin ScheduleModule no corre y la primera carga del panel paga
+    // el cálculo completo.
     ScheduleModule.forRoot(),
-    CacheModule.register({
-      ttl: 3600,
-      max: 1000,
-    }),
+    // `ttl` va en **milisegundos** (así lo documenta `CacheModuleOptions`):
+    // 3600 aquí serían 3,6 segundos, no una hora.
+    CacheModule.register({ ttl: IPCP_CACHE_TTL_MS }),
     TypeOrmModule.forFeature([
       HealthIndicator,
       Appointment,
@@ -30,13 +32,15 @@ import { TypeIndicator } from '../catalogues/entities/type-indicator.entity';
       MedicationSchedule,
       ClinicalRange,
       ClinicalRangeBand,
-      User,
       Patient,
-      TypeIndicator,
+      User,
     ]),
+    // El scoping por centro no se reimplementa: se reutiliza
+    // `PatientsService.findRecordForScope()` en las rutas de un paciente.
     PatientsModule,
   ],
   controllers: [IpcpController],
   providers: [IpcpService, ClinicalRangeBandsService],
+  exports: [IpcpService],
 })
 export class IpcpModule {}

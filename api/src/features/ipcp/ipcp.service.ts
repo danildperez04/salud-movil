@@ -1,5 +1,6 @@
-import { ForbiddenException, Injectable } from '@nestjs/common';
+import { ForbiddenException, Inject, Injectable, Logger } from '@nestjs/common';
 import { Cron, CronExpression } from '@nestjs/schedule';
+import { CACHE_MANAGER } from '@nestjs/cache-manager';
 import { InjectRepository } from '@nestjs/typeorm';
 import { In, Repository } from 'typeorm';
 import { HealthIndicator } from '../health-indicators/entities/health-indicator.entity';
@@ -13,21 +14,26 @@ import {
 } from '../catalogues/clinical-range-bands.service';
 import { BandSeverity } from '../catalogues/entities/clinical-range-band.entity';
 import { PatientsService } from '../patients/patients.service';
+import { Patient } from '../users/entities/patient.entity';
+import { User } from '../users/entities/user.entity';
 import type { JwtPayload } from '../../common/guards/jwt-payload.interface';
+import type { Cache } from '@nestjs/cache-manager';
 import type {
   IpcpComponent,
+  IpcpComponentKey,
   IpcpIndicatorDetail,
   IpcpLevel,
   PublicIpcp,
 } from './ipcp.interface';
 import {
+  IPCP_CACHE_PREFIX,
+  IPCP_CACHE_TTL_MS,
   IPCP_LEVEL_CUTS,
   IPCP_SEVERITY_SCORE,
   IPCP_TREND_SCORE,
   IPCP_WEIGHTS,
   IPCP_WINDOWS,
 } from './ipcp.constants';
-import { Cache } from 'cache-manager';
 
 /** Orden de gravedad. `clinical_range_band` ordena ascendente por `sequence`. */
 const SEVERITY_ORDER: Record<BandSeverity, number> = {
@@ -90,6 +96,8 @@ export interface IpcpBatchResult {
  */
 @Injectable()
 export class IpcpService {
+  private readonly logger = new Logger(IpcpService.name);
+
   constructor(
     @InjectRepository(HealthIndicator)
     private readonly indicatorRepository: Repository<HealthIndicator>,
@@ -99,9 +107,13 @@ export class IpcpService {
     private readonly reminderRepository: Repository<MedicationReminder>,
     @InjectRepository(MedicationSchedule)
     private readonly scheduleRepository: Repository<MedicationSchedule>,
+    @InjectRepository(Patient)
+    private readonly patientRepository: Repository<Patient>,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
     private readonly bandsService: ClinicalRangeBandsService,
     private readonly patientsService: PatientsService,
-    private readonly cacheManager: Cache,
+    @Inject(CACHE_MANAGER) private readonly cacheManager: Cache,
   ) {}
 
   /** IPCP de un paciente, con el scoping de centro ya existente. */
@@ -113,7 +125,7 @@ export class IpcpService {
       patientId,
       currentUser,
     );
-    return this.compute(patient.id);
+    return this.getCachedOrCompute(patient.id);
   }
 
   /** IPCP del propio paciente (HU-34; la UI es de jarey). */
@@ -122,7 +134,7 @@ export class IpcpService {
     if (!patient) {
       throw new ForbiddenException('No hay un paciente asociado a esta cuenta');
     }
-    return this.compute(patient.id);
+    return this.getCachedOrCompute(patient.id);
   }
 
   async compute(patientId: string): Promise<PublicIpcp> {
@@ -475,48 +487,87 @@ export class IpcpService {
     return result;
   }
 
-  // ========== BATCH / CACHE METHODS ==========
+  // ========== BATCH / CACHE ==========
 
-  private readonly CACHE_KEY_PREFIX = 'ipcp:';
-  private readonly CACHE_TTL = 3600; // 1 hour
-
-  /** Obtiene IPCP del cache o lo computa y lo guarda. */
+  /**
+   * Lee el IPCP de un paciente desde cache; si no está, lo calcula y lo guarda.
+   *
+   * El refresco real lo aporta `recalculateAllIpcp`, que **fuerza** el
+   * recálculo en cada pasada: si el cron llamara a este método se limitaría a
+   * revalidar entradas que aún no han expirado y el índice envejecería hasta
+   * que el TTL lo dejara caer.
+   */
   async getCachedOrCompute(patientId: string): Promise<PublicIpcp> {
-    const cacheKey = `${this.CACHE_KEY_PREFIX}${patientId}`;
-    const cached = await this.cacheManager.get<PublicIpcp>(cacheKey);
+    const key = this.cacheKey(patientId);
+    const cached = await this.cacheManager.get<PublicIpcp>(key);
     if (cached) {
       return cached;
     }
     const computed = await this.compute(patientId);
-    await this.cacheManager.set(cacheKey, computed, this.CACHE_TTL);
+    await this.cacheManager.set(key, computed, IPCP_CACHE_TTL_MS);
     return computed;
   }
 
-  /** Invalida el cache de un paciente. */
+  /** Invalida el IPCP cacheado de un paciente. */
   async invalidateCache(patientId: string): Promise<void> {
-    const cacheKey = `${this.CACHE_KEY_PREFIX}${patientId}`;
-    await this.cacheManager.del(cacheKey);
+    await this.cacheManager.del(this.cacheKey(patientId));
   }
 
-  /** Recalcula y cachea IPCP para todos los pacientes en scope. */
+  private cacheKey(patientId: string): string {
+    return `${IPCP_CACHE_PREFIX}${patientId}`;
+  }
+
+  /**
+   * Precalcula el IPCP de todos los pacientes para que el panel no pague ese
+   * coste en la primera carga. Corre cada 30 minutos y **no** mira el cache:
+   * su trabajo es refrescarlo, no leerlo.
+   */
   @Cron(CronExpression.EVERY_30_MINUTES)
   async recalculateAllIpcp(): Promise<void> {
-    try {
-      const patients = await this.getAllPatientsInScope();
-      const batchSize = 50;
-      for (let i = 0; i < patients.length; i += batchSize) {
-        const batch = patients.slice(i, i + batchSize);
-        await Promise.all(
-          batch.map((patient) => this.getCachedOrCompute(patient.id)),
-        );
-      }
-    } catch (error) {
-      // Log error but don't throw - cron should not crash
-      console.error('[IPCP] Error recalculando IPCP en lote:', error);
+    const scope = await this.getScopePatients();
+    const batchSize = 50;
+    for (let i = 0; i < scope.length; i += batchSize) {
+      const batch = scope.slice(i, i + batchSize);
+      await Promise.all(
+        batch.map(async ({ id }) => {
+          try {
+            const ipcp = await this.compute(id);
+            await this.cacheManager.set(
+              this.cacheKey(id),
+              ipcp,
+              IPCP_CACHE_TTL_MS,
+            );
+          } catch (error) {
+            // Un paciente que no se pueda calcular no debe tumbar el resto de
+            // la pasada del cron.
+            this.logger.error(
+              `No se pudo recalcular el IPCP de ${id}`,
+              error as Error,
+            );
+          }
+        }),
+      );
     }
   }
 
-  /** Obtiene lista paginada de IPCP con filtros. */
+  /**
+   * Listado paginado de IPCP (HU-32, HU-33). El alcance se resuelve aquí: el
+   * admin ve todos los pacientes y, si pide un centro, se queda con ese; el
+   * personal de salud solo los de su centro, que se toma del servidor e
+   * ignora lo que llegue en la query.
+   */
+  async getBatchForUser(
+    currentUser: JwtPayload,
+    query: Omit<IpcpBatchFilters, 'centerId'> & { healthCenterId?: string },
+  ): Promise<IpcpBatchResult> {
+    const { healthCenterId, ...filters } = query;
+    const centerId =
+      currentUser.role === 'admin'
+        ? healthCenterId
+        : await this.resolveStaffCenterId(currentUser);
+    return this.getBatch({ ...filters, centerId });
+  }
+
   async getBatch(filters: IpcpBatchFilters): Promise<IpcpBatchResult> {
     const {
       level,
@@ -527,107 +578,72 @@ export class IpcpService {
       sortBy = 'score',
       sortOrder = 'desc',
     } = filters;
+    const currentPage = Math.max(1, Math.trunc(page));
+    const pageSize = Math.min(MAX_PAGE_SIZE, Math.max(1, Math.trunc(limit)));
 
-    const patientIds = await this.getPatientIdsInScope(centerId, search);
-    const total = patientIds.length;
+    const scope = await this.getScopePatients(centerId, search);
+    const ipcpByPatient = await this.computeBatch(scope.map((p) => p.id));
 
-    // Paginación
-    const start = (page - 1) * limit;
-    const end = start + limit;
-    const pageIds = patientIds.slice(start, end);
-
-    // Obtener IPCP (desde cache o computando)
-    const results = await Promise.all(
-      pageIds.map((id) => this.getCachedOrCompute(id)),
+    let summaries = scope.map((patient) =>
+      this.toSummary(patient, ipcpByPatient.get(patient.id) as PublicIpcp),
     );
 
-    // Mapear a summary
-    const summaries: IpcpSummary[] = results.map((ipcp) => ({
-      id: ipcp.components.find((c) => c.key === 'indicatorDeviation')
-        ?.indicators?.[0]?.typeIndicatorId
-        ? ''
-        : '', // placeholder
-      name: '',
-      email: '',
-      score: ipcp.score,
-      level: ipcp.level,
-      deviationScore:
-        ipcp.components.find((c) => c.key === 'indicatorDeviation')?.score ??
-        null,
-      adherenceScore:
-        ipcp.components.find((c) => c.key === 'adherence')?.score ?? null,
-      appointmentScore:
-        ipcp.components.find((c) => c.key === 'appointmentControl')?.score ??
-        null,
-      trendScore: ipcp.components.find((c) => c.key === 'trend')?.score ?? null,
-      updatedAt: ipcp.generatedAt,
-    }));
-
-    // Necesitamos nombres/emails - obtener de BD
-    const patients = await this.getPatientsByIds(pageIds);
-    summaries.forEach((summary, idx) => {
-      const patient = patients.find((p) => p.id === pageIds[idx]);
-      if (patient) {
-        summary.id = patient.id;
-        summary.name = patient.name;
-        summary.email = patient.email;
-      }
-    });
-
-    // Filtrar por nivel si se especifica
-    let filtered = summaries;
+    // El nivel se filtra **antes** de paginar: con el filtro después, `total`
+    // y `totalPages` describirían una página ya recortada y aparecerían
+    // páginas con menos filas de las que promete el encabezado.
     if (level) {
-      filtered = summaries.filter((s) => s.level === level);
+      summaries = summaries.filter((summary) => summary.level === level);
     }
+    summaries.sort(summariesComparator(sortBy, sortOrder));
 
-    // Ordenar
-    filtered.sort((a, b) => {
-      let aVal: number | string = a[sortBy];
-      let bVal: number | string = b[sortBy];
-      if (sortBy === 'level') {
-        const levelOrder = { high: 3, moderate: 2, low: 1 };
-        aVal = levelOrder[a.level];
-        bVal = levelOrder[b.level];
-      }
-      if (typeof aVal === 'string') {
-        return sortOrder === 'asc'
-          ? aVal.localeCompare(bVal as string)
-          : (bVal as string).localeCompare(aVal);
-      }
-      return sortOrder === 'asc'
-        ? aVal - (bVal as number)
-        : (bVal as number) - aVal;
-    });
-
-    const totalPages = Math.ceil(filtered.length / limit);
+    const total = summaries.length;
+    const start = (currentPage - 1) * pageSize;
 
     return {
-      data: filtered,
-      total: filtered.length,
-      page,
-      limit,
-      totalPages,
+      data: summaries.slice(start, start + pageSize),
+      total,
+      page: currentPage,
+      limit: pageSize,
+      // Nunca 0: con `totalPages` en 0 el botón "Siguiente" de la web quedaría
+      // habilitado en la página 1 y mandaría a una página inexistente.
+      totalPages: Math.max(1, Math.ceil(total / pageSize)),
     };
   }
 
-  /** Obtiene IDs de pacientes en scope (centro + búsqueda). */
-  private async getPatientIdsInScope(
+  /** Centro del personal de salud; sin él no hay alcance posible. */
+  private async resolveStaffCenterId(currentUser: JwtPayload): Promise<string> {
+    const user = await this.userRepository.findOne({
+      where: { id: currentUser.sub },
+      relations: { healthcareWorker: { healthCenter: true } },
+    });
+    const centerId = user?.healthcareWorker?.healthCenter?.id;
+    if (!centerId) {
+      throw new ForbiddenException(
+        'El personal de salud debe pertenecer a un centro de salud',
+      );
+    }
+    return centerId;
+  }
+
+  /**
+   * Pacientes del alcance (centro y búsqueda) con los datos que pinta el
+   * listado. El borrado lógico lo excluye el QueryBuilder solo.
+   */
+  private async getScopePatients(
     centerId?: string,
     search?: string,
-  ): Promise<string[]> {
-    const query = this.indicatorRepository.manager
-      .createQueryBuilder()
-      .select('DISTINCT patient.id')
-      .from('patient', 'patient')
+  ): Promise<ScopePatient[]> {
+    const query = this.patientRepository
+      .createQueryBuilder('patient')
       .innerJoin('patient.user', 'user')
-      .where('patient.deleted_at IS NULL')
-      .andWhere('user.deleted_at IS NULL')
-      .andWhere('user.is_active = true');
+      .select('patient.id', 'id')
+      .addSelect('user.name', 'name')
+      .addSelect('user.email', 'email');
 
     if (centerId) {
       query.andWhere('patient.health_center_id = :centerId', { centerId });
     }
-    if (search) {
+    if (search && search.trim().length > 0) {
       const term = `%${search.trim()}%`;
       query.andWhere(
         '(user.name ILIKE :term OR user.email ILIKE :term OR user.username ILIKE :term)',
@@ -635,48 +651,69 @@ export class IpcpService {
       );
     }
 
-    const rows = await query.getRawMany<{ id: string }>();
-    return rows.map((r) => r.id);
+    return query.getRawMany<ScopePatient>();
   }
 
-  /** Obtiene pacientes por IDs para mapear nombres/emails. */
-  private async getPatientsByIds(
-    ids: string[],
-  ): Promise<Array<{ id: string; name: string; email: string }>> {
-    if (ids.length === 0) return [];
-    const patients = await this.indicatorRepository.manager
-      .createQueryBuilder()
-      .select(['patient.id', 'user.name', 'user.email'])
-      .from('patient', 'patient')
-      .innerJoin('patient.user', 'user')
-      .where('patient.id IN (:...ids)', { ids })
-      .andWhere('patient.deleted_at IS NULL')
-      .andWhere('user.deleted_at IS NULL')
-      .getRawMany<{
-        patient_id: string;
-        user_name: string;
-        user_email: string;
-      }>();
-    return patients.map((p) => ({
-      id: p.patient_id,
-      name: p.user_name,
-      email: p.user_email,
-    }));
+  /** IPCP de cada paciente del lote, reutilizando lo que ya esté en cache. */
+  private async computeBatch(ids: string[]): Promise<Map<string, PublicIpcp>> {
+    const result = new Map<string, PublicIpcp>();
+    const batchSize = 50;
+    for (let i = 0; i < ids.length; i += batchSize) {
+      const batch = ids.slice(i, i + batchSize);
+      const computed = await Promise.all(
+        batch.map((id) => this.getCachedOrCompute(id)),
+      );
+      batch.forEach((id, index) => result.set(id, computed[index]));
+    }
+    return result;
   }
 
-  /** Obtiene todos los pacientes en scope (para cron). */
-  private async getAllPatientsInScope(): Promise<Array<{ id: string }>> {
-    const rows = await this.indicatorRepository.manager
-      .createQueryBuilder()
-      .select('DISTINCT patient.id')
-      .from('patient', 'patient')
-      .innerJoin('patient.user', 'user')
-      .where('patient.deleted_at IS NULL')
-      .andWhere('user.deleted_at IS NULL')
-      .andWhere('user.is_active = true')
-      .getRawMany<{ id: string }>();
-    return rows;
+  /** Fila del listado: el IPCP calculado junto a quien lo pinta. */
+  private toSummary(patient: ScopePatient, ipcp: PublicIpcp): IpcpSummary {
+    const scoreOf = (key: IpcpComponentKey): number | null =>
+      ipcp.components.find((component) => component.key === key)?.score ?? null;
+
+    return {
+      id: patient.id,
+      name: patient.name,
+      email: patient.email,
+      score: ipcp.score,
+      level: ipcp.level,
+      deviationScore: scoreOf('indicatorDeviation'),
+      adherenceScore: scoreOf('adherence'),
+      appointmentScore: scoreOf('appointmentControl'),
+      trendScore: scoreOf('trend'),
+      updatedAt: ipcp.generatedAt,
+    };
   }
+}
+
+/** Paciente con los datos mínimos que pinta el listado de prioridad. */
+interface ScopePatient {
+  id: string;
+  name: string;
+  email: string;
+}
+
+/** Tope de filas por página: evita que `?limit=100000` seque la base. */
+const MAX_PAGE_SIZE = 1000;
+
+/** Último nivel primero cuando se ordena por nivel. */
+const LEVEL_ORDER: Record<IpcpLevel, number> = { high: 3, moderate: 2, low: 1 };
+
+/** Orden del listado. El orden por defecto es el score, descendente. */
+function summariesComparator(
+  sortBy: NonNullable<IpcpBatchFilters['sortBy']>,
+  sortOrder: NonNullable<IpcpBatchFilters['sortOrder']>,
+): (a: IpcpSummary, b: IpcpSummary) => number {
+  const sign = sortOrder === 'asc' ? 1 : -1;
+  if (sortBy === 'name') {
+    return (a, b) => sign * a.name.localeCompare(b.name, 'es');
+  }
+  if (sortBy === 'level') {
+    return (a, b) => sign * (LEVEL_ORDER[a.level] - LEVEL_ORDER[b.level]);
+  }
+  return (a, b) => sign * (a.score - b.score);
 }
 
 function daysAgo(days: number): Date {
