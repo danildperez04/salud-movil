@@ -3,6 +3,7 @@ import {
   AlertTriangle,
   BarChart3,
   Bell,
+  CalendarCheck,
   Home,
   HeartHandshake,
   Map,
@@ -91,6 +92,17 @@ export const NAV_SECTIONS: NavSection[] = [
         to: "/app/reports",
         label: "Reportes",
         icon: BarChart3,
+        roles: ["admin"],
+      },
+    ],
+  },
+  {
+    title: "Sitio web",
+    items: [
+      {
+        to: "/app/demo-requests",
+        label: "Solicitudes de demo",
+        icon: CalendarCheck,
         roles: ["admin"],
       },
     ],
