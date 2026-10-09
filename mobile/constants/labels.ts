@@ -1,18 +1,20 @@
 // constants/labels.ts
 import type { LanguageCode } from '@/types/preferences';
 
-// ⚠️ PENDIENTE DE CONFIRMAR: el Figma muestra "Confirmada"/"Pendiente",
-// pero cat_appointment_state en la BD tiene Scheduled/Cancelled/Completed/No show.
-// No existe un estado "Pendiente" en el catálogo real. Mapeo tentativo abajo —
-// confirmar con el equipo antes de usar esto en la pantalla de citas real.
+// Claves = cat_appointment_state.name. El Figma muestra "Confirmada" para las programadas.
 export const APPOINTMENT_STATUS_LABELS: Record<string, string> = {
   Scheduled: 'Confirmada',
   Cancelled: 'Cancelada',
   Completed: 'Completada',
   'No show': 'No asistió',
-  // ⚠️ "Pending" NO existe en cat_appointment_state real — clave usada
-  // únicamente en datos mock, hasta que el equipo confirme el estado real.
-  Pending: 'Pendiente',
+};
+
+// cat_appointment_type.name viene en inglés de la BD.
+export const APPOINTMENT_TYPE_LABELS: Record<string, string> = {
+  'First visit': 'Primera consulta',
+  'Follow-up': 'Seguimiento',
+  'Check-up': 'Control',
+  Other: 'Consulta',
 };
 
 // cat_frequency de la BD → label en español para mostrar en ReminderCard

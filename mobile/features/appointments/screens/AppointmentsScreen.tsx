@@ -29,7 +29,7 @@ export default function AppointmentsScreen() {
             <AppointmentCard
               key={appointment.id}
               date={parseLocalDate(appointment.date)}
-              specialty={appointment.specialty}
+              title={appointment.title}
               doctorName={appointment.doctorName}
               time={appointment.time}
               status={appointment.status}

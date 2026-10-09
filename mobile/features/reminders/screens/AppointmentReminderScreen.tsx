@@ -20,7 +20,7 @@ import { SwitchRowsCard } from '@/components/ui/switch-rows-card';
 import { Text } from '@/components/ui/text';
 import { COMMON_LABELS, REMINDERS_LABELS, SCREEN_TITLES } from '@/constants/labels';
 import { formatDayMonth } from '@/lib/date-format';
-import type { AppointmentRecord } from '@/features/appointments/api/mock-appointments';
+import type { AppointmentRecord } from '@/features/appointments/domain/appointment-record';
 import { parseLocalDate } from '@/features/appointments/domain/appointment-date';
 import { isCancellable } from '@/features/appointments/domain/appointment-status';
 import { useAppointments } from '@/features/appointments/hooks/useAppointments';
@@ -42,7 +42,7 @@ const { appointment: labels } = REMINDERS_LABELS;
 
 /** "Medicina General · 15 mayo · 10:00 AM" */
 const describeAppointment = (appointment: AppointmentRecord) =>
-  `${appointment.specialty} · ${formatDayMonth(parseLocalDate(appointment.date))} · ${appointment.time}`;
+  `${appointment.title} · ${formatDayMonth(parseLocalDate(appointment.date))} · ${appointment.time}`;
 
 export default function AppointmentReminderScreen() {
   const { id } = useLocalSearchParams<{ id?: string }>();

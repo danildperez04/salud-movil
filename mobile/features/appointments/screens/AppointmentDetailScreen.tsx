@@ -8,11 +8,12 @@ import { Switch } from '@/components/ui/switch';
 import { Text } from '@/components/ui/text';
 import { APPOINTMENTS_LABELS, SCREEN_TITLES } from '@/constants/labels';
 import { cn } from '@/lib/utils';
-import type { AppointmentRecord } from '../api/mock-appointments';
 import { InfoTile } from '@/components/ui/info-tile';
-import { formatLongDate, parseLocalDate } from '../domain/appointment-date';
-import { getAppointmentStatus, isCancellable } from '../domain/appointment-status';
+import { usePatientMe } from '@/features/profile/hooks/usePatientMe';
 import { useAppointmentReminderToggle } from '@/features/reminders/hooks/useReminders';
+import { formatLongDate, parseLocalDate } from '../domain/appointment-date';
+import type { AppointmentRecord } from '../domain/appointment-record';
+import { getAppointmentStatus, isCancellable } from '../domain/appointment-status';
 import { useAppointment, useCancelAppointment } from '../hooks/useAppointments';
 
 export default function AppointmentDetailScreen() {
@@ -42,13 +43,17 @@ export default function AppointmentDetailScreen() {
 }
 
 function AppointmentDetail({ appointment }: { appointment: AppointmentRecord }) {
-  const cancelAppointment = useCancelAppointment(appointment.id);
+  const cancelAppointment = useCancelAppointment();
   const reminder = useAppointmentReminderToggle(appointment.id);
+  const { data: patient } = usePatientMe();
 
   const status = getAppointmentStatus(appointment.status);
+  // la API no trae el lugar: las citas son en el centro de salud del paciente
+  const location = appointment.location ?? patient?.healthCenterName;
 
   const openDirections = () => {
-    const query = encodeURIComponent(appointment.location);
+    if (!location) return;
+    const query = encodeURIComponent(location);
     Linking.openURL(`https://www.google.com/maps/search/?api=1&query=${query}`);
   };
 
@@ -58,7 +63,7 @@ function AppointmentDetail({ appointment }: { appointment: AppointmentRecord }) 
       {
         text: APPOINTMENTS_LABELS.cancelButton,
         style: 'destructive',
-        onPress: () => cancelAppointment.mutate(),
+        onPress: () => cancelAppointment.mutate(appointment),
       },
     ]);
   };
@@ -71,7 +76,7 @@ function AppointmentDetail({ appointment }: { appointment: AppointmentRecord }) 
         >
           {status.label}
         </Text>
-        <Text className="text-h3 font-heading text-foreground">{appointment.specialty}</Text>
+        <Text className="text-h3 font-heading text-foreground">{appointment.title}</Text>
         <Text className="text-small font-body text-muted-foreground">{appointment.doctorName}</Text>
       </View>
 
@@ -91,7 +96,7 @@ function AppointmentDetail({ appointment }: { appointment: AppointmentRecord }) 
             value={appointment.time}
           />
         </View>
-        <InfoTile label={APPOINTMENTS_LABELS.placeLabel} value={appointment.location} />
+        {location && <InfoTile label={APPOINTMENTS_LABELS.placeLabel} value={location} />}
         {appointment.reason && (
           <InfoTile label={APPOINTMENTS_LABELS.reasonLabel} value={appointment.reason} />
         )}
@@ -114,11 +119,13 @@ function AppointmentDetail({ appointment }: { appointment: AppointmentRecord }) 
       </View>
 
       <View className="gap-3">
-        <Button variant="outline" size="lg" className="border-primary" onPress={openDirections}>
-          <Text className="text-body font-heading-semibold text-primary">
-            {APPOINTMENTS_LABELS.directionsButton}
-          </Text>
-        </Button>
+        {location && (
+          <Button variant="outline" size="lg" className="border-primary" onPress={openDirections}>
+            <Text className="text-body font-heading-semibold text-primary">
+              {APPOINTMENTS_LABELS.directionsButton}
+            </Text>
+          </Button>
+        )}
 
         {isCancellable(appointment.status) && (
           <Button
