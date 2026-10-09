@@ -18,6 +18,7 @@ import { Inter_400Regular } from '@expo-google-fonts/inter/400Regular';
 import { Inter_500Medium } from '@expo-google-fonts/inter/500Medium';
 import { Inter_600SemiBold } from '@expo-google-fonts/inter/600SemiBold';
 import { AccessibilityEffects } from '@/components/accessibility-effects';
+import { warmUpApi } from '@/lib/api-client';
 import { NAV_THEME } from '@/lib/theme';
 import { queryClient } from '@/lib/query-client';
 import { setupOnlineManager } from '@/lib/query-online-manager';
@@ -55,6 +56,8 @@ export default function RootLayout() {
 
   useEffect(() => {
     setupOnlineManager();
+    // el servidor gratuito duerme: se despierta ya, mientras se ve la bienvenida o el login
+    warmUpApi();
   }, []);
 
   useQueryAppStateSync();
