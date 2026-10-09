@@ -22,6 +22,15 @@
       "env": {
         "EXPO_PUBLIC_API_URL": "https://salud-movil.onrender.com"
       }
+    },
+    "apk": {
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "EXPO_PUBLIC_API_URL": "https://salud-movil.onrender.com"
+      }
     }
   },
   "submit": {
