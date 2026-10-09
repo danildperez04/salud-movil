@@ -25,9 +25,12 @@ import { queryClient } from '@/lib/query-client';
 import { setupOnlineManager } from '@/lib/query-online-manager';
 import { useQueryAppStateSync } from '@/hooks/useQueryAppStateSync';
 import { useAuthBootstrap } from '@/hooks/useAuthBootstrap';
+import { bindLanguageToStore } from '@/lib/i18n/store-binding';
 import { useAppStore } from '@/store';
 
 SplashScreen.preventAutoHideAsync();
+// Antes del primer render, para que la app no arranque un instante en español.
+bindLanguageToStore();
 
 /** Cualquier pantalla que falle al dibujarse cae acá (Expo Router usa el del layout más cercano). */
 export function ErrorBoundary({ retry }: ErrorBoundaryProps) {
