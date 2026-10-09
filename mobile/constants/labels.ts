@@ -608,6 +608,7 @@ export const MEDICAL_RECORD_LABELS = {
 } as const;
 
 // ===== Cuenta, preferencias y ayuda =====
+// Nombre de cada lengua escrito en esa lengua: no se traduce, se reconoce desde cualquier idioma.
 export const LANGUAGE_LABELS: Record<LanguageCode, string> = {
   es: 'Español',
   bzk: 'Inglés Creole (Kriol)',
@@ -617,12 +618,6 @@ export const LANGUAGE_LABELS: Record<LanguageCode, string> = {
   cab: 'Garífuna',
   rma: 'Rama',
 };
-
-export const LANGUAGE_SCREEN_LABELS = {
-  introTitle: 'Selecciona tu idioma',
-  introDescription: 'Elige tu idioma de preferencia.',
-  save: 'Guardar',
-} as const;
 
 export const NOTIFICATION_SETTINGS_LABELS = {
   medications: { title: 'Medicamentos', subtitle: 'Recordatorios de dosis y horarios' },
