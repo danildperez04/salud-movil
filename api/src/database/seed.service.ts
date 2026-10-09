@@ -324,7 +324,7 @@ export class SeedService implements OnApplicationBootstrap {
     }
     await manager.save(HealthCenter, {
       name:
-        this.configService.get<string>('SEED_HEALTH_CENTER_NAME') ??
+        this.configService.get<string>('SEED_HEALTH_CENTER_NAME') ||
         'Centro de Salud Carlos Núñez Téllez',
       address: 'Managua',
       phoneNumber: '2255-0000',
@@ -351,10 +351,10 @@ export class SeedService implements OnApplicationBootstrap {
       throw new Error('No se encontró el municipio para el seed del admin');
     }
     const email =
-      this.configService.get<string>('SEED_ADMIN_EMAIL') ??
+      this.configService.get<string>('SEED_ADMIN_EMAIL') ||
       'admin@saludmovil.com';
     const password =
-      this.configService.get<string>('SEED_ADMIN_PASSWORD') ?? 'Admin123!';
+      this.configService.get<string>('SEED_ADMIN_PASSWORD') || 'Admin123!';
     await manager.save(User, {
       name: 'Administrador Principal',
       email,
@@ -391,7 +391,7 @@ export class SeedService implements OnApplicationBootstrap {
     });
     const healthCenter = await manager.findOneBy(HealthCenter, {
       name:
-        this.configService.get<string>('SEED_HEALTH_CENTER_NAME') ??
+        this.configService.get<string>('SEED_HEALTH_CENTER_NAME') ||
         'Centro de Salud Carlos Núñez Téllez',
     });
     if (!municipality || !major || !healthCenter) {
@@ -400,10 +400,10 @@ export class SeedService implements OnApplicationBootstrap {
       );
     }
     const email =
-      this.configService.get<string>('SEED_PERSONNEL_EMAIL') ??
+      this.configService.get<string>('SEED_PERSONNEL_EMAIL') ||
       'personal@saludmovil.com';
     const password =
-      this.configService.get<string>('SEED_PERSONNEL_PASSWORD') ??
+      this.configService.get<string>('SEED_PERSONNEL_PASSWORD') ||
       'Personal123!';
     const user = await manager.save(User, {
       name: 'Dr. Ejemplo Pérez',
