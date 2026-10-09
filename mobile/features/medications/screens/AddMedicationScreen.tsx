@@ -1,7 +1,7 @@
 // features/medications/screens/AddMedicationScreen.tsx
 import { zodResolver } from '@hookform/resolvers/zod';
 import { router } from 'expo-router';
-import { Calendar, Clock } from 'lucide-react-native';
+import { Calendar, Clock } from '@/lib/icons';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 import { ScrollView, View } from 'react-native';
 import { Button } from '@/components/ui/button';

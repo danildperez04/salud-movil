@@ -1,6 +1,6 @@
 // features/medications/screens/MedicationsScreen.tsx
 import { router } from 'expo-router';
-import { Plus } from 'lucide-react-native';
+import { Plus } from '@/lib/icons';
 import { useMemo } from 'react';
 import { ScrollView, View } from 'react-native';
 import { Button } from '@/components/ui/button';

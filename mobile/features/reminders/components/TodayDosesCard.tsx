@@ -1,5 +1,5 @@
 // features/reminders/components/TodayDosesCard.tsx
-import { Check, Pill, X } from 'lucide-react-native';
+import { Check, Pill, X } from '@/lib/icons';
 import { View } from 'react-native';
 import { Button } from '@/components/ui/button';
 import { SectionHeader } from '@/components/ui/section-header';

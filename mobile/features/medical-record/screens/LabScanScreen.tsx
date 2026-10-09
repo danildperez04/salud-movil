@@ -1,5 +1,5 @@
 // features/medical-record/screens/LabScanScreen.tsx
-import { Calendar, Camera, ImagePlus } from 'lucide-react-native';
+import { Calendar, Camera, ImagePlus } from '@/lib/icons';
 import { ScrollView, View } from 'react-native';
 import { SelectFormField, TextFormField } from '@/components/ui/controlled-fields';
 import { FooterButton } from '@/components/ui/footer-button';

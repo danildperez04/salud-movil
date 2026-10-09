@@ -1,6 +1,6 @@
 // features/reminders/screens/RemindersScreen.tsx
 import { router } from 'expo-router';
-import { Calendar } from 'lucide-react-native';
+import { Calendar } from '@/lib/icons';
 import { useMemo, useState } from 'react';
 import { ScrollView, View } from 'react-native';
 import { Button } from '@/components/ui/button';

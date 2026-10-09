@@ -1,5 +1,5 @@
 // features/medical-record/components/LabScanBanner.tsx
-import { Camera } from 'lucide-react-native';
+import { Camera } from '@/lib/icons';
 import { Pressable, View } from 'react-native';
 import { Text } from '@/components/ui/text';
 import { MEDICAL_RECORD_LABELS } from '@/constants/labels';

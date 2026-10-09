@@ -9,7 +9,7 @@ import {
   TriangleAlert,
   Users,
   type LucideIcon,
-} from 'lucide-react-native';
+} from '@/lib/icons';
 import { statusColors } from '@/lib/tokens';
 import type { AllergySeverity, DocumentCategory, LabStatus } from '../domain/record-catalogs';
 import type { RecordMenuItem } from '../hooks/useMedicalRecordMenu';

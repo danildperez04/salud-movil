@@ -1,6 +1,6 @@
 // features/medical-record/screens/DiagnosisScreen.tsx
 import { router } from 'expo-router';
-import { Stethoscope } from 'lucide-react-native';
+import { Stethoscope } from '@/lib/icons';
 import { ScrollView, View } from 'react-native';
 import { EmptyStateCard } from '@/components/ui/empty-state-card';
 import { FooterButton } from '@/components/ui/footer-button';

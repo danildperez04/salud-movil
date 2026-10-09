@@ -1,5 +1,5 @@
 // features/medications/components/MedicationCard.tsx
-import { Pill } from 'lucide-react-native';
+import { Pill } from '@/lib/icons';
 import { View } from 'react-native';
 import { Switch } from '@/components/ui/switch';
 import { Text } from '@/components/ui/text';

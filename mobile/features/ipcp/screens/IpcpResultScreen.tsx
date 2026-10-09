@@ -1,6 +1,6 @@
 // features/ipcp/screens/IpcpResultScreen.tsx
 import { router } from 'expo-router';
-import { Activity, TriangleAlert } from 'lucide-react-native';
+import { Activity, TriangleAlert } from '@/lib/icons';
 import { ScrollView, View } from 'react-native';
 import { EmptyStateCard } from '@/components/ui/empty-state-card';
 import { FooterButton } from '@/components/ui/footer-button';

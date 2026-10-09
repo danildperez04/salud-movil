@@ -1,5 +1,5 @@
 // features/voice-assistant/components/VoiceOrb.tsx
-import { Mic } from 'lucide-react-native';
+import { Mic } from '@/lib/icons';
 import { useEffect } from 'react';
 import { Pressable } from 'react-native';
 import Animated, {

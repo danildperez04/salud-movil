@@ -1,5 +1,5 @@
 // features/medical-record/components/PatientCard.tsx
-import { UserRound } from 'lucide-react-native';
+import { UserRound } from '@/lib/icons';
 import { View } from 'react-native';
 import { Text } from '@/components/ui/text';
 import { MEDICAL_RECORD_LABELS } from '@/constants/labels';

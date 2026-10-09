@@ -1,5 +1,5 @@
 // components/ui/form-field.tsx
-import { ChevronDown, type LucideIcon } from 'lucide-react-native';
+import { ChevronDown, type LucideIcon } from '@/lib/icons';
 import type { ReactNode } from 'react';
 import { Pressable, View } from 'react-native';
 import { Label } from '@/components/ui/label';

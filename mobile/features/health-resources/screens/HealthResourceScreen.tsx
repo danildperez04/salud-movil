@@ -1,6 +1,6 @@
 // features/health-resources/screens/HealthResourceScreen.tsx
 import { router, useLocalSearchParams } from 'expo-router';
-import { Clock, Hospital, Map, ShieldCheck } from 'lucide-react-native';
+import { Clock, Hospital, Map, ShieldCheck } from '@/lib/icons';
 import { ScrollView, View } from 'react-native';
 import { Button } from '@/components/ui/button';
 import { ListItemCard } from '@/components/ui/list-item-card';

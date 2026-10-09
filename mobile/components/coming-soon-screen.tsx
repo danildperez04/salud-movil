@@ -1,6 +1,6 @@
 // components/coming-soon-screen.tsx
 import { router } from 'expo-router';
-import { Construction } from 'lucide-react-native';
+import { Construction } from '@/lib/icons';
 import { View } from 'react-native';
 import { Button } from '@/components/ui/button';
 import { ScreenHeader } from '@/components/ui/screen-header';

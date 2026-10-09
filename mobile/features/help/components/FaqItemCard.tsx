@@ -1,5 +1,5 @@
 // features/help/components/FaqItemCard.tsx
-import { Minus, Plus } from 'lucide-react-native';
+import { Minus, Plus } from '@/lib/icons';
 import { Pressable, View } from 'react-native';
 import { Text } from '@/components/ui/text';
 import { colors } from '@/lib/tokens';
