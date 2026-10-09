@@ -1,5 +1,5 @@
 // features/emergency/components/EmergencyContactCard.tsx
-import { Phone, UserRound } from 'lucide-react-native';
+import { Phone, UserRound } from '@/lib/icons';
 import { Pressable } from 'react-native';
 import { ListItemCard } from '@/components/ui/list-item-card';
 import { EMERGENCY_LABELS, EMERGENCY_RELATION_LABELS } from '@/constants/labels';

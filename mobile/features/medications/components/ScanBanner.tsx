@@ -1,5 +1,5 @@
 // features/medications/components/ScanBanner.tsx
-import { Camera } from 'lucide-react-native';
+import { Camera } from '@/lib/icons';
 import { View } from 'react-native';
 import { Badge } from '@/components/ui/badge';
 import { Text } from '@/components/ui/text';

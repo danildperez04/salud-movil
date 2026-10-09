@@ -1,11 +1,6 @@
 // features/help/screens/HelpScreen.tsx
 import { router, type Href } from 'expo-router';
-import {
-  CircleQuestionMark,
-  MessageCircle,
-  TriangleAlert,
-  type LucideIcon,
-} from 'lucide-react-native';
+import { CircleQuestionMark, MessageCircle, TriangleAlert, type LucideIcon } from '@/lib/icons';
 import { ScrollView, View } from 'react-native';
 import { ListItemCard } from '@/components/ui/list-item-card';
 import { ScreenHeader } from '@/components/ui/screen-header';

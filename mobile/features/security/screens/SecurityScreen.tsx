@@ -1,12 +1,6 @@
 // features/security/screens/SecurityScreen.tsx
 import { router, type Href } from 'expo-router';
-import {
-  FingerprintPattern,
-  Lock,
-  ShieldCheck,
-  Smartphone,
-  type LucideIcon,
-} from 'lucide-react-native';
+import { FingerprintPattern, Lock, ShieldCheck, Smartphone, type LucideIcon } from '@/lib/icons';
 import { ScrollView, View } from 'react-native';
 import { ListItemCard } from '@/components/ui/list-item-card';
 import { ScreenHeader } from '@/components/ui/screen-header';

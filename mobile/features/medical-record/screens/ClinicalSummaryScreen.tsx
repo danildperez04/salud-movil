@@ -1,5 +1,5 @@
 // features/medical-record/screens/ClinicalSummaryScreen.tsx
-import { Phone } from 'lucide-react-native';
+import { Phone } from '@/lib/icons';
 import { ScrollView, View } from 'react-native';
 import { InfoRowsCard } from '@/components/ui/info-rows-card';
 import { ListItemCard } from '@/components/ui/list-item-card';

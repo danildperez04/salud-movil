@@ -1,5 +1,5 @@
 // features/medications/components/MedicationTipCard.tsx
-import { Calendar } from 'lucide-react-native';
+import { Calendar } from '@/lib/icons';
 import { View } from 'react-native';
 import { Text } from '@/components/ui/text';
 import { MEDICATIONS_LABELS } from '@/constants/labels';

@@ -1,6 +1,6 @@
 // features/medical-record/screens/DocumentUploadScreen.tsx
 import { useLocalSearchParams } from 'expo-router';
-import { Calendar, Camera, FileText, ImagePlus } from 'lucide-react-native';
+import { Calendar, Camera, FileText, ImagePlus } from '@/lib/icons';
 import { ScrollView, View } from 'react-native';
 import { SelectFormField, TextFormField } from '@/components/ui/controlled-fields';
 import { FooterButton } from '@/components/ui/footer-button';

@@ -1,6 +1,6 @@
 // features/voice-assistant/screens/VoiceAssistantScreen.tsx
 import { router } from 'expo-router';
-import { Map, ShieldCheck } from 'lucide-react-native';
+import { Map, ShieldCheck } from '@/lib/icons';
 import { Pressable, ScrollView, View } from 'react-native';
 import { ListItemCard } from '@/components/ui/list-item-card';
 import { ScreenHeader } from '@/components/ui/screen-header';

@@ -1,6 +1,6 @@
 // features/medical-record/screens/LabDetailScreen.tsx
 import { useLocalSearchParams } from 'expo-router';
-import { FileX } from 'lucide-react-native';
+import { FileX } from '@/lib/icons';
 import { ScrollView, View } from 'react-native';
 import { Button } from '@/components/ui/button';
 import { EmptyStateCard } from '@/components/ui/empty-state-card';

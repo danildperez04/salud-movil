@@ -1,5 +1,5 @@
 // features/security/screens/BiometricScreen.tsx
-import { ShieldCheck } from 'lucide-react-native';
+import { ShieldCheck } from '@/lib/icons';
 import { ScrollView, View } from 'react-native';
 import { FooterButton } from '@/components/ui/footer-button';
 import { HeroCard } from '@/components/ui/hero-card';

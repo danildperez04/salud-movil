@@ -1,5 +1,5 @@
 // features/medical-record/components/AllergyCard.tsx
-import { TriangleAlert } from 'lucide-react-native';
+import { TriangleAlert } from '@/lib/icons';
 import { ListItemCard } from '@/components/ui/list-item-card';
 import { ToneBadge } from '@/components/ui/tone-badge';
 import {

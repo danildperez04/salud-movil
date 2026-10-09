@@ -1,5 +1,5 @@
 // components/ui/list-item-card.tsx
-import { ChevronRight, type LucideIcon } from 'lucide-react-native';
+import { ChevronRight, type LucideIcon } from '@/lib/icons';
 import type { ReactNode } from 'react';
 import { Pressable, View } from 'react-native';
 import { Text } from '@/components/ui/text';

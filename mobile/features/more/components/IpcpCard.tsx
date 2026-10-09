@@ -1,6 +1,6 @@
 // features/more/components/IpcpCard.tsx
 import { router } from 'expo-router';
-import { ChevronRight, ShieldCheck } from 'lucide-react-native';
+import { ChevronRight, ShieldCheck } from '@/lib/icons';
 import { Pressable, View } from 'react-native';
 import { Text } from '@/components/ui/text';
 import { MORE_LABELS } from '@/constants/labels';

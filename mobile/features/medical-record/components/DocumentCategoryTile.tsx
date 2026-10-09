@@ -1,5 +1,5 @@
 // features/medical-record/components/DocumentCategoryTile.tsx
-import { ChevronRight } from 'lucide-react-native';
+import { ChevronRight } from '@/lib/icons';
 import { Pressable, View } from 'react-native';
 import { Text } from '@/components/ui/text';
 import { DOCUMENT_CATEGORIES } from '@/constants/labels';
