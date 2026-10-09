@@ -18,6 +18,7 @@ import { MedicationsModule } from './features/medications/medications.module';
 import { RemindersModule } from './features/reminders/reminders.module';
 import { DashboardModule } from './features/dashboard/dashboard.module';
 import { IpcpModule } from './features/ipcp/ipcp.module';
+import { DemoRequestsModule } from './features/demo-requests/demo-requests.module';
 import { DatabaseModule } from './database/database.module';
 
 @Module({
@@ -62,6 +63,7 @@ import { DatabaseModule } from './database/database.module';
     RemindersModule,
     DashboardModule,
     IpcpModule,
+    DemoRequestsModule,
     DatabaseModule,
   ],
   controllers: [AppController, HealthController],
