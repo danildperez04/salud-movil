@@ -2,10 +2,10 @@
 
 ## Resumen
 
-| Componente                      | Plataforma                                  |
-| ------------------------------- | ------------------------------------------- |
-| App móvil (Expo / React Native) | EAS Build (Expo Application Services)       |
-| API backend                     | Render — `https://salud-movil.onrender.com` |
+| Componente                      | Plataforma                                                |
+| ------------------------------- | --------------------------------------------------------- |
+| App móvil (Expo / React Native) | EAS Build (Expo Application Services)                     |
+| API backend                     | Docker en un servidor propio — `http://158.23.21.222/api` |
 
 ## Expo Go no es compatible
 
@@ -30,6 +30,7 @@ En ambos casos el APK instalado tiene que ser un "development build" firmado con
 - `EXPO_PUBLIC_API_URL`: URL base del backend que consume `lib/api-client.ts`.
   - Al llevar el prefijo `EXPO_PUBLIC_`, el valor queda embebido en el bundle del cliente — no es información sensible.
   - **En local:** se toma del `.env` en la raíz de `mobile/`.
+  - Lleva el prefijo `/api`: el nginx del stack de Docker sirve el panel web en `/` y la API en `/api/` (las rutas de la app, como `/auth/login`, se agregan a esa base).
   - **En builds de EAS (nube):** el `.env` local NO se sube automáticamente al build. Por eso cada profile de `eas.json` define explícitamente su propio `env` (ver abajo). Si un profile no lo define, `api-client.ts` cae al fallback `http://10.0.2.2:3000` (loopback del emulador de Android) — válido solo para desarrollo local, nunca para un build distribuido.
 
 ## `eas.json` — configuración de referencia
@@ -45,19 +46,19 @@ En ambos casos el APK instalado tiene que ser un "development build" firmado con
       "developmentClient": true,
       "distribution": "internal",
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://salud-movil.onrender.com"
+        "EXPO_PUBLIC_API_URL": "http://158.23.21.222/api"
       }
     },
     "preview": {
       "distribution": "internal",
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://salud-movil.onrender.com"
+        "EXPO_PUBLIC_API_URL": "http://158.23.21.222/api"
       }
     },
     "production": {
       "autoIncrement": true,
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://salud-movil.onrender.com"
+        "EXPO_PUBLIC_API_URL": "http://158.23.21.222/api"
       }
     },
     "apk": {
@@ -66,7 +67,7 @@ En ambos casos el APK instalado tiene que ser un "development build" firmado con
         "buildType": "apk"
       },
       "env": {
-        "EXPO_PUBLIC_API_URL": "https://salud-movil.onrender.com"
+        "EXPO_PUBLIC_API_URL": "http://158.23.21.222/api"
       }
     }
   },
@@ -150,17 +151,18 @@ eas submit --profile production --platform ios
 
 El bloque `submit.production` en `eas.json` está vacío (`{}`), así que en la primera corrida `eas-cli` va a pedir de forma interactiva los datos necesarios (service account de Google Play para Android, Apple ID/App Store Connect para iOS). Una vez completado el flujo interactivo, conviene guardar esos valores en `eas.json` para que las siguientes publicaciones no vuelvan a preguntar.
 
-## Backend (Render)
+## Backend
 
-- URL de producción: `https://salud-movil.onrender.com`
-- La base de datos está en Supabase (plan gratuito) y la API la necesita para arrancar (`GET /health` hace un `SELECT 1`). **Un proyecto gratuito de Supabase se pausa tras ~7 días sin actividad**: si el APK instala pero no puede iniciar sesión, revisar primero el panel de Supabase ("Restore project") y luego los logs de Render.
-- El plan gratuito de Render duerme el servicio tras ~15 min sin tráfico y tarda ~50 s en despertar. La app lo despierta al abrirse, pero antes de una demo conviene abrir la URL `/health` un par de minutos antes.
+- URL actual: `http://158.23.21.222/api` (stack de Docker del repo: nginx en el puerto 80 → API; ver [`docs/Docker.md`](../docs/Docker.md)). Sonda de salud: `GET /api/health` → `{"status":"ok"}`.
+- **No tiene HTTPS todavía**, y Android bloquea HTTP sin cifrar por defecto. `plugins/with-cleartext-api-host.js` lo permite solo hacia el host de `EXPO_PUBLIC_API_URL` y solo si esa URL es `http://`. Con HTTP viajan sin cifrar el correo, la contraseña y el token: sirve para demos, no para datos reales.
+- **Pasar a HTTPS**: poner TLS delante (Caddy con certificado automático, según `docs/Docker.md`), abrir el puerto 443 del servidor y cambiar `EXPO_PUBLIC_API_URL` a `https://…/api` en `eas.json`. El plugin deja de activarse solo; no hay que tocar código. Sin dominio propio sirve un nombre gratuito como `158-23-21-222.sslip.io`.
+- Los usuarios viven en la base del servidor: una cuenta creada en otro entorno (por ejemplo la antigua de Render/Supabase) no existe aquí. Las cuentas iniciales salen del seed (`SEED_ADMIN_*`, `SEED_PERSONNEL_*`) y los pacientes los crea el personal desde el panel web.
+- Despliegue anterior: Render (`https://salud-movil.onrender.com`) con la base en Supabase gratuito. Dejó de responder; un proyecto gratuito de Supabase se pausa tras ~7 días sin actividad y la API necesita la base para arrancar.
 
 ## Checklist antes de cada release
 
 - [ ] Confirmar que el profile usado tiene `env.EXPO_PUBLIC_API_URL` apuntando al backend correcto (no asumir que toma el `.env` local).
 - [ ] Verificar que el número de versión/build sea el esperado (`autoIncrement` solo aplica al profile `production`).
 - [ ] Instalar y probar el build `preview` en un dispositivo físico antes de pasar a `production`.
-- [ ] `curl https://salud-movil.onrender.com/health` responde `{"status":"ok"}` (si no, ver "Backend").
+- [ ] `curl http://158.23.21.222/api/health` responde `{"status":"ok"}` (si no, ver "Backend").
 - [ ] Revisar el manifiesto del APK: `aapt2 dump badging app.apk` (sin `SYSTEM_ALERT_WINDOW`, `native-code` esperado) y `apksigner verify --print-certs app.apk` (firma de producción, no la de debug).
-- [ ] Confirmar que el backend en Render esté respondiendo (o tener en cuenta el cold start si está en plan free).
