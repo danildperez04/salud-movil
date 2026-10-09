@@ -1,6 +1,6 @@
 // app/_layout.tsx
 import '../global.css';
-import { Stack, SplashScreen } from 'expo-router';
+import { Stack, SplashScreen, type ErrorBoundaryProps } from 'expo-router';
 import { ThemeProvider } from 'expo-router/react-navigation';
 import { PortalHost } from '@rn-primitives/portal';
 import { useEffect } from 'react';
@@ -18,6 +18,7 @@ import { Inter_400Regular } from '@expo-google-fonts/inter/400Regular';
 import { Inter_500Medium } from '@expo-google-fonts/inter/500Medium';
 import { Inter_600SemiBold } from '@expo-google-fonts/inter/600SemiBold';
 import { AccessibilityEffects } from '@/components/accessibility-effects';
+import { ScreenError } from '@/components/screen-error';
 import { warmUpApi } from '@/lib/api-client';
 import { NAV_THEME } from '@/lib/theme';
 import { queryClient } from '@/lib/query-client';
@@ -27,6 +28,16 @@ import { useAuthBootstrap } from '@/hooks/useAuthBootstrap';
 import { useAppStore } from '@/store';
 
 SplashScreen.preventAutoHideAsync();
+
+/** Cualquier pantalla que falle al dibujarse cae acá (Expo Router usa el del layout más cercano). */
+export function ErrorBoundary({ retry }: ErrorBoundaryProps) {
+  // Si el fallo ocurre con la splash visible, el layout ya no la oculta: sin esto el aviso no se vería.
+  useEffect(() => {
+    SplashScreen.hideAsync().catch(() => undefined);
+  }, []);
+
+  return <ScreenError onRetry={retry} />;
+}
 
 function SplashScreenController({ fontsLoaded }: { fontsLoaded: boolean }) {
   const hasHydrated = useAppStore((state) => state.hasHydrated);
