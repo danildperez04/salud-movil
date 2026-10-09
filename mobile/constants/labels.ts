@@ -235,6 +235,10 @@ export const REGISTER_INDICATOR_LABELS = {
   timeLabel: 'Hora',
   notesLabel: 'Notas (opcional)',
   submitButton: 'Nuevo indicador',
+  typesError: {
+    title: 'No se pudieron cargar los indicadores',
+    description: 'Revisa tu conexión e intenta de nuevo.',
+  },
 } as const;
 
 export const APPOINTMENTS_LABELS = {
@@ -1156,7 +1160,6 @@ export const IPCP_LABELS = {
     outOf: '/100',
     scoreA11y: (score: number, level: string) => `Puntaje ${score} de 100, ${level}`,
     updatedAt: (date: string, time: string) => `Actualizado el ${date} · ${time}`,
-    alertSent: 'Ya se mandó una alerta a tu hospital de confianza y cuidador.',
     meaningTitle: '¿Qué significa?',
     recommendationsTitle: 'Recomendaciones para ti',
     disclaimer:
@@ -1176,22 +1179,19 @@ export const IPCP_LABELS = {
     },
     drivers: {
       criticalReading: (indicator: string) =>
-        `Tu ${indicator} tuvo una lectura crítica en las últimas 48 horas.`,
+        `Tu última lectura de ${indicator} está en un nivel crítico.`,
       elevatedReadings: (indicator: string) =>
-        `Tus lecturas de ${indicator} han estado fuera de rango.`,
+        `Tu última lectura de ${indicator} está fuera de rango.`,
       lowAdherence: (percent: number) =>
-        `Confirmaste el ${percent} % de tus tomas de medicamento en los últimos 14 días.`,
-      worseningTrend: (indicator: string) => `Tu ${indicator} empeoró frente a la semana anterior.`,
-      monitoringLapse: (days: number, indicator: string) =>
-        `Llevas ${days} ${days === 1 ? 'día' : 'días'} sin registrar tu ${indicator}.`,
-      neverRecorded: (indicator: string) => `Aún no has registrado tu ${indicator}.`,
-      missedAppointments: (count: number) =>
-        `Faltaste a ${count} ${count === 1 ? 'cita' : 'citas'} en los últimos 3 meses.`,
+        `Confirmaste el ${percent} % de tus tomas de medicamento en los últimos 30 días.`,
+      worseningTrend: 'Tus indicadores empeoraron frente a tu lectura anterior.',
+      missedAppointments: (percent: number) =>
+        `No asististe o cancelaste el ${percent} % de tus citas de los últimos 3 meses.`,
     },
     trend: {
-      worsening: 'Tus indicadores empeoraron frente a la semana anterior.',
-      stable: 'Tus indicadores se mantienen estables frente a la semana anterior.',
-      improving: 'Tus indicadores mejoraron frente a la semana anterior.',
+      worsening: 'Tus indicadores empeoraron frente a tu lectura anterior.',
+      stable: 'Tus indicadores se mantienen estables frente a tu lectura anterior.',
+      improving: 'Tus indicadores mejoraron frente a tu lectura anterior.',
     },
     coverage: (percent: number) =>
       `Calculado con el ${percent} % de la información posible. Mientras más registres, más preciso será.`,
@@ -1206,7 +1206,7 @@ export const IPCP_LABELS = {
       missingTitle: 'Para calcularlo necesitamos',
       missing: {
         clinical: 'Registrar tu presión, glucosa o temperatura',
-        adherence: 'Confirmar tus tomas con “Tomé” u “Omití”',
+        adherence: 'Confirmar tus tomas de medicamento cuando te las indiquen',
       },
       action: 'Registrar un indicador',
     },

@@ -2,7 +2,7 @@
 import { View } from 'react-native';
 import { Text } from '@/components/ui/text';
 import { IPCP_LABELS } from '@/constants/labels';
-import type { ReadyIpcpReport } from '../api/mock-ipcp';
+import type { ReadyIpcpReport } from '../domain/ipcp-model';
 import { LEVEL_VISUALS, withAlpha } from './ipcp-visuals';
 
 const labels = IPCP_LABELS.result;
@@ -35,7 +35,6 @@ export function RiskBanner({ result }: RiskBannerProps) {
         </Text>
         <Text className="text-small font-body-medium" style={{ color }}>
           {content.bannerText}
-          {result.alertSent ? ` ${labels.alertSent}` : ''}
         </Text>
       </View>
     </View>

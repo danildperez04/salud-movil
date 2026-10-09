@@ -3,7 +3,7 @@
 // historial y evolución: filtrado por período, serie graficable y tendencia.
 // Sin dependencias de React ni de UI.
 
-import type { HealthIndicatorRecord } from '../api/mock-health-indicators';
+import type { HealthIndicatorRecord } from './indicator-record';
 import { parseComponents } from './indicator-range';
 
 export const TIME_RANGES = ['7d', '30d', '3m'] as const;

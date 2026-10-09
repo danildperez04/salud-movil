@@ -3,7 +3,6 @@ import {
   Activity,
   CalendarDays,
   CalendarX,
-  Clock,
   Heart,
   Pill,
   ShieldCheck,
@@ -27,7 +26,6 @@ export const DRIVER_ICONS: Record<IpcpDriver['code'], LucideIcon> = {
   elevatedReadings: Activity,
   lowAdherence: Pill,
   worseningTrend: TrendingUp,
-  monitoringLapse: Clock,
   missedAppointments: CalendarX,
 };
 

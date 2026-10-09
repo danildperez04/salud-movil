@@ -2,12 +2,14 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import DateTimePicker, { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import { router, useLocalSearchParams } from 'expo-router';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
-import { useState } from 'react';
+import { TriangleAlert } from 'lucide-react-native';
+import { useMemo, useState } from 'react';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 import { Platform, ScrollView, View } from 'react-native';
 import { z } from 'zod';
-import { Button } from '@/components/ui/button';
+import { EmptyStateCard } from '@/components/ui/empty-state-card';
+import { FooterButton } from '@/components/ui/footer-button';
+import { FIELD_CLASS_NAME, FormField, PickerField } from '@/components/ui/form-field';
 import { Input } from '@/components/ui/input';
 import { IntroCard } from '@/components/ui/intro-card';
 import { ScreenHeader } from '@/components/ui/screen-header';
@@ -18,25 +20,18 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Spinner } from '@/components/ui/spinner';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Text } from '@/components/ui/text';
-import { INDICATOR_TYPE_LABELS, REGISTER_INDICATOR_LABELS } from '@/constants/labels';
-import { createMockHealthIndicator } from '../api/mock-health-indicators';
-import { FIELD_CLASS_NAME, FormField, PickerField } from '@/components/ui/form-field';
+import {
+  COMMON_LABELS,
+  INDICATOR_TYPE_LABELS,
+  REGISTER_INDICATOR_LABELS,
+} from '@/constants/labels';
+import { BLOOD_PRESSURE, type IndicatorType } from '../domain/indicator-record';
 import { typeNameFromSlug } from '../domain/indicator-type';
-import { HEALTH_INDICATORS_QUERY_KEY } from '../hooks/useHealthIndicators';
+import { useCreateHealthIndicator, useIndicatorTypes } from '../hooks/useHealthIndicators';
 
-// TODO: no existe GET /catalogues/type-indicators en el backend todavía.
-// Hardcodeado a partir del seed real de cat_type_indicator.
-const INDICATOR_TYPES = [
-  { id: '1', name: 'Blood pressure', unit: 'mmHg' },
-  { id: '2', name: 'Glucose', unit: 'mg/dL' },
-  { id: '3', name: 'Weight', unit: 'kg' },
-  { id: '4', name: 'Temperature', unit: '°C' },
-];
-
-const findType = (id: string) => INDICATOR_TYPES.find((t) => t.id === id);
-const isBloodPressure = (id: string) => findType(id)?.name === 'Blood pressure';
+const toNumber = (text: string) => Number(text.trim().replace(',', '.'));
 
 const isPositiveNumber = (text: string) => {
   const normalized = text.trim().replace(',', '.');
@@ -45,39 +40,79 @@ const isPositiveNumber = (text: string) => {
 
 // Los campos de valor dependen del tipo: presión arterial pide sistólica y
 // diastólica; el resto un único valor.
-const schema = z
-  .object({
-    typeIndicatorId: z.string().min(1, 'Seleccioná un tipo de indicador'),
-    value: z.string(),
-    systolic: z.string(),
-    diastolic: z.string(),
-    notes: z.string(),
-  })
-  .superRefine((data, ctx) => {
-    const fields = isBloodPressure(data.typeIndicatorId)
-      ? (['systolic', 'diastolic'] as const)
-      : (['value'] as const);
+function buildSchema(types: IndicatorType[]) {
+  const isBloodPressure = (id: string) =>
+    types.find((t) => String(t.id) === id)?.name === BLOOD_PRESSURE;
 
-    for (const field of fields) {
-      if (isPositiveNumber(data[field])) continue;
-      ctx.addIssue({
-        code: 'custom',
-        path: [field],
-        message: data[field].trim() ? 'Ingresá un valor válido' : 'Ingresá un valor',
-      });
-    }
-  });
+  return z
+    .object({
+      typeIndicatorId: z.string().min(1, 'Seleccioná un tipo de indicador'),
+      value: z.string(),
+      systolic: z.string(),
+      diastolic: z.string(),
+      notes: z.string(),
+    })
+    .superRefine((data, ctx) => {
+      const fields = isBloodPressure(data.typeIndicatorId)
+        ? (['systolic', 'diastolic'] as const)
+        : (['value'] as const);
 
-type FormValues = z.infer<typeof schema>;
+      for (const field of fields) {
+        if (isPositiveNumber(data[field])) continue;
+        ctx.addIssue({
+          code: 'custom',
+          path: [field],
+          message: data[field].trim() ? 'Ingresá un valor válido' : 'Ingresá un valor',
+        });
+      }
+    });
+}
+
+type FormValues = z.infer<ReturnType<typeof buildSchema>>;
 type PickerMode = 'date' | 'time';
 
 export default function RegisterHealthIndicatorScreen() {
-  const queryClient = useQueryClient();
+  const { data: types, isLoading, isError, refetch } = useIndicatorTypes();
+
+  return (
+    <View className="bg-background flex-1">
+      <ScreenHeader title={REGISTER_INDICATOR_LABELS.title} align="center" />
+
+      {types ? (
+        <RegisterForm types={types} />
+      ) : isLoading ? (
+        <View className="gap-6 px-6 pt-2">
+          <Skeleton className="h-28 w-full rounded-3xl" />
+          <Skeleton className="h-14 w-full rounded-2xl" />
+          <Skeleton className="h-14 w-full rounded-2xl" />
+        </View>
+      ) : (
+        <>
+          <View className="flex-1 px-6 pt-2">
+            <EmptyStateCard
+              icon={TriangleAlert}
+              tone="danger"
+              title={REGISTER_INDICATOR_LABELS.typesError.title}
+              description={REGISTER_INDICATOR_LABELS.typesError.description}
+            />
+          </View>
+          {isError && <FooterButton label={COMMON_LABELS.retry} onPress={() => refetch()} />}
+        </>
+      )}
+    </View>
+  );
+}
+
+function RegisterForm({ types }: { types: IndicatorType[] }) {
   // si se llega desde el historial/evolución de un indicador, viene preseleccionado
   const { type: typeSlug } = useLocalSearchParams<{ type?: string }>();
-  const presetTypeId = INDICATOR_TYPES.find((t) => t.name === typeNameFromSlug(typeSlug))?.id;
+  const presetType = types.find((t) => t.name === typeNameFromSlug(typeSlug));
   const [dateHour, setDateHour] = useState(new Date());
   const [iosPickerMode, setIosPickerMode] = useState<PickerMode | null>(null);
+  const registerIndicator = useCreateHealthIndicator();
+
+  const schema = useMemo(() => buildSchema(types), [types]);
+  const findType = (id: string) => types.find((t) => String(t.id) === id);
 
   const {
     control,
@@ -86,7 +121,7 @@ export default function RegisterHealthIndicatorScreen() {
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
-      typeIndicatorId: presetTypeId ?? '',
+      typeIndicatorId: presetType ? String(presetType.id) : '',
       value: '',
       systolic: '',
       diastolic: '',
@@ -95,30 +130,23 @@ export default function RegisterHealthIndicatorScreen() {
   });
 
   const selectedType = findType(useWatch({ control, name: 'typeIndicatorId' }));
-  const showBloodPressureFields = selectedType?.name === 'Blood pressure';
-
-  // TODO: reemplazar createMockHealthIndicator por
-  // apiClient.post('/health-indicators', payload) cuando exista el endpoint.
-  const registerIndicator = useMutation({
-    mutationFn: (payload: { typeName: string; value: string; dateHour: Date; notes?: string }) =>
-      createMockHealthIndicator(payload),
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: HEALTH_INDICATORS_QUERY_KEY });
-      router.back();
-    },
-  });
+  const showBloodPressureFields = selectedType?.name === BLOOD_PRESSURE;
 
   const onSubmit = (values: FormValues) => {
     const type = findType(values.typeIndicatorId);
     if (!type) return;
-    registerIndicator.mutate({
-      typeName: type.name,
-      value: isBloodPressure(type.id)
-        ? `${values.systolic.trim()}/${values.diastolic.trim()}`
-        : values.value.trim(),
-      dateHour,
-      notes: values.notes.trim() || undefined,
-    });
+    const isBloodPressure = type.name === BLOOD_PRESSURE;
+
+    registerIndicator.mutate(
+      {
+        typeIndicatorId: type.id,
+        value: toNumber(isBloodPressure ? values.systolic : values.value),
+        valueSecondary: isBloodPressure ? toNumber(values.diastolic) : undefined,
+        dateHour,
+        notes: values.notes.trim() || undefined,
+      },
+      { onSuccess: () => router.back() },
+    );
   };
 
   const openPicker = (mode: PickerMode) => {
@@ -140,12 +168,11 @@ export default function RegisterHealthIndicatorScreen() {
   });
   const formattedTime = dateHour.toLocaleTimeString('es', { hour: '2-digit', minute: '2-digit' });
 
-  const valueLabel = (base: string) => (selectedType ? `${base} (${selectedType.unit})` : base);
+  const valueLabel = (base: string) =>
+    selectedType ? `${base} (${selectedType.measurementUnit})` : base;
 
   return (
-    <View className="bg-background flex-1">
-      <ScreenHeader title={REGISTER_INDICATOR_LABELS.title} align="center" />
-
+    <>
       <ScrollView
         contentContainerClassName="gap-6 px-6 pt-2 pb-6"
         keyboardShouldPersistTaps="handled"
@@ -168,7 +195,10 @@ export default function RegisterHealthIndicatorScreen() {
                 <Select
                   value={
                     current
-                      ? { value: current.id, label: INDICATOR_TYPE_LABELS[current.name] }
+                      ? {
+                          value: String(current.id),
+                          label: INDICATOR_TYPE_LABELS[current.name] ?? current.name,
+                        }
                       : undefined
                   }
                   onValueChange={(option) => onChange(option?.value ?? '')}
@@ -180,11 +210,11 @@ export default function RegisterHealthIndicatorScreen() {
                     />
                   </SelectTrigger>
                   <SelectContent>
-                    {INDICATOR_TYPES.map((type) => (
+                    {types.map((type) => (
                       <SelectItem
                         key={type.id}
-                        label={INDICATOR_TYPE_LABELS[type.name]}
-                        value={type.id}
+                        label={INDICATOR_TYPE_LABELS[type.name] ?? type.name}
+                        value={String(type.id)}
                       />
                     ))}
                   </SelectContent>
@@ -301,22 +331,11 @@ export default function RegisterHealthIndicatorScreen() {
         )}
       </ScrollView>
 
-      <View className="px-6 pt-2 pb-8">
-        <Button
-          size="lg"
-          className="h-14"
-          onPress={handleSubmit(onSubmit)}
-          disabled={registerIndicator.isPending}
-        >
-          {registerIndicator.isPending ? (
-            <Spinner size="sm" color="#FFFFFF" />
-          ) : (
-            <Text className="text-body text-primary-foreground">
-              {REGISTER_INDICATOR_LABELS.submitButton}
-            </Text>
-          )}
-        </Button>
-      </View>
-    </View>
+      <FooterButton
+        label={REGISTER_INDICATOR_LABELS.submitButton}
+        onPress={handleSubmit(onSubmit)}
+        isPending={registerIndicator.isPending}
+      />
+    </>
   );
 }

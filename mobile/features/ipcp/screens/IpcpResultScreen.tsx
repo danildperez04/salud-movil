@@ -9,7 +9,7 @@ import { ScreenHeader } from '@/components/ui/screen-header';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Text } from '@/components/ui/text';
 import { COMMON_LABELS, IPCP_LABELS, SCREEN_TITLES } from '@/constants/labels';
-import type { IpcpReport } from '../api/mock-ipcp';
+import type { IpcpReport } from '../domain/ipcp-model';
 import { DriversCard } from '../components/DriversCard';
 import { RecommendationsCard } from '../components/RecommendationsCard';
 import { RiskBanner } from '../components/RiskBanner';
