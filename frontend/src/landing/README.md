@@ -23,4 +23,4 @@ landing/
 - **Cada sección con `id` salta bien bajo el header fijo** gracias a `scroll-margin-top` en `landing.css`; el Navbar resalta la sección activa leyendo `main section[id]`.
 - **Animaciones de entrada:** envuelve en `<FadeInOnScroll delay={index * 90} direction="up|left|right|scale|fade">`. Ponlo en un wrapper *alrededor* de la tarjeta, no en la tarjeta con hover, para que el hover no herede el retraso.
 - **Animaciones continuas** (`animate-float`, `animate-drift`, `animate-orbit`…) se definen una sola vez en `landing.css`. Todo respeta `prefers-reduced-motion`.
-- Los breakpoints `landing-sm` (680px) y `landing-md` (980px) se escriben literales en las clases; el del Navbar (`min-[1200px]`) también (ver el comentario en `Navbar.tsx`).
+- Los breakpoints `landing-sm` (680px) y `landing-md` (980px) se escriben literales en las clases; el del Navbar (`min-[1320px]`) también (ver el comentario en `Navbar.tsx`).

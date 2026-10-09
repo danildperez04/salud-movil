@@ -23,7 +23,7 @@ export function DownloadAppSection() {
   return (
     <section
       id="descargar"
-      className="py-19.5 bg-[linear-gradient(180deg,#ffffff_0%,var(--color-mint-soft-2)_100%)] landing-sm:py-27.5"
+      className="py-16 bg-[linear-gradient(180deg,#ffffff_0%,var(--color-mint-soft-2)_100%)] landing-sm:py-22"
     >
       <div className="container-x grid grid-cols-1 items-center gap-12 landing-md:grid-cols-[0.8fr_1.2fr] landing-md:gap-16">
         <SectionHeader
@@ -86,8 +86,8 @@ function PlatformCard({
         <div className="mb-5 grid h-13.5 w-13.5 place-items-center rounded-[18px] bg-white/10 text-[25px] text-mint-light transition duration-300 group-hover:-rotate-6 group-hover:scale-110">
           {icon}
         </div>
-        <h3 className="mb-2 text-[22px] font-bold text-white">{name}</h3>
-        <p className="mb-5 text-[13px] leading-[1.65] text-[#c2d1d8] landing-sm:min-h-16">
+        <h3 className="mb-2 text-[26px] font-bold text-white">{name}</h3>
+        <p className="mb-5 text-[15px] leading-[1.65] text-[#c2d1d8] landing-sm:min-h-16">
           {description}
         </p>
         {loading ? (
@@ -96,7 +96,7 @@ function PlatformCard({
             className="block h-9 w-36 animate-pulse rounded-full bg-white/10"
           />
         ) : (
-          <span className="inline-flex items-center gap-2.5 rounded-full bg-mint/12 px-3.5 py-2.5 text-[11px] font-[850] text-mint-light">
+          <span className="inline-flex items-center gap-2.5 rounded-full bg-mint/12 px-3.5 py-2.5 text-[13px] font-[850] text-mint-light">
             <span className="relative grid h-1.75 w-1.75 place-items-center">
               <span className="absolute inset-0 animate-ping-soft rounded-full bg-mint" />
               <span className="relative h-full w-full rounded-full bg-mint" />
@@ -113,11 +113,11 @@ function PlatformCard({
       <div className="mb-5 grid h-13.5 w-13.5 place-items-center rounded-[18px] bg-mint-soft text-[25px] text-mint-dark transition duration-300 group-hover:-rotate-6 group-hover:scale-110 group-hover:bg-mint group-hover:text-white">
         {icon}
       </div>
-      <h3 className="mb-2 text-[22px] font-bold text-navy">{name}</h3>
-      <p className="mb-2 text-[13px] leading-[1.65] text-muted landing-sm:min-h-16">
+      <h3 className="mb-2 text-[26px] font-bold text-navy">{name}</h3>
+      <p className="mb-2 text-[15px] leading-[1.65] text-muted landing-sm:min-h-16">
         {description}
       </p>
-      <p className="mb-5 text-[12px] font-semibold text-navy-2">
+      <p className="mb-5 text-[14px] font-semibold text-navy-2">
         Versión {release.version} · {formatBytes(release.sizeBytes)}
       </p>
       <Button href={releaseDownloadUrl(release.downloadPath)} download>

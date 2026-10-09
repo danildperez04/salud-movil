@@ -14,9 +14,9 @@ export function CheckBadge({ tone = "light", className = "" }: CheckBadgeProps) 
   return (
     <span
       aria-hidden="true"
-      className={`grid h-4.75 w-4.75 flex-none place-items-center rounded-full ${TONES[tone]} ${className}`}
+      className={`grid h-5.5 w-5.5 flex-none place-items-center rounded-full ${TONES[tone]} ${className}`}
     >
-      <Check size={11} strokeWidth={3.2} />
+      <Check size={13} strokeWidth={3.2} />
     </span>
   );
 }

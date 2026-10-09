@@ -5,7 +5,7 @@ import { FadeInOnScroll } from "../ui/FadeInOnScroll";
 
 export function CtaSection() {
   return (
-    <section className="relative overflow-hidden bg-navy py-23.75">
+    <section className="relative overflow-hidden bg-navy py-20">
       <div
         aria-hidden="true"
         className="absolute -right-30 -top-42.5 h-120 w-120 animate-drift rounded-full bg-mint/13"
@@ -20,13 +20,13 @@ export function CtaSection() {
       />
       <FadeInOnScroll
         direction="scale"
-        className="container-x relative z-2 mx-auto max-w-200 text-center"
+        className="container-x relative z-2 mx-auto max-w-220 text-center"
       >
         <Badge tone="dark">Salud Móvil</Badge>
-        <h2 className="my-3.25 mb-4.5 text-[clamp(38px,5vw,64px)] leading-none tracking-[-0.035em] text-white">
+        <h2 className="my-3.25 mb-4.5 text-[clamp(40px,5.4vw,74px)] leading-none tracking-[-0.035em] text-white">
           ¿Y si tu salud estuviera siempre contigo?
         </h2>
-        <p className="mx-auto mb-7 max-w-162.5 text-[16px] leading-[1.7] text-[#bfd0d9]">
+        <p className="mx-auto mb-7 max-w-180 text-[18px] leading-[1.7] text-[#bfd0d9]">
           Menos información dispersa. Más claridad para organizar tus citas,
           medicamentos, indicadores y expediente.
         </p>

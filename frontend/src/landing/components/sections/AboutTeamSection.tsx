@@ -20,7 +20,7 @@ export function AboutTeamSection() {
   return (
     <section
       id="sobre-nosotros"
-      className="bg-white py-19.5 landing-sm:py-27.5"
+      className="bg-white py-16 landing-sm:py-22"
     >
       <div className="container-x grid grid-cols-1 items-start gap-14 landing-md:grid-cols-[0.95fr_1.05fr] landing-md:gap-16">
         <div>
@@ -31,13 +31,13 @@ export function AboutTeamSection() {
           />
 
           <FadeInOnScroll delay={180} className="mt-4 flex flex-col gap-4">
-            <p className="m-0 max-w-162.5 text-[15px] leading-[1.75] text-muted">
+            <p className="m-0 max-w-180 text-[17px] leading-[1.75] text-muted">
               Salud Móvil nace del trabajo de un equipo de cinco integrantes que
               combina tecnología, diseño, investigación y compromiso con una
               experiencia de salud más sencilla para las personas, sus familias
               y cuidadores.
             </p>
-            <p className="m-0 max-w-162.5 text-[15px] leading-[1.75] text-muted">
+            <p className="m-0 max-w-180 text-[17px] leading-[1.75] text-muted">
               Nuestro objetivo es crear una herramienta que ayude a organizar
               información de salud, facilitar el seguimiento y acercar la
               tecnología a quienes necesitan una experiencia más clara,
@@ -55,11 +55,11 @@ export function AboutTeamSection() {
                 <div className="group flex-1 rounded-[18px] border border-mint-line bg-mint-soft-2 p-4 transition duration-300 hover:-translate-y-1 hover:border-mint-line-strong hover:bg-white hover:shadow-soft">
                   <div className="mb-2.5 flex items-center gap-2.5">
                     <IconTile icon={ICONS[value.icon]} size="sm" />
-                    <strong className="text-[13px] font-bold text-navy">
+                    <strong className="text-[15px] font-bold text-navy">
                       {value.title}
                     </strong>
                   </div>
-                  <span className="block text-[11px] leading-[1.55] text-muted">
+                  <span className="block text-[13px] leading-[1.55] text-muted">
                     {value.text}
                   </span>
                 </div>
@@ -68,7 +68,7 @@ export function AboutTeamSection() {
           </div>
 
           <FadeInOnScroll className="mt-7 border-t border-line pt-6">
-            <span className="mb-3.5 block text-[11px] font-bold uppercase tracking-[0.08em] text-muted">
+            <span className="mb-3.5 block text-[13px] font-bold uppercase tracking-[0.08em] text-muted">
               Conecta con nosotros
             </span>
             <div className="flex flex-wrap items-center gap-3">
@@ -93,7 +93,7 @@ export function AboutTeamSection() {
                   href={tiktok.href}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2 rounded-full border border-line px-4 py-2.5 text-[13px] font-medium text-navy transition duration-200 hover:-translate-y-0.5 hover:border-mint hover:text-mint-dark"
+                  className="flex items-center gap-2 rounded-full border border-line px-4 py-2.5 text-[15px] font-medium text-navy transition duration-200 hover:-translate-y-0.5 hover:border-mint hover:text-mint-dark"
                 >
                   <FaTiktok />
                   Síguenos en TikTok

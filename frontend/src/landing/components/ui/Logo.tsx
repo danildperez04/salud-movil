@@ -6,7 +6,7 @@ type LogoProps = {
 export function Logo({ animated = true }: LogoProps) {
   return (
     <a href="#inicio" aria-label="Salud Móvil" className="flex items-center">
-      <svg viewBox="0 0 687 232" aria-hidden="true" className="h-14 w-auto">
+      <svg viewBox="0 0 687 232" aria-hidden="true" className="h-15 w-auto">
         {/* Pulso: entrada plana → joroba → caída → pico → regresa a la línea base y continúa.
             pathLength=1 normaliza el trazo para poder "dibujarlo" con stroke-dashoffset. */}
         <path

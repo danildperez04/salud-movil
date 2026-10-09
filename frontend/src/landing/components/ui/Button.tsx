@@ -12,7 +12,7 @@ type ButtonProps = {
 };
 
 const baseClasses =
-  "group relative inline-flex cursor-pointer items-center justify-center overflow-hidden whitespace-nowrap rounded-[14px] px-5 py-3.5 font-body font-[850] transition duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mint";
+  "group relative inline-flex cursor-pointer items-center justify-center overflow-hidden whitespace-nowrap rounded-[14px] px-6 py-3.5 font-body text-[17px] font-[850] transition duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mint";
 
 const variantClasses: Record<"primary" | "secondary", string> = {
   // El `before:` es un destello que cruza el botón al pasar el cursor.

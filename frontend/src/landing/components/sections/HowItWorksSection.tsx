@@ -9,7 +9,7 @@ export function HowItWorksSection() {
   return (
     <section
       id="como-funciona"
-      className="py-19.5 bg-[linear-gradient(180deg,#f7fbfa,#fff)] landing-sm:py-27.5"
+      className="py-16 bg-[linear-gradient(180deg,#f7fbfa,#fff)] landing-sm:py-22"
     >
       <div className="container-x">
         <SectionHeader
@@ -40,13 +40,13 @@ export function HowItWorksSection() {
                   size="lg"
                   className="relative mb-7"
                 />
-                <div className="relative mb-2 text-[12px] font-black tracking-[0.12em] text-mint-dark">
+                <div className="relative mb-2 text-[14px] font-black tracking-[0.12em] text-mint-dark">
                   {step.num} · {step.label}
                 </div>
-                <h3 className="relative mb-2.25 text-[21px] font-bold text-navy">
+                <h3 className="relative mb-2.25 text-[24px] font-bold text-navy">
                   {step.title}
                 </h3>
-                <p className="relative m-0 text-[13px] leading-[1.7] text-muted">
+                <p className="relative m-0 text-[15px] leading-[1.7] text-muted">
                   {step.text}
                 </p>
               </article>

@@ -5,11 +5,11 @@ import { SectionHeader } from "../ui/SectionHeader";
 
 export function IpcpSection() {
   return (
-    <section id="prioridad" className="bg-white py-19.5 landing-sm:py-27.5">
+    <section id="prioridad" className="bg-white py-16 landing-sm:py-22">
       <div className="container-x grid grid-cols-1 items-center gap-12 landing-md:grid-cols-2 landing-md:gap-17.5">
         <FadeInOnScroll
           direction="left"
-          className="relative grid min-h-112.5 place-items-center [--mini-phone-width:165px] landing-sm:min-h-135 landing-sm:[--mini-phone-width:215px]"
+          className="relative grid min-h-112.5 place-items-center [--mini-phone-width:165px] landing-sm:min-h-135 landing-sm:[--mini-phone-width:215px] landing-md:min-h-155 landing-md:[--mini-phone-width:265px]"
         >
           <div
             aria-hidden="true"
@@ -43,19 +43,19 @@ export function IpcpSection() {
           />
 
           <FadeInOnScroll delay={180} className="mt-4 flex flex-col gap-4">
-            <p className="m-0 text-[15px] leading-[1.7] text-muted">
+            <p className="m-0 text-[17px] leading-[1.7] text-muted">
               “Mi prioridad” reúne información ingresada por el usuario para
               mostrar un nivel de prioridad visual y ofrecer orientación sobre
               el siguiente paso.
             </p>
-            <p className="m-0 text-[15px] leading-[1.7] text-muted">
+            <p className="m-0 text-[17px] leading-[1.7] text-muted">
               Además, Salud Móvil presenta indicadores con rangos fáciles de
               interpretar y acceso al historial de mediciones.
             </p>
           </FadeInOnScroll>
 
           <FadeInOnScroll delay={280} className="mt-6">
-            <div className="flex items-start gap-3 rounded-[18px] border border-mint-line bg-mint-soft-2 p-4 text-xs leading-[1.6] text-muted">
+            <div className="flex items-start gap-3 rounded-[18px] border border-mint-line bg-mint-soft-2 p-4 text-[14px] leading-[1.6] text-muted">
               <Info
                 size={18}
                 strokeWidth={2.2}

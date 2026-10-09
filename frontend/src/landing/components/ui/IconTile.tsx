@@ -15,9 +15,9 @@ const TONES = {
 };
 
 const SIZES = {
-  sm: { box: "h-9 w-9", icon: 17 },
-  md: { box: "h-11 w-11", icon: 20 },
-  lg: { box: "h-12 w-12", icon: 22 },
+  sm: { box: "h-10 w-10", icon: 19 },
+  md: { box: "h-12 w-12", icon: 22 },
+  lg: { box: "h-14 w-14", icon: 26 },
 };
 
 export function IconTile({
