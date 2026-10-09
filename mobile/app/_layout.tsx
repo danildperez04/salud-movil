@@ -9,11 +9,13 @@ import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { QueryClientProvider } from '@tanstack/react-query';
 import { useFonts } from 'expo-font';
 import {
+  Poppins_400Regular,
   Poppins_500Medium,
   Poppins_600SemiBold,
   Poppins_700Bold,
 } from '@expo-google-fonts/poppins';
 import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold } from '@expo-google-fonts/inter';
+import { AccessibilityEffects } from '@/components/accessibility-effects';
 import { NAV_THEME } from '@/lib/theme';
 import { queryClient } from '@/lib/query-client';
 import { setupOnlineManager } from '@/lib/query-online-manager';
@@ -43,6 +45,7 @@ export default function RootLayout() {
     Poppins_700Bold,
     Poppins_600SemiBold,
     Poppins_500Medium,
+    Poppins_400Regular,
     Inter_400Regular,
     Inter_500Medium,
     Inter_600SemiBold,
@@ -64,6 +67,7 @@ export default function RootLayout() {
       <QueryClientProvider client={queryClient}>
         <ThemeProvider value={theme}>
           <SplashScreenController fontsLoaded={fontsLoaded || !!fontError} />
+          <AccessibilityEffects />
           <Stack screenOptions={{ headerShown: false }} />
           <PortalHost />
         </ThemeProvider>

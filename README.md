@@ -86,10 +86,11 @@ salud-móvil/
 ├── frontend/
 │   └── src/
 │       ├── auth/             # Guards de rutas (RequireAuth, RequireRole)
-│       ├── components/ui/    # 8 componentes reutilizables (Alert, Badge, Button, Card, Input, Modal, Select, Table)
+│       ├── components/ui/    # 11 componentes (Alert, Badge, Button, Card, ConfirmDeleteModal, Input, Logo, Modal, Select, Table, buttonStyles)
+│       ├── components/patients/  # HealthIndicatorBar e IpcpBadge
 │       ├── layouts/          # AppLayout (sidebar) y AuthLayout
-│       ├── lib/              # Cliente API, mapeo de roles
-│       ├── pages/            # Login, Home, StaffList, StaffForm, PatientsList, PatientForm, PatientDetail
+│       ├── lib/              # Cliente API, tipos de fecha, roles, navegación
+│       ├── pages/            # Login, Home, RecoverPassword, personal, pacientes, cuidadores y ficha clínica
 │       └── store/            # Zustand (auth con persist, catalogues)
 ├── docs/                     # Documentación del proyecto
 └── shared/                   # Logo del proyecto
@@ -107,6 +108,19 @@ salud-móvil/
 | `POST` | `/auth/forgot-password` | Solicitar recuperación (siempre responde 200, sin revelar si el correo existe) | Público |
 | `POST` | `/auth/reset-password` | Restablecer contraseña con token | Público |
 | `POST` | `/auth/change-password` | Cambiar contraseña | Autenticado |
+| `POST` | `/auth/2fa/enable` | Pedir el código para activar la verificación en dos pasos | Autenticado |
+| `POST` | `/auth/2fa/enable/confirm` | Confirmar la activación con el código recibido | Autenticado |
+| `POST` | `/auth/2fa/disable` | Desactivar el 2FA (exige la contraseña) | Autenticado |
+| `POST` | `/auth/2fa/verify` | Completar el login con el código OTP y recibir el JWT | Público |
+| `POST` | `/auth/2fa/resend` | Reenviar el código (espera 30 s entre envíos) | Público |
+
+> **Verificación en dos pasos (opcional por usuario).** Si la cuenta la tiene activa,
+> `POST /auth/login` ya **no** devuelve el JWT: responde
+> `{ requiresTwoFactor: true, challengeId, expiresAt }` y la sesión se obtiene en
+> `POST /auth/2fa/verify` con `{ challengeId, code }` (código de 6 dígitos, vigencia de
+> 5 minutos, 5 intentos). Los clientes distinguen ambos casos por `requiresTwoFactor`.
+> ⚠️ Por ahora el código **se escribe en el log del servidor**, no se envía por correo ni
+> SMS (`ConsoleOtpDelivery`); ver `docs/Guia_de_Despliegue.md` §7.
 
 ### Usuarios (`/users`)
 
@@ -134,6 +148,12 @@ salud-móvil/
 | `GET` | `/catalogues/appointment-types` | Listar tipos de cita |
 | `GET` | `/catalogues/notification-states` | Listar estados de notificación |
 | `GET` | `/catalogues/route-administrations` | Listar vías de administración |
+
+### Panel (`/dashboard`)
+
+| Método | Ruta | Descripción | Acceso |
+| --- | --- | --- | --- |
+| `GET` | `/dashboard/stats` | Contadores del panel y pacientes con indicadores en banda de alerta o crítica | Admin, Personal de salud |
 
 ### Pacientes (`/patients`)
 
@@ -200,25 +220,63 @@ salud-móvil/
 | `PATCH` | `/patients/:id/medications/:medicationId` | Editar (activo, horarios, datos) | Admin, Personal de salud |
 | `DELETE` | `/patients/:id/medications/:medicationId` | Eliminar medicamento (soft delete) | Admin, Personal de salud |
 
+### Índice de prioridad del paciente (IPCP)
+
+Regla explicable sobre datos medidos: desviación de indicadores, adherencia,
+cumplimiento de controles y tendencia, con renormalización de las variables sin
+datos. Ver la advertencia de la §Estado de desarrollo sobre la validación
+médica pendiente.
+
+| Método | Ruta | Descripción | Acceso |
+| --- | --- | --- | --- |
+| `GET` | `/patients/:id/ipcp` | IPCP del paciente, con desglose por variable (HU-32, HU-33) | Admin, Personal de salud |
+| `GET` | `/patients/me/ipcp` | IPCP propio (HU-34) | Paciente |
+
+Fuera del alcance del paciente queda el **peso**: `cat_type_indicator` no tiene
+rangos ni bandas para él, así que no hay umbral con el que puntuarlo. Está
+documentado en la respuesta (`exclusions`) en vez de inventarse un rango.
+
 ## Estado de desarrollo
 
 | Aplicación | Estado | Detalle |
 | --- | --- | --- |
-| **API** | ~88% | 9 módulos funcionales (auth, users, patients, catalogues, medical-records, health-indicators, appointments, medications, reminders). Con Helmet, rate limiting global y 39 pruebas (unitarias + e2e de RBAC y scoping). Pendientes: migraciones SQL (`synchronize: false`) e IPCP. |
-| **Frontend** | ~60% | Login, dashboard, gestión de personal de salud y pacientes completa. Pendiente: módulo de indicadores de salud en panel web. |
-| **Mobile** | ~5% | Scaffold con Expo SDK 57, tokens de diseño y layout base. Sin pantallas funcionales ni cliente API. |
+| **API** | ~97% | 12 módulos (los 11 anteriores más `ipcp`). Helmet, rate limiting, bandas de gravedad clínica, IPCP multivariable con renormalización, esquema gobernado por migraciones (`synchronize: false`) y **78 unitarias + 14 e2e**. Pendiente: la validación médica de bandas y pesos |
+| **Frontend** | ~80% | Login, recuperación de contraseña completa (solicitar **y** establecer), perfil y cambio de contraseña, dashboard con datos reales, gestión de personal, pacientes y cuidadores, y ficha clínica con indicadores, IPCP, citas, medicamentos y consultas. Sin datos clínicos inventados, con un guardia que lo verifica. Pendiente: 4 rutas `ComingSoon` (§9 del plan de cierre) |
+| **Mobile** | ~5% | Scaffold con Expo SDK 57, tokens de diseño y layout base. **La API que necesita ya está entregada**: recordatorios, indicadores, citas, medicamentos e IPCP |
 
-**Cronograma de desarrollo (ver `docs/Plan_de_Desarrollo.md`):**
+### Reparto del trabajo
 
-| Fase | Periodo | Contenido | Estado |
-| --- | --- | --- | --- |
-| Fase 0-1 | Ago 6-13 | Scaffold, auth, usuarios, pacientes, expediente, frontend | Completada |
-| Fase 2 | Ago 13-14 | App móvil: auth, pacientes, expediente | Pendiente |
-| Fase 3 | Ago 14-16 | Indicadores de salud (API + móvil) | Pendiente |
-| Fase 4 | Ago 17-20 | Citas médicas (API + móvil) | Pendiente |
-| Fase 5 | Ago 21-24 | Medicamentos y recordatorios (API + móvil) | Pendiente |
-| Fase 6 | Ago 25-28 | Panel web: indicadores | Pendiente |
-| Fase 7 | Ago 29 - Sep 1 | Seguridad, tests, CI/CD, builds, entrega | Pendiente |
+- **`api/` y `frontend/`**: un solo frente. El panel consume la API directamente.
+- **`mobile/`**: lo asume **jarey**. La API entrega lo que necesita en `me/*` y en el feed de recordatorios; ver el contrato en el plan de cierre.
+- El plan de cierre vive **fuera del repositorio**, en
+  `/data/development/opencode-plans/salud-movil/plan-cierre-mvp.md`, y ahí se
+  registra el avance de cada fase.
+
+> ⚠️ **Rangos clínicos y pesos del IPCP pendientes de validación médica.**
+> Las bandas `normal` / `alert` / `critical` y los pesos del índice (40/25/20/15)
+> son valores estándar de referencia, **no umbrales validados clínicamente**. El
+> IPCP **no debe usarse para priorizar pacientes reales** hasta que el equipo
+> médico los confirme.
+>
+> El IPCP es una **regla explicable y determinista, no IA**: la misma
+> información produce siempre el mismo score, y la API devuelve el desglose por
+> variable para que se pueda revisar. Renormaliza: una variable sin datos no
+> cuenta como 0, el resto se reescala. No diagnostica ni sustituye al médico.
+> Los pesos están en constantes aisladas (`api/src/features/ipcp/ipcp.constants.ts`)
+> para que cambiarlos no obligue a reescribir el cálculo.
+
+**Cronograma:** el de `docs/Plan_de_Desarrollo.md` fijaba la entrega de v1.0.0
+el 1 de septiembre de 2026 y **esa fecha venció**, igual que la de la
+presentación. Se conserva como documento histórico; el estado real y lo que
+falta están en el **plan de cierre**, que vive fuera del repositorio:
+
+```
+/data/development/opencode-plans/salud-movil/plan-cierre-mvp.md
+```
+
+Su §9 es el registro de **lo que queda fuera del MVP**: functionality
+conservada en el código pero no implementada, con el motivo y lo que falta para
+cada cosa.
 
 ## Instalación
 
@@ -240,7 +298,46 @@ git clone https://github.com/danildperez04/salud-móvil.git
 ``` bash
 cd api
 pnpm install
+pnpm run migration:run   # crea el esquema (ver abajo)
 pnpm run start:dev
+```
+
+#### El esquema lo crean las migraciones
+
+Desde el 5-oct-2026 la API usa `synchronize: false`: el arranque **no** altera
+la base. El esquema sale de `src/database/migrations/`, así que hay que aplicar
+las migraciones una vez por base.
+
+``` bash
+pnpm run migration:run     # aplicar
+pnpm run migration:show    # ver cuál falta
+pnpm run migration:check   # fallar si las entidades y las migraciones divergen
+```
+
+> **La base de desarrollo actual no está registrada en `migrations`**: nació de
+> `synchronize`, tiene el esquema correcto pero con residuos, y `migration:run`
+> le fallaría. Para reconstruirla desde cero hay
+> `scripts/reset-dev-db.sh`, que es **destructivo** (exige `CONFIRM_RESET`).
+
+Regenerar la migración baseline exige una base **vacía**: contra una ya creada
+por `synchronize` no habría diferencias y saldría una migración vacía. Para eso
+está `scripts/migration-baseline.sh`, que crea una base temporal, genera y
+verifica que la migración reconstruye el esquema en una segunda base.
+
+### Pruebas
+
+Las unitarias no tocan la base. Las **e2e sí**, y se niegan a arrancar si el
+nombre de la base no contiene `test`: antes escribían en la de desarrollo y
+dejaron 52 usuarios `e2e-*` ahí.
+
+``` bash
+cd api && pnpm test     # unitarias
+
+# e2e sobre una base dedicada (el globalSetup aplica las migraciones)
+createdb salud_movil_test
+DB_NAME=salud_movil_test pnpm test:e2e
+
+cd frontend && pnpm verify   # lint + guardia de mocks + build
 ```
 
 ### Frontend

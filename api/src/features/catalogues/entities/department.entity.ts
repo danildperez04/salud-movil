@@ -6,7 +6,8 @@ export class Department {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column({ length: 100 })
+  // Único: los municipios se resuelven por nombre de departamento al sembrar.
+  @Column({ length: 100, unique: true })
   name!: string;
 
   @OneToMany(() => Municipality, (municipality) => municipality.department)

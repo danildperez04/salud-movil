@@ -24,3 +24,5 @@ dist-ssr
 *.sw?
 
 .env
+# Los APK pesan más de 100 MB y GitHub rechaza el push. Distribúyelos fuera del repo.
+*.apk

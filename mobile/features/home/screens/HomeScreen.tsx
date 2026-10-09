@@ -3,15 +3,20 @@ import { router } from 'expo-router';
 import { Bell, Calendar, FileText, LineChart, Pill } from 'lucide-react-native';
 import { Pressable, ScrollView, View } from 'react-native';
 import { CircularProgress } from '@/components/ui/circular-progress';
+import { Skeleton } from '@/components/ui/skeleton';
 import { Text } from '@/components/ui/text';
 import { HOME_LABELS } from '@/constants/labels';
 import { HealthIndicatorCard } from '@/features/health-indicators/components/HealthIndicatorCard';
+import { useHealthIndicators } from '@/features/health-indicators/hooks/useHealthIndicators';
 import { useAppStore } from '@/store';
 import { QuickActionCard } from '../components/QuickActionCard';
 
 export default function HomeScreen() {
   const user = useAppStore((state) => state.user);
   const firstName = user?.name?.split(' ')[0] ?? '';
+  const { data: indicators, isLoading } = useHealthIndicators();
+  // el mock devuelve los registros del más reciente al más antiguo
+  const latestIndicator = indicators?.[0];
 
   const today = new Date()
     .toLocaleDateString('es', { weekday: 'long', day: 'numeric', month: 'long' })
@@ -77,9 +82,20 @@ export default function HomeScreen() {
         </View>
       </View>
 
-      {/* TODO: reemplazar por el indicador más reciente real cuando
-          health-indicators tenga controlador/servicio en el backend */}
-      <HealthIndicatorCard typeName="Glucose" value={110} unit="mg/dL" status="normal" />
+      {isLoading ? (
+        <Skeleton className="h-52 w-full rounded-3xl" />
+      ) : (
+        latestIndicator && (
+          <HealthIndicatorCard
+            variant="summary"
+            typeName={latestIndicator.typeName}
+            value={latestIndicator.value}
+            unit={latestIndicator.unit}
+            onPress={() => router.push('/(app)/health-indicators')}
+            onEdit={() => router.push('/(app)/health-indicators/new')}
+          />
+        )
+      )}
     </ScrollView>
   );
 }

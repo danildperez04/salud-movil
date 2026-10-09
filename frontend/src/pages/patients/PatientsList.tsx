@@ -1,8 +1,8 @@
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { api, ApiError } from "../../lib/api";
+import { ageOf } from "../../lib/age";
 import { useAuthStore } from "../../store/auth";
-import { getMockIpcp } from "../../lib/ipcp";
 import type { PublicPatient } from "../../types";
 import { Card } from "../../components/ui/Card";
 import { Table } from "../../components/ui/Table";
@@ -22,6 +22,7 @@ export default function PatientsList() {
   const isAdmin = user?.role === "admin";
 
   const [patients, setPatients] = useState<PublicPatient[]>([]);
+  const [ipcpMap, setIpcpMap] = useState<Record<string, { score: number; level: "high" | "moderate" | "low" }>>({});
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -43,6 +44,15 @@ export default function PatientsList() {
       const data = await api.listPatients(search);
       if (requestIdRef.current === requestId) {
         setPatients(data);
+        // Cargar IPCP para los pacientes cargados
+        if (data.length > 0) {
+          const ipcpBatch = await api.getPatientsIpcp({ limit: 1000 });
+          const map: Record<string, { score: number; level: "high" | "moderate" | "low" }> = {};
+          for (const p of ipcpBatch.data) {
+            map[p.id] = { score: p.score, level: p.level };
+          }
+          setIpcpMap(map);
+        }
       }
     } catch (err) {
       if (requestIdRef.current === requestId) {
@@ -74,13 +84,6 @@ export default function PatientsList() {
     }, delay);
     return () => clearTimeout(handle);
   }, [query]);
-
-  // IPCP simulado por paciente. Ver src/lib/ipcp.ts para el porqué del mock.
-  const ipcpByPatient = useMemo(() => {
-    const map = new Map<string, ReturnType<typeof getMockIpcp>>();
-    patients.forEach((patient) => map.set(patient.id, getMockIpcp(patient.id)));
-    return map;
-  }, [patients]);
 
   async function confirmDelete() {
     if (!toDelete) {
@@ -130,10 +133,9 @@ export default function PatientsList() {
     {
       header: "IPCP",
       render: (row) => {
-        const ipcp = ipcpByPatient.get(row.id);
-        return ipcp ? (
-          <IpcpBadge score={ipcp.score} level={ipcp.level} />
-        ) : null;
+        const ipcp = ipcpMap[row.id];
+        if (!ipcp) return <span className="text-slate-400 text-xs">—</span>;
+        return <IpcpBadge score={ipcp.score} level={ipcp.level} />;
       },
     },
     {
@@ -230,6 +232,7 @@ export default function PatientsList() {
 
       {toDelete ? (
         <ConfirmDeleteModal
+          isOpen={!!toDelete}
           title="Eliminar paciente"
           message={
             <>
@@ -244,15 +247,4 @@ export default function PatientsList() {
       ) : null}
     </div>
   );
-}
-
-function ageOf(dateOfBirth: string): string {
-  const birth = new Date(`${dateOfBirth.slice(0, 10)}T00:00:00`);
-  const now = new Date();
-  let years = now.getFullYear() - birth.getFullYear();
-  const monthDiff = now.getMonth() - birth.getMonth();
-  if (monthDiff < 0 || (monthDiff === 0 && now.getDate() < birth.getDate())) {
-    years -= 1;
-  }
-  return years >= 0 ? `${years} años` : "—";
 }

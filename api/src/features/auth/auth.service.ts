@@ -19,12 +19,33 @@ import { PasswordReset } from './entities/password-reset.entity';
 import { RegisterCaregiverDto } from './dto/register-caregiver.dto';
 import { LoginDto } from './dto/login.dto';
 import { ChangePasswordDto } from './dto/change-password.dto';
+import { VerifyTwoFactorDto } from './dto/verify-two-factor.dto';
+import { TwoFactorService } from './two-factor.service';
 import { JwtPayload } from '../../common/guards/jwt-payload.interface';
 
 export interface AuthResponse {
   user: PublicUser;
   accessToken: string;
 }
+
+/**
+ * El login no entrega sesión cuando el usuario tiene 2FA: devuelve un desafío
+ * que se resuelve en `POST /auth/2fa/verify`. Los clientes distinguen ambos
+ * casos por `requiresTwoFactor`.
+ */
+export interface TwoFactorRequiredResponse {
+  requiresTwoFactor: true;
+  challengeId: string;
+  expiresAt: Date;
+}
+
+export type LoginResponse = AuthResponse | TwoFactorRequiredResponse;
+
+const PROFILE_RELATIONS = {
+  role: true,
+  municipality: true,
+  healthcareWorker: { major: true, healthCenter: true },
+} as const;
 
 export interface PublicUser {
   id: string;
@@ -35,6 +56,7 @@ export interface PublicUser {
   address: string;
   municipalityId: number;
   role: string;
+  twoFactorEnabled: boolean;
   healthcareWorker?: {
     licenseNumber: string;
     employeeId: string;
@@ -60,6 +82,7 @@ export class AuthService {
     private readonly municipalityRepository: Repository<Municipality>,
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
+    private readonly twoFactorService: TwoFactorService,
   ) {}
 
   async registerCaregiver(dto: RegisterCaregiverDto): Promise<AuthResponse> {
@@ -104,14 +127,10 @@ export class AuthService {
     return this.buildAuthResponse(user);
   }
 
-  async login(dto: LoginDto): Promise<AuthResponse> {
+  async login(dto: LoginDto): Promise<LoginResponse> {
     const user = await this.userRepository.findOne({
       where: [{ email: dto.email }, { username: dto.email }],
-      relations: {
-        role: true,
-        municipality: true,
-        healthcareWorker: { major: true, healthCenter: true },
-      },
+      relations: PROFILE_RELATIONS,
       withDeleted: true,
     });
 
@@ -122,20 +141,38 @@ export class AuthService {
       throw new UnauthorizedException('La cuenta está desactivada');
     }
 
-    user.lastLoginAt = new Date();
-    await this.userRepository.save(user);
+    // Con 2FA la contraseña sola no abre sesión: ni token ni `lastLoginAt`
+    // hasta que se verifique el código.
+    if (user.twoFactorEnabled) {
+      const challenge = await this.twoFactorService.issue(user, 'login');
+      return { requiresTwoFactor: true, ...challenge };
+    }
 
-    return this.buildAuthResponse(user);
+    return this.finishLogin(user);
+  }
+
+  /** Segundo paso del login: canjea el código por la sesión. */
+  async completeTwoFactorLogin(dto: VerifyTwoFactorDto): Promise<AuthResponse> {
+    const userId = await this.twoFactorService.consume(
+      dto.challengeId,
+      dto.code,
+      'login',
+    );
+    const user = await this.userRepository.findOne({
+      where: { id: userId },
+      relations: PROFILE_RELATIONS,
+      withDeleted: true,
+    });
+    if (!user || !user.isActive) {
+      throw new UnauthorizedException('La cuenta está desactivada');
+    }
+    return this.finishLogin(user);
   }
 
   async getProfile(payload: JwtPayload): Promise<PublicUser> {
     const user = await this.userRepository.findOne({
       where: { id: payload.sub },
-      relations: {
-        role: true,
-        municipality: true,
-        healthcareWorker: { major: true, healthCenter: true },
-      },
+      relations: PROFILE_RELATIONS,
       withDeleted: true,
     });
     if (!user || !user.isActive) {
@@ -223,6 +260,12 @@ export class AuthService {
     await this.userRepository.save(user);
   }
 
+  private async finishLogin(user: User): Promise<AuthResponse> {
+    user.lastLoginAt = new Date();
+    await this.userRepository.save(user);
+    return this.buildAuthResponse(user);
+  }
+
   private async buildAuthResponse(user: User): Promise<AuthResponse> {
     const accessToken = await this.jwtService.signAsync({
       sub: user.id,
@@ -242,6 +285,7 @@ export class AuthService {
       address: user.address,
       municipalityId: user.municipality.id,
       role: user.role.code,
+      twoFactorEnabled: user.twoFactorEnabled,
       healthcareWorker: user.healthcareWorker
         ? {
             licenseNumber: user.healthcareWorker.licenseNumber,

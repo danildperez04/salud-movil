@@ -1,20 +1,39 @@
+import { useState } from "react";
+import { UserPlus } from "lucide-react";
 import type { PublicCaregiverLink } from "../../../types";
 import { Card } from "../../../components/ui/Card";
+import { Button } from "../../../components/ui/Button";
 import { getButtonClassName } from "../../../components/ui/buttonStyles";
+import { LinkCaregiverModal } from "../../caregivers/caregiver-detail/LinkCaregiverModal";
+
+interface CaregiverSummaryCardProps {
+  patientId: string;
+  caregivers: PublicCaregiverLink[];
+  /** Tras vincular, el padre recarga los vínculos del paciente. */
+  onLinked: () => void;
+}
 
 export function CaregiverSummaryCard({
+  patientId,
   caregivers,
-}: {
-  caregivers: PublicCaregiverLink[];
-}) {
-  // Mostramos solo al cuidador principal (o el primero vinculado) como
-  // resumen rápido. La gestión completa (buscar, vincular, desvincular)
-  // sigue viviendo en la pestaña "Cuidadores", sin duplicar esa lógica aquí.
+  onLinked,
+}: CaregiverSummaryCardProps) {
+  const [linking, setLinking] = useState(false);
+  // Resumen rápido: el principal, o el primero vinculado. La gestión completa
+  // (desvincular) vive en la ficha del cuidador.
   const primary =
     caregivers.find((link) => link.isPrimary) ?? caregivers[0] ?? null;
 
   return (
-    <Card title="Cuidador / persona de apoyo">
+    <Card
+      title="Cuidador / persona de apoyo"
+      actions={
+        <Button variant="secondary" onClick={() => setLinking(true)}>
+          <UserPlus size={14} aria-hidden="true" />
+          {primary ? "Cambiar" : "Vincular"}
+        </Button>
+      }
+    >
       {primary ? (
         <>
           <p className="font-body text-sm font-semibold text-navy">
@@ -37,6 +56,17 @@ export function CaregiverSummaryCard({
           Este paciente no tiene un cuidador vinculado todavía.
         </p>
       )}
+      {linking ? (
+        <LinkCaregiverModal
+          patientId={patientId}
+          linked={caregivers}
+          onClose={() => setLinking(false)}
+          onLinked={() => {
+            setLinking(false);
+            onLinked();
+          }}
+        />
+      ) : null}
     </Card>
   );
 }

@@ -1,3 +1,4 @@
+import { Type } from 'class-transformer';
 import {
   ArrayMaxSize,
   ArrayMinSize,
@@ -13,6 +14,7 @@ import {
   Max,
   MaxLength,
   Min,
+  ValidateNested,
 } from 'class-validator';
 
 export class CreateMedicationScheduleDto {
@@ -67,7 +69,13 @@ export class CreateMedicationDto {
   @IsInt()
   routeAdministrationId!: number;
 
+  // `@ValidateNested` + `@Type` son imprescindibles: sin ellos class-validator
+  // no baja a los horarios y sus reglas no se aplican. Eso dejaba pasar horas
+  // imposibles (que Postgres rechaza con un 500) y `days` vacío o `timesPerDay`
+  // fuera de rango.
   @IsArray()
   @ArrayMinSize(1)
+  @ValidateNested({ each: true })
+  @Type(() => CreateMedicationScheduleDto)
   schedules!: CreateMedicationScheduleDto[];
 }

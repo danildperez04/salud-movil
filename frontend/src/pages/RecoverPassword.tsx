@@ -6,7 +6,7 @@ import { Input } from "../components/ui/Input";
 import { Button } from "../components/ui/Button";
 import { Alert } from "../components/ui/Alert";
 import { Logo } from "../components/ui/Logo";
-import { ApiError } from "../lib/api";
+import { api, ApiError } from "../lib/api";
 
 export default function RecoverPassword() {
   const [email, setEmail] = useState("");
@@ -23,15 +23,9 @@ export default function RecoverPassword() {
     }
     setLoading(true);
     try {
-      // TODO: agregar `requestPasswordReset` a lib/api.ts cuando exista
-      // el endpoint en el backend, ej.:
-      //   requestPasswordReset(email: string) {
-      //     return request<void>('/auth/forgot-password', {
-      //       method: 'POST',
-      //       body: JSON.stringify({ email }),
-      //     });
-      //   },
-      // await api.requestPasswordReset(email);
+      // La API responde 200 exista o no la cuenta, para no revelar qué correos
+      // están registrados, así que un error aquí sí es un fallo real.
+      await api.requestPasswordReset(email.trim());
       setSubmitted(true);
     } catch (err) {
       setError(
@@ -65,10 +59,32 @@ export default function RecoverPassword() {
       </p>
 
       {submitted ? (
-        <Alert variant="success">
-          Si el correo existe en nuestro sistema, recibirás instrucciones para
-          restablecer tu contraseña en unos minutos.
-        </Alert>
+        <div className="flex flex-col gap-4">
+          <Alert variant="success">
+            Si el correo existe en nuestro sistema, recibirás instrucciones para
+            restablecer tu contraseña en unos minutos.
+          </Alert>
+          {/* Sin servicio de correo el token solo se registra en el log de la
+              API (`auth.service.ts`, fuera de producción), así que en
+              desarrollo no hay forma de probar el paso final si no se ofrece
+              este atajo. En producción el token llega por el enlace del correo.
+              Ver §4 Fase 3 del plan de cierre: el envío de correo está
+              documentado como fuera del MVP. */}
+          {import.meta.env.DEV ? (
+            <p className="font-body text-xs text-muted">
+              <strong>Desarrollo:</strong> el token aparece en el log de la API
+              ({"<token de restablecimiento>"}). Pégalo en{" "}
+              <code className="rounded bg-mint-soft px-1">/nueva-contrasena</code>
+              .
+            </p>
+          ) : null}
+          <Link
+            to="/login"
+            className="font-body text-sm font-medium text-primary hover:underline"
+          >
+            Volver al inicio de sesión
+          </Link>
+        </div>
       ) : (
         <form
           onSubmit={handleSubmit}

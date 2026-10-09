@@ -3,12 +3,14 @@ import { Link, useParams } from "react-router";
 import { ArrowLeft, FileText, Pencil, Phone } from "lucide-react";
 import { FaWhatsapp } from "react-icons/fa6";
 import { api, ApiError } from "../../lib/api";
-import { getMockIpcp } from "../../lib/ipcp";
 import type { PublicCaregiverLink, PublicPatient } from "../../types";
 import { Alert } from "../../components/ui/Alert";
 import { getButtonClassName } from "../../components/ui/buttonStyles";
 import { PatientOverviewCard } from "./patient-detail/PatientOverviewCard";
 import { HealthIndicatorsCard } from "./patient-detail/HealthIndicatorsCard";
+import { IpcpCard } from "./patient-detail/IpcpCard";
+import { AppointmentsPanel } from "./patient-detail/AppointmentsPanel";
+import { MedicationsPanel } from "./patient-detail/MedicationsPanel";
 import { CaregiverSummaryCard } from "./patient-detail/CaregiverSummaryCard";
 import { FollowUpCard } from "./patient-detail/FollowUpCard";
 
@@ -66,6 +68,13 @@ export default function PatientDetail() {
     };
   }, [id]);
 
+  /** Tras vincular un cuidador se recarga la lista de vínculos del paciente. */
+  const reloadCaregivers = async () => {
+    if (!id) return;
+    const list = await api.getPatientCaregivers(id);
+    setCaregivers(list);
+  };
+
   if (error) {
     return <Alert>{error}</Alert>;
   }
@@ -74,9 +83,6 @@ export default function PatientDetail() {
       <p className="py-8 text-center font-body text-sm text-muted">Cargando…</p>
     );
   }
-
-  // MOCK: el IPCP real todavía no existe en el backend (ver lib/ipcp.ts).
-  const ipcp = getMockIpcp(patient.id);
 
   return (
     <div className="flex flex-col gap-6">
@@ -135,12 +141,22 @@ export default function PatientDetail() {
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1.4fr_1fr]">
         <div className="flex flex-col gap-6">
-          <PatientOverviewCard patient={patient} ipcp={ipcp} />
+          <PatientOverviewCard patient={patient} />
+          <IpcpCard patientId={patient.id} />
           <HealthIndicatorsCard patientId={patient.id} />
+          <AppointmentsPanel
+            patientId={patient.id}
+            patientCenterId={patient.healthCenterId}
+          />
+          <MedicationsPanel patientId={patient.id} />
         </div>
         <div className="flex flex-col gap-6">
-          <CaregiverSummaryCard caregivers={caregivers} />
-          <FollowUpCard ipcpScore={ipcp.score} />
+          <CaregiverSummaryCard
+            patientId={patient.id}
+            caregivers={caregivers}
+            onLinked={reloadCaregivers}
+          />
+          <FollowUpCard patientId={patient.id} />
         </div>
       </div>
     </div>

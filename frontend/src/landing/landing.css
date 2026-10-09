@@ -1,0 +1,227 @@
+/* ------------------------------------------------------------------------
+   Landing — base, tokens de movimiento y CSS que Tailwind no cubre.
+
+   Se importa desde src/index.css (no desde un componente) para compilar en la
+   misma pasada que Tailwind: así `@theme` genera las utilidades `animate-*` y
+   `ease-out-expo`. Todo lo que no es token está scoped a `.landing` para no
+   filtrar estilos al panel de gestión.
+------------------------------------------------------------------------- */
+
+@theme {
+  /* Breakpoints exactos de la landing (980px / 680px) */
+  --breakpoint-landing-md: 980px;
+  --breakpoint-landing-sm: 680px;
+
+  --ease-out-expo: cubic-bezier(0.22, 1, 0.36, 1);
+
+  /* Flotación y deriva: decoración que da vida sin llamar la atención */
+  --animate-float: float 5s ease-in-out infinite;
+  --animate-float-slow: float 7s ease-in-out infinite;
+  --animate-drift: drift 16s ease-in-out infinite;
+  --animate-drift-reverse: drift 21s ease-in-out infinite reverse;
+  --animate-orbit: orbit 50s linear infinite;
+  --animate-orbit-reverse: orbit 70s linear infinite reverse;
+  --animate-glow: glow 4.5s ease-in-out infinite;
+  --animate-ping-soft: ping-soft 2.4s cubic-bezier(0, 0, 0.2, 1) infinite;
+  --animate-shimmer: shimmer 7s linear infinite;
+  --animate-bounce-dot: bounce-dot 1.3s ease-in-out infinite;
+
+  /* Entradas puntuales (logo, cambio de pestaña en el showcase) */
+  --animate-draw: draw 1.6s cubic-bezier(0.22, 1, 0.36, 1) 0.15s both;
+  --animate-dot-in: dot-in 0.45s ease-out both;
+  --animate-panel-in: panel-in 0.65s cubic-bezier(0.22, 1, 0.36, 1) both;
+  --animate-phone-in: phone-in 0.85s cubic-bezier(0.22, 1, 0.36, 1) both;
+
+  @keyframes float {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  @keyframes drift {
+    0%,
+    100% {
+      transform: translate3d(0, 0, 0) scale(1);
+    }
+    50% {
+      transform: translate3d(-32px, 26px, 0) scale(1.08);
+    }
+  }
+
+  @keyframes orbit {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  @keyframes glow {
+    0%,
+    100% {
+      opacity: 0.45;
+      transform: scale(1);
+    }
+    50% {
+      opacity: 1;
+      transform: scale(1.18);
+    }
+  }
+
+  @keyframes ping-soft {
+    0% {
+      opacity: 0.7;
+      transform: scale(1);
+    }
+    75%,
+    100% {
+      opacity: 0;
+      transform: scale(2.6);
+    }
+  }
+
+  @keyframes shimmer {
+    from {
+      background-position: 0% 50%;
+    }
+    to {
+      background-position: 200% 50%;
+    }
+  }
+
+  @keyframes bounce-dot {
+    0%,
+    60%,
+    100% {
+      transform: translateY(0);
+    }
+    30% {
+      transform: translateY(-12px);
+    }
+  }
+
+  @keyframes draw {
+    from {
+      stroke-dashoffset: 1;
+    }
+    to {
+      stroke-dashoffset: 0;
+    }
+  }
+
+  @keyframes dot-in {
+    from {
+      opacity: 0;
+      transform: scale(0.2);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  @keyframes panel-in {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 18px, 0);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  @keyframes phone-in {
+    from {
+      opacity: 0;
+      transform: translate3d(0, 40px, 0) scale(0.95);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+}
+
+.container-x {
+  width: min(100% - 28px, 1360px);
+  margin-inline: auto;
+}
+
+@media (min-width: 680px) {
+  .container-x {
+    width: min(1360px, calc(100% - 48px));
+  }
+}
+
+.landing {
+  font-family: var(--font-body);
+  color: var(--color-text);
+  background: #fff;
+  overflow-x: clip;
+}
+
+.landing h1,
+.landing h2,
+.landing h3 {
+  font-family: var(--font-display);
+}
+
+/* El header es fijo: sin este margen el título de la sección quedaba tapado
+   al saltar con los enlaces del menú. */
+.landing section[id] {
+  scroll-margin-top: 4.5rem;
+}
+
+/* Reveal al hacer scroll. `data-reveal` define de dónde llega el elemento y
+   `--reveal-delay` (en ms, lo pone FadeInOnScroll) escalona a los hermanos.
+   La clase final la pone useScrollReveal con `data-visible`. */
+.landing .reveal {
+  opacity: 0;
+  transform: translate3d(0, 28px, 0);
+  transition:
+    opacity 0.8s var(--ease-out-expo) var(--reveal-delay, 0ms),
+    transform 0.8s var(--ease-out-expo) var(--reveal-delay, 0ms);
+}
+
+.landing .reveal[data-reveal='left'] {
+  transform: translate3d(-40px, 0, 0);
+}
+
+.landing .reveal[data-reveal='right'] {
+  transform: translate3d(40px, 0, 0);
+}
+
+.landing .reveal[data-reveal='scale'] {
+  transform: scale(0.92);
+}
+
+.landing .reveal[data-reveal='fade'] {
+  transform: none;
+}
+
+.landing .reveal[data-visible='true'] {
+  opacity: 1;
+  transform: none;
+}
+
+/* Quien prefiere menos movimiento ve todo en su lugar desde el inicio. */
+@media (prefers-reduced-motion: reduce) {
+  .landing .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+
+  .landing *,
+  .landing *::before,
+  .landing *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    animation-delay: 0ms !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+  }
+}

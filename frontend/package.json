@@ -1,12 +1,15 @@
 {
   "name": "frontend",
   "private": true,
+  "packageManager": "pnpm@11.20.0+sha512.9a6f330a95b66446ea088faf1521405a8a01f07fde7124cc9958dfed52d4bb436737e65b08f85f37b46fcba375092558ac51262b816844b22f63406ed166bfee",
   "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
+    "check:mocks": "bash scripts/check-no-clinical-mocks.sh",
+    "verify": "pnpm lint && pnpm check:mocks && pnpm build",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -16,6 +19,7 @@
     "react-dom": "^19.2.7",
     "react-icons": "^5.7.0",
     "react-router": "^8.3.0",
+    "sonner": "^2.0.8",
     "tailwindcss": "^4.3.3",
     "zustand": "^5.0.14"
   },

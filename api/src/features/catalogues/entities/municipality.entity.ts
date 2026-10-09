@@ -14,7 +14,9 @@ export class Municipality {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Column({ length: 100 })
+  // Único también entre departamentos: se verificó que no hay dos municipios
+  // con el mismo nombre, así que la identidad es global.
+  @Column({ length: 100, unique: true })
   name!: string;
 
   @ManyToOne(() => Department, (department) => department.municipalities, {

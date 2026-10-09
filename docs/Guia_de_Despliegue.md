@@ -3,6 +3,8 @@
 **Última actualización:** 24 de agosto de 2026
 **Estado:** API desplegada en Render + PostgreSQL en Supabase · Panel web pendiente de desplegar
 
+> Alternativa autocontenida: el stack completo (panel + API + PostgreSQL + nginx) se despliega con Docker en cualquier entorno. Ver [`Docker.md`](Docker.md).
+
 ## 1. Arquitectura de despliegue
 
 ```
@@ -80,6 +82,7 @@ Configuración actual del servicio:
 | `DB_NAME` | `postgres` | |
 | `JWT_SECRET` | *(cadena aleatoria larga)* | Generar con `openssl rand -base64 48`; nunca usar el valor de desarrollo |
 | `JWT_EXPIRES_IN` | `1d` | |
+| `OTP_EXPIRES_MINUTES` | `5` | Opcional. Vigencia del código OTP de la verificación en dos pasos |
 | `CORS_ORIGIN` | `https://<panel>.onrender.com` | URL final del panel web; actualizar en el paso 6 |
 | `PORT` | *(no definir)* | Render la inyecta automáticamente; `main.ts` la lee |
 
@@ -88,7 +91,7 @@ Configuración actual del servicio:
 - `PORT`: `main.ts` escucha en `process.env.PORT ?? 3000`, así que respeta el puerto que asigna Render.
 - **bcrypt nativo:** el archivo `api/pnpm-workspace.yaml` aprueba los scripts de compilación de `bcrypt` (`allowBuilds`). Sin esa aprobación, pnpm ≥ 10 no compila el binario nativo y el build falla.
 - **Primer arranque:** el seed idempotente crea roles, catálogos (17 departamentos, 150 municipios) y usuarios iniciales, entre ellos `admin@saludmovil.com` con contraseña `Admin123!`.
-- No hay endpoint público de health check (`GET /` responde 404). En Render puede dejarse el Health Check Path vacío; agregar `GET /health` queda pendiente para la Fase 7.
+- Health check: `GET /health` verifica la conexión a la base. Úsalo como Health Check Path en Render.
 
 **Verificación rápida:**
 
@@ -148,20 +151,42 @@ Sin este paso, el navegador bloquea las peticiones del panel con errores de CORS
 
 | Tema | Situación actual | Recomendación |
 |---|---|---|
-| Esquema de BD | `synchronize: true` crea/altera tablas al arrancar (deuda conocida) | Reemplazar por migraciones SQL antes de v1.0.0 (Fase 7) |
-| Logging SQL | `logging: true` imprime cada query (incluye contraseñas en tránsito de queries de login) | Desactivar o filtrar en producción (Fase 7) |
+| Esquema de BD | `synchronize: false`. El esquema lo crean las migraciones (`src/database/migrations/`), no el arranque | **Resuelto el 5-oct-2026.** Antes de desplegar: aplicar `pnpm migration:run` contra la base de producción (§4). Si la base nació de `synchronize`, sus tablas ya están y la migración fallará: recrearla con `scripts/migration-baseline.sh` contra una base vacía |
+| Logging SQL | Solo fuera de producción: `logging` depende de `NODE_ENV` y el seed no imprime contraseñas cuando es `production` | **Resuelto.** Configurar `NODE_ENV=production` en Render |
 | Usuario admin | El seed crea `admin@saludmovil.com` / `Admin123!` | Cambiar la contraseña inmediatamente después del primer despliegue |
 | `JWT_SECRET` | Debe ser aleatorio y exclusivo de producción | `openssl rand -base64 48`; rotar ante cualquier sospecha |
 | Cold starts | El plan Free de Render duerme el servicio tras ~15 min sin tráfico (~50 s en despertar) | Aceptable para demos; evitar en producción real |
+| Instaladores subidos desde el panel | La API los guarda en disco (`RELEASES_DIR`, por defecto `./storage/releases`). El disco del plan Free de Render es **efímero**: se borra en cada despliegue o reinicio, y las versiones quedarían registradas en la base sin archivo (la descarga responde 404) | En Render usa un disco persistente (plan de pago) o despliega con Docker (volumen `release-data`, ver [`Docker.md`](Docker.md)). Alternativa: implementar `ReleaseStorage` sobre S3/Supabase Storage |
+| Solicitudes de demo | Se guardan en la base y se consultan en el panel (*Sitio web → Solicitudes de demo*); no hay envío de correo | Revisar el panel periódicamente, o añadir un aviso por correo cuando exista un servicio de envío |
 | Pausa de Supabase | Proyectos free se pausan por inactividad | Revisar el dashboard si la API reporta errores de conexión tras días sin uso |
-| Seguridad extra | Sin Helmet ni rate limiting | Pendiente en Fase 7 (`@nestjs/throttler`) |
-| Health check | No existe endpoint público | Agregar `GET /health` en Fase 7 |
+| Seguridad extra | Helmet activo y rate limiting global con `@nestjs/throttler` (por defecto 100 req/min por IP) | **Resuelto.** Ajustar con `THROTTLE_LIMIT` y `THROTTLE_TTL_MS` |
+| Health check | `GET /health` (público, sin límite de peticiones) responde `{"status":"ok"}` si la API alcanza la base; 503 si no | **Resuelto.** Usarlo como Health Check Path en Render o en Docker |
+| Código OTP del 2FA | Provisionalmente se escribe en el **log del servidor** (`ConsoleOtpDelivery`): no hay servicio de correo ni SMS | **Pendiente.** Quien pueda leer los logs (p. ej. el panel de Render) y conozca la contraseña puede completar el login de una cuenta con 2FA. Sustituir `OtpDelivery` por un canal real antes de tratar el 2FA como una barrera de seguridad. Es opcional por usuario: ninguna cuenta se ve afectada hasta que su dueño lo active |
+| Migración `AddTwoFactorOtp` | Con `synchronize: true`, el primer arranque ya crea `otp_challenge` y `user.two_factor_enabled` | La migración es idempotente: sobre una base que ya tiene esos objetos solo queda registrada. Tras desplegar, ejecutar una vez `pnpm migration:run` (necesita las devDependencies) y comprobar con `pnpm migration:show`. No se ejecuta sola al arrancar a propósito: `migrationsRun` corre **antes** de `synchronize` y fallaría en una base vacía |
+
+> ⚠️ **`forgot-password` cambió de contrato.** Ya **no devuelve el token** en la
+> respuesta (permitía secuestrar cualquier cuenta con solo conocer el correo) y
+> responde **siempre 200** con un mensaje genérico, para no revelar qué correos
+> existen. Mientras no haya servicio de correo, el token se registra **únicamente
+> fuera de producción**.
+
+### Migrar la base antes del primer arranque
+
+Con `synchronize: false`, si la base no tiene el esquema la API arranca igual y
+falla en la primera consulta. Hay que migrar **antes**:
+
+```bash
+cd api
+DB_HOST=... DB_USER=... DB_PASSWORD=... DB_NAME=... pnpm run migration:run
+```
 
 ## 8. Checklist post-despliegue
 
 - [ ] `POST /auth/login` con admin responde `accessToken`.
 - [ ] `POST /auth/login` con personal de salud responde `accessToken`.
 - [ ] `GET /catalogues/departments` con token devuelve los 17 departamentos.
+- [ ] `GET /patients/:id/ipcp` con token devuelve `score` y `level`.
+- [ ] La tabla `migrations` de producción registra `InitialSchema`.
 - [ ] El panel web carga y el login funciona desde el navegador (sin errores de CORS en consola).
 - [ ] Crear y editar un paciente desde el panel persiste en Supabase.
 - [ ] La contraseña del admin fue cambiada.

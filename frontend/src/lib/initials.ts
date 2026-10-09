@@ -1,6 +1,6 @@
 /**
- * También vive duplicada como función local en layouts/AppLayout.tsx.
- * Cuando puedas, reemplázala ahí por este import para no repetirla.
+ * Iniciales para los avatares. Se usa en el layout del panel y en la ficha del
+ * paciente, así que vive aquí y no duplicada.
  */
 export function getInitials(name?: string): string {
   if (!name) return "";

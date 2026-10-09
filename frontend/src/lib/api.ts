@@ -1,33 +1,76 @@
 import type {
+  AdminRelease,
   AuthResponse,
   CatalogueItem,
+  CreateAppointmentPayload,
   CreateCaregiverPayload,
+  CreateDemoRequestPayload,
+  CreateHealthIndicatorPayload,
   CreateMedicalVisitPayload,
+  CreateMedicationPayload,
   CreatePatientPayload,
   CreateStaffPayload,
+  DemoRequest,
+  DemoRequestPage,
+  DemoRequestStats,
+  DemoRequestStatus,
+  DisableTwoFactorDto,
   HealthCenterItem,
+  IpcpBatchFilters,
+  IpcpBatchResponse,
   LinkCaregiverPayload,
+  LoginResponse,
   MunicipalityItem,
+  PublicAppointment,
   PublicCaregiver,
   PublicCaregiverDetail,
   PublicCaregiverLink,
+  PublicDashboardStats,
+  PublicHealthIndicator,
+  PublicIpcp,
+  PublicIndicatorSummary,
   PublicMedicalRecord,
+  PublicMedication,
   PublicPatient,
   PublicPatientLink,
+  PublicReminder,
+  PublicRelease,
   PublicStaff,
+  TwoFactorChallengeInfo,
+  UpdateAppointmentPayload,
   UpdateCaregiverPayload,
+  UpdateDemoRequestPayload,
+  UpdateHealthIndicatorPayload,
   UpdateMedicalRecordPayload,
+  UpdateMedicationPayload,
+  UpdateReleasePayload,
   UpdatePatientPayload,
   UpdateStaffPayload,
+  VerifyTwoFactorDto,
 } from '../types';
 
 const API_URL =
   (import.meta.env.VITE_API_URL as string | undefined) ?? 'http://localhost:3000';
 
+/** Enlace absoluto de descarga a partir del `downloadPath` que devuelve la API. */
+export function releaseDownloadUrl(downloadPath: string): string {
+  return `${API_URL}${downloadPath}`;
+}
+
 let tokenGetter: () => string | null = () => null;
+let unauthorizedHandler: () => void = () => {};
 
 export function setTokenGetter(getter: () => string | null) {
   tokenGetter = getter;
+}
+
+/**
+ * Se invoca cuando la API responde 401. Lo registra el store de autenticación
+ * para limpiar la sesión: sin esto, un token expirado dejaba al usuario
+ * atascado viendo errores en lugar de volver al login.
+ */
+export function setUnauthorizedHandler(handler: () => void) {
+  unauthorizedHandler = handler;
 }
 
 interface ApiErrorBody {
@@ -44,6 +87,24 @@ export class ApiError extends Error {
   }
 }
 
+type QueryValue = string | number | boolean | null | undefined;
+
+/** Serializa query params omitiendo los vacíos, sin dejar `?a=&b=`. */
+function withQuery(path: string, query?: Record<string, QueryValue>): string {
+  if (!query) {
+    return path;
+  }
+  const params = new URLSearchParams();
+  for (const [key, value] of Object.entries(query)) {
+    if (value === undefined || value === null || value === '') {
+      continue;
+    }
+    params.set(key, String(value));
+  }
+  const qs = params.toString();
+  return qs ? `${path}?${qs}` : path;
+}
+
 async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   const token = tokenGetter();
   const headers: Record<string, string> = {
@@ -57,6 +118,10 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
     response = await fetch(`${API_URL}${path}`, { ...options, headers });
   } catch {
     throw new ApiError('No se pudo conectar con el servidor', 0);
+  }
+
+  if (response.status === 401) {
+    unauthorizedHandler();
   }
 
   if (!response.ok) {
@@ -75,12 +140,19 @@ async function request<T>(path: string, options: RequestInit = {}): Promise<T> {
   }
 
   const text = await response.text();
-  return text ? (JSON.parse(text) as T) : (undefined as T);
+  if (!text) {
+    return undefined as T;
+  }
+  try {
+    return JSON.parse(text) as T;
+  } catch {
+    throw new ApiError('El servidor devolvió una respuesta inesperada', response.status);
+  }
 }
 
 export const api = {
   login(email: string, password: string) {
-    return request<AuthResponse>('/auth/login', {
+    return request<LoginResponse>('/auth/login', {
       method: 'POST',
       body: JSON.stringify({ email, password }),
     });
@@ -88,6 +160,81 @@ export const api = {
 
   me() {
     return request<AuthResponse['user']>('/auth/me');
+  },
+
+  /**
+   * La API responde siempre 200 con un mensaje genérico, exista o no la cuenta,
+   * y no devuelve el token. `{ message }` documenta ese contrato.
+   */
+  requestPasswordReset(email: string) {
+    return request<{ message: string }>('/auth/forgot-password', {
+      method: 'POST',
+      body: JSON.stringify({ email }),
+    });
+  },
+
+  /**
+   * Cierra el flujo de recuperación de contraseña (HU-04). El `token` llega por
+   * el enlace del correo; la API responde 400 si venció o ya se usó.
+   */
+  resetPassword(token: string, newPassword: string) {
+    return request<{ message: string }>('/auth/reset-password', {
+      method: 'POST',
+      body: JSON.stringify({ token, newPassword }),
+    });
+  },
+
+  /** Cambio de contraseña con la sesión abierta (HU-08). */
+  changePassword(currentPassword: string, newPassword: string) {
+    return request<{ message: string }>('/auth/change-password', {
+      method: 'POST',
+      body: JSON.stringify({ currentPassword, newPassword }),
+    });
+  },
+
+  // --- Solicitudes de demo (públicas) ---
+
+  createDemoRequest(payload: CreateDemoRequestPayload) {
+    return request<{ message: string }>('/demo-requests', {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  },
+
+  // --- 2FA ---
+
+  verifyTwoFactor(dto: VerifyTwoFactorDto) {
+    return request<AuthResponse>('/auth/2fa/verify', {
+      method: 'POST',
+      body: JSON.stringify(dto),
+    });
+  },
+
+  enableTwoFactor() {
+    return request<TwoFactorChallengeInfo>('/auth/2fa/enable', {
+      method: 'POST',
+    });
+  },
+
+  confirmEnableTwoFactor(challengeId: string, code: string) {
+    return request<{ twoFactorEnabled: true }>('/auth/2fa/enable/confirm', {
+      method: 'POST',
+      body: JSON.stringify({ challengeId, code }),
+    });
+  },
+
+  disableTwoFactor(password: string) {
+    return request<{ twoFactorEnabled: false }>('/auth/2fa/disable', {
+      method: 'POST',
+      body: JSON.stringify({ password } as DisableTwoFactorDto),
+    });
+  },
+
+  resendTwoFactor(challengeId: string) {
+    return request<TwoFactorChallengeInfo>('/auth/2fa/resend', {
+      method: 'POST',
+      body: JSON.stringify({ challengeId }),
+    });
   },
 
   getDepartments() {
@@ -115,12 +262,31 @@ export const api = {
     return request<HealthCenterItem[]>('/catalogues/health-centers');
   },
 
+  /** Tipos de cita, para el formulario de agenda. */
+  getAppointmentTypes() {
+    return request<CatalogueItem[]>('/catalogues/appointment-types');
+  },
+
+  /** Vías de administración, para el formulario de medicamentos. */
+  getRouteAdministrations() {
+    return request<CatalogueItem[]>('/catalogues/route-administrations');
+  },
+
+  /** Estados de cita, para filtrar la agenda sin escribir el texto a mano. */
+  getAppointmentStates() {
+    return request<CatalogueItem[]>('/catalogues/appointment-states');
+  },
+
   searchCaregivers(q: string) {
     return request<PublicCaregiver[]>('/caregivers?q=' + encodeURIComponent(q));
   },
 
-  listUsers() {
-    return request<PublicStaff[]>('/users');
+  /**
+   * `role` filtra en el servidor. Sin él el backend devuelve pacientes y
+   * cuidadores también, que el panel descarta en el navegador.
+   */
+  listUsers(role?: string) {
+    return request<PublicStaff[]>(withQuery('/users', { role }));
   },
 
   getUser(id: string) {
@@ -231,5 +397,275 @@ export const api = {
       method: 'POST',
       body: JSON.stringify(payload),
     });
+  },
+  // --- Panel ---
+
+  getDashboardStats() {
+    return request<PublicDashboardStats>('/dashboard/stats');
+  },
+
+  // --- Indicadores de salud ---
+
+  getPatientHealthIndicators(
+    patientId: string,
+    query?: { typeIndicatorId?: number; from?: string; to?: string },
+  ) {
+    return request<PublicHealthIndicator[]>(
+      withQuery(`/patients/${patientId}/health-indicators`, query),
+    );
+  },
+
+  getPatientHealthIndicatorsLatest(patientId: string) {
+    return request<PublicHealthIndicator[]>(
+      `/patients/${patientId}/health-indicators/latest`,
+    );
+  },
+
+  getPatientHealthIndicatorsSummary(patientId: string) {
+    return request<PublicIndicatorSummary[]>(
+      `/patients/${patientId}/health-indicators/summary`,
+    );
+  },
+
+  createPatientHealthIndicator(
+    patientId: string,
+    payload: CreateHealthIndicatorPayload,
+  ) {
+    return request<PublicHealthIndicator>(
+      `/patients/${patientId}/health-indicators`,
+      { method: 'POST', body: JSON.stringify(payload) },
+    );
+  },
+
+  updatePatientHealthIndicator(
+    patientId: string,
+    indicatorId: string,
+    payload: UpdateHealthIndicatorPayload,
+  ) {
+    return request<PublicHealthIndicator>(
+      `/patients/${patientId}/health-indicators/${indicatorId}`,
+      { method: 'PATCH', body: JSON.stringify(payload) },
+    );
+  },
+
+  deletePatientHealthIndicator(patientId: string, indicatorId: string) {
+    return request<void>(`/patients/${patientId}/health-indicators/${indicatorId}`, {
+      method: 'DELETE',
+    });
+  },
+
+  // --- Citas médicas ---
+
+  getPatientAppointments(patientId: string) {
+    return request<PublicAppointment[]>(`/patients/${patientId}/appointments`);
+  },
+
+  getPatientUpcomingAppointments(patientId: string) {
+    return request<PublicAppointment[]>(`/patients/${patientId}/appointments/upcoming`);
+  },
+
+  createPatientAppointment(
+    patientId: string,
+    payload: CreateAppointmentPayload,
+  ) {
+    return request<PublicAppointment>(`/patients/${patientId}/appointments`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  },
+
+  updatePatientAppointment(
+    patientId: string,
+    appointmentId: string,
+    payload: UpdateAppointmentPayload,
+  ) {
+    return request<PublicAppointment>(
+      `/patients/${patientId}/appointments/${appointmentId}`,
+      { method: 'PATCH', body: JSON.stringify(payload) },
+    );
+  },
+
+  cancelPatientAppointment(
+    patientId: string,
+    appointmentId: string,
+    cancelReason: string,
+  ) {
+    return request<PublicAppointment>(
+      `/patients/${patientId}/appointments/${appointmentId}/cancel`,
+      { method: 'POST', body: JSON.stringify({ cancelReason }) },
+    );
+  },
+
+  changePatientAppointmentState(
+    patientId: string,
+    appointmentId: string,
+    state: 'Completed' | 'No show',
+  ) {
+    return request<PublicAppointment>(
+      `/patients/${patientId}/appointments/${appointmentId}/state`,
+      { method: 'PATCH', body: JSON.stringify({ state }) },
+    );
+  },
+
+  deletePatientAppointment(patientId: string, appointmentId: string) {
+    return request<void>(`/patients/${patientId}/appointments/${appointmentId}`, {
+      method: 'DELETE',
+    });
+  },
+
+  // --- Medicamentos ---
+
+  getPatientMedications(patientId: string) {
+    return request<PublicMedication[]>(`/patients/${patientId}/medications`);
+  },
+
+  createPatientMedication(patientId: string, payload: CreateMedicationPayload) {
+    return request<PublicMedication>(`/patients/${patientId}/medications`, {
+      method: 'POST',
+      body: JSON.stringify(payload),
+    });
+  },
+
+  updatePatientMedication(
+    patientId: string,
+    medicationId: string,
+    payload: UpdateMedicationPayload,
+  ) {
+    return request<PublicMedication>(
+      `/patients/${patientId}/medications/${medicationId}`,
+      { method: 'PATCH', body: JSON.stringify(payload) },
+    );
+  },
+
+  deletePatientMedication(patientId: string, medicationId: string) {
+    return request<void>(`/patients/${patientId}/medications/${medicationId}`, {
+      method: 'DELETE',
+    });
+  },
+
+  // --- Recordatorios ---
+
+  getMyReminders(windowDays?: number) {
+    return request<PublicReminder[]>(withQuery('/patients/me/reminders', { windowDays }));
+  },
+
+  getPatientReminders(patientId: string, windowDays?: number) {
+    return request<PublicReminder[]>(
+      withQuery(`/patients/${patientId}/reminders`, { windowDays }),
+    );
+  },
+
+  /**
+   * Listado de IPCP con filtros, paginación y orden (HU-32, HU-33).
+   *
+   * Los campos vacíos los descarta `withQuery`, así que `search: ''` viaja
+   * como "sin búsqueda" y no como un filtro que no matchea a nadie.
+   */
+  getPatientsIpcp(filters?: IpcpBatchFilters) {
+    return request<IpcpBatchResponse>(
+      withQuery('/patients/ipcp', filters as Record<string, QueryValue>),
+    );
+  },
+
+  getPatientIpcp(patientId: string) {
+    return request<PublicIpcp>(`/patients/${patientId}/ipcp`);
+  },
+
+  // --- Solicitudes de demo (administración) ---
+
+  listDemoRequests(query: {
+    status?: DemoRequestStatus;
+    search?: string;
+    page?: number;
+    pageSize?: number;
+  }) {
+    return request<DemoRequestPage>(withQuery('/admin/demo-requests', query));
+  },
+
+  getDemoRequestStats() {
+    return request<DemoRequestStats>('/admin/demo-requests/stats');
+  },
+
+  updateDemoRequest(id: string, payload: UpdateDemoRequestPayload) {
+    return request<DemoRequest>(`/admin/demo-requests/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    });
+  },
+
+  deleteDemoRequest(id: string) {
+    return request<void>(`/admin/demo-requests/${id}`, { method: 'DELETE' });
+  },
+
+  // --- Instaladores (administración) ---
+
+  listReleases() {
+    return request<AdminRelease[]>('/admin/releases');
+  },
+
+  updateRelease(id: string, payload: UpdateReleasePayload) {
+    return request<AdminRelease>(`/admin/releases/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(payload),
+    });
+  },
+
+  deleteRelease(id: string) {
+    return request<void>(`/admin/releases/${id}`, { method: 'DELETE' });
+  },
+
+  /**
+   * Sube un instalable. Usa XMLHttpRequest en vez de `fetch` porque `fetch`
+   * no informa del progreso de subida, y un DMG pesa cientos de MB.
+   */
+  uploadRelease(
+    form: FormData,
+    options: { onProgress?: (fraction: number) => void; signal?: AbortSignal } = {},
+  ) {
+    return new Promise<AdminRelease>((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', `${API_URL}/admin/releases`);
+      const token = tokenGetter();
+      if (token) xhr.setRequestHeader('Authorization', `Bearer ${token}`);
+
+      xhr.upload.onprogress = (event) => {
+        if (event.lengthComputable) options.onProgress?.(event.loaded / event.total);
+      };
+      xhr.onerror = () => reject(new ApiError('No se pudo conectar con el servidor', 0));
+      xhr.onabort = () => reject(new ApiError('Subida cancelada', 0));
+      xhr.onload = () => {
+        if (xhr.status === 401) unauthorizedHandler();
+        let body: (AdminRelease & ApiErrorBody) | null = null;
+        try {
+          body = JSON.parse(xhr.responseText) as AdminRelease & ApiErrorBody;
+        } catch {
+          // Respuesta sin JSON (p. ej. 413 de nginx): se usa un mensaje por estado.
+        }
+        if (xhr.status >= 200 && xhr.status < 300 && body) {
+          resolve(body);
+          return;
+        }
+        const message = Array.isArray(body?.message) ? body.message.join('. ') : body?.message;
+        reject(
+          new ApiError(
+            message ??
+              (xhr.status === 413
+                ? 'El archivo supera el tamaño máximo permitido'
+                : 'No se pudo subir el instalable'),
+            xhr.status,
+          ),
+        );
+      };
+
+      options.signal?.addEventListener('abort', () => xhr.abort());
+      xhr.send(form);
+    });
+  },
+
+  // --- Instaladores (públicos) ---
+
+  /** Última versión publicada de cada plataforma que ya tiene instalable. */
+  getLatestReleases() {
+    return request<PublicRelease[]>('/releases/latest');
   },
 };
