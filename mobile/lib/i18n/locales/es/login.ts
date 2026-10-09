@@ -1,0 +1,38 @@
+// lib/i18n/locales/es/login.ts
+// Texto exacto del Figma (pantalla "Inicio de Sesión") y de la verificación en dos pasos.
+export const login = {
+  brand: 'Salud Móvil',
+  tagline: 'Tu salud, en tus manos',
+  title: 'Inicio de Sesión',
+  subtitle: 'Ingresa tus datos para continuar',
+  emailLabel: 'Correo electrónico',
+  emailPlaceholder: 'tu@email.com',
+  passwordLabel: 'Contraseña',
+  forgotPassword: '¿Olvidaste tu contraseña?',
+  submit: 'Iniciar Sesión',
+  emailRequired: 'Ingresá tu correo',
+  emailInvalid: 'Correo inválido',
+  passwordRequired: 'Ingresá tu contraseña',
+  invalidCredentials: 'Correo o contraseña incorrectos',
+  twoFactor: {
+    title: 'Verificá tu identidad',
+    subtitle: 'Ingresá el código de 6 dígitos que te enviamos para completar el inicio de sesión.',
+    codeLabel: 'Código de verificación',
+    codePlaceholder: '000000',
+    submit: 'Verificar',
+    expiresIn: 'El código vence en {{time}}',
+    expired: 'El código venció. Pedí uno nuevo para continuar.',
+    resend: 'Reenviar código',
+    resendIn: 'Reenviar código en {{seconds}} s',
+    resent: 'Te enviamos un código nuevo. El anterior ya no sirve.',
+    backToLogin: 'Volver a iniciar sesión',
+    errors: {
+      codeRequired: 'Ingresá el código',
+      codeInvalid: 'El código tiene 6 dígitos',
+      wrongOrExpired: 'El código es incorrecto o ya venció. Revisalo o pedí uno nuevo.',
+      tooManyRequests: 'Hiciste demasiados intentos. Esperá un momento y probá de nuevo.',
+      resendTooSoon: 'Esperá unos segundos antes de pedir otro código.',
+      challengeGone: 'La verificación ya no está disponible. Volvé a iniciar sesión.',
+    },
+  },
+};

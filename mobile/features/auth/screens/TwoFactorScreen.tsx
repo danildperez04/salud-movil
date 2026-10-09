@@ -3,13 +3,13 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { Redirect, router } from 'expo-router';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { KeyboardAvoidingView, Platform, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BrandLogo } from '@/components/brand-logo';
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/spinner';
 import { Text } from '@/components/ui/text';
-import { LOGIN_LABELS } from '@/constants/labels';
 import { ApiError } from '@/lib/api-client';
 import { userMessage } from '@/lib/error-messages';
 import { useAppStore } from '@/store';
@@ -22,9 +22,8 @@ import { useSecondsLeft } from '../hooks/useSecondsLeft';
 import { useVerifyTwoFactor } from '../hooks/useVerifyTwoFactor';
 import { useTwoFactorStore } from '../store/two-factor-store';
 
-const labels = LOGIN_LABELS.twoFactor;
-
 export default function TwoFactorScreen() {
+  const { t } = useTranslation('login');
   const insets = useSafeAreaInsets();
   const isAuthenticated = useAppStore((state) => state.isAuthenticated);
   const challenge = useTwoFactorStore((state) => state.challenge);
@@ -65,7 +64,7 @@ export default function TwoFactorScreen() {
       onSuccess: () => {
         verify.reset();
         reset({ code: '' });
-        setNotice(labels.resent);
+        setNotice(t('twoFactor.resent'));
       },
       onError: (error) => {
         const { kind, message } = classifyResendError(error);
@@ -105,18 +104,18 @@ export default function TwoFactorScreen() {
               aria-level={1}
               className="font-heading text-brand-blue dark:text-neutral-white text-[24px] leading-[36px]"
             >
-              {labels.title}
+              {t('twoFactor.title')}
             </Text>
             <Text className="font-heading-regular text-secondary-steel mt-1 text-[14px] leading-[21px]">
-              {labels.subtitle}
+              {t('twoFactor.subtitle')}
             </Text>
 
             <View className="mt-4 gap-4">
               <OtpCodeField
                 control={control}
                 name="code"
-                label={labels.codeLabel}
-                placeholder={labels.codePlaceholder}
+                label={t('twoFactor.codeLabel')}
+                placeholder={t('twoFactor.codePlaceholder')}
                 testID="otp-input"
                 autoFocus
                 editable={!verify.isPending}
@@ -130,7 +129,9 @@ export default function TwoFactorScreen() {
                     : 'text-small font-body text-muted-foreground'
                 }
               >
-                {isExpired ? labels.expired : labels.expiresIn(formatCountdown(expiresIn))}
+                {isExpired
+                  ? t('twoFactor.expired')
+                  : t('twoFactor.expiresIn', { time: formatCountdown(expiresIn) })}
               </Text>
 
               {verifyError && <Text className="text-small text-destructive">{verifyError}</Text>}
@@ -149,7 +150,7 @@ export default function TwoFactorScreen() {
                 {verify.isPending ? (
                   <Spinner size="sm" color="#FFFFFF" />
                 ) : (
-                  <Text className="text-[16px] leading-6 text-white">{labels.submit}</Text>
+                  <Text className="text-[16px] leading-6 text-white">{t('twoFactor.submit')}</Text>
                 )}
               </Button>
 
@@ -165,7 +166,9 @@ export default function TwoFactorScreen() {
                     <Spinner size="sm" />
                   ) : (
                     <Text className="text-body text-foreground">
-                      {resendIn > 0 ? labels.resendIn(resendIn) : labels.resend}
+                      {resendIn > 0
+                        ? t('twoFactor.resendIn', { seconds: resendIn })
+                        : t('twoFactor.resend')}
                     </Text>
                   )}
                 </Button>
@@ -173,7 +176,7 @@ export default function TwoFactorScreen() {
 
               <Button variant="ghost" onPress={backToLogin} disabled={verify.isPending}>
                 <Text className="text-small text-secondary-steel underline">
-                  {labels.backToLogin}
+                  {t('twoFactor.backToLogin')}
                 </Text>
               </Button>
             </View>
