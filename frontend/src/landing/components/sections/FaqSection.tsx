@@ -46,7 +46,7 @@ function FaqItem({ index, question, answer, isOpen, onToggle }: FaqItemProps) {
             className="group flex w-full cursor-pointer items-center gap-4 border-0 bg-transparent p-4.5 text-left font-body focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-mint landing-sm:px-6 landing-sm:py-5"
           >
             <span
-              className={`grid h-9 w-9 shrink-0 place-items-center rounded-full text-[12px] font-black transition-colors duration-300 ${
+              className={`grid h-9 w-9 shrink-0 place-items-center rounded-full text-[14px] font-black transition-colors duration-300 ${
                 isOpen
                   ? "bg-mint text-white"
                   : "bg-mint-soft text-mint-dark group-hover:bg-mint-line"
@@ -54,7 +54,7 @@ function FaqItem({ index, question, answer, isOpen, onToggle }: FaqItemProps) {
             >
               {String(index + 1).padStart(2, "0")}
             </span>
-            <span className="flex-1 text-[15px] font-[850] leading-[1.4] text-navy landing-sm:text-[16px]">
+            <span className="flex-1 text-[17px] font-[850] leading-[1.4] text-navy landing-sm:text-[18px]">
               {question}
             </span>
             {/* El "+" gira 45° y se vuelve una "x" al abrir */}
@@ -82,7 +82,7 @@ function FaqItem({ index, question, answer, isOpen, onToggle }: FaqItemProps) {
           }`}
         >
           <div className="overflow-hidden">
-            <p className="m-0 pb-5 pl-17.5 pr-4.5 text-[14px] leading-[1.75] text-muted landing-sm:pb-6 landing-sm:pl-19 landing-sm:pr-6">
+            <p className="m-0 pb-5 pl-17.5 pr-4.5 text-[16px] leading-[1.75] text-muted landing-sm:pb-6 landing-sm:pl-19 landing-sm:pr-6">
               {answer}
             </p>
           </div>
@@ -102,7 +102,7 @@ export function FaqSection() {
   };
 
   return (
-    <section id="faq" className="bg-white py-19.5 landing-sm:py-25">
+    <section id="faq" className="bg-white py-16 landing-sm:py-22">
       <div className="container-x">
         <SectionHeader
           badge="Preguntas frecuentes"
@@ -110,7 +110,7 @@ export function FaqSection() {
           className="mb-12"
         />
 
-        <div className="mx-auto grid max-w-205 gap-3">
+        <div className="mx-auto grid max-w-225 gap-3">
           {faqItems.map((item, index) => (
             <FaqItem
               key={item.question}
@@ -124,15 +124,15 @@ export function FaqSection() {
         </div>
 
         {whatsapp && (
-          <FadeInOnScroll delay={faqItems.length * 90} className="mx-auto mt-8 max-w-205">
+          <FadeInOnScroll delay={faqItems.length * 90} className="mx-auto mt-8 max-w-225">
             <div className="group flex flex-col items-center justify-between gap-4 rounded-[20px] border border-mint-line bg-mint-soft-2 px-5 py-5 text-center landing-sm:flex-row landing-sm:px-6 landing-sm:text-left">
               <div className="flex flex-col items-center gap-3.5 landing-sm:flex-row">
                 <IconTile icon={MessageCircle} size="lg" />
                 <div>
-                  <strong className="block text-[15px] font-bold text-navy">
+                  <strong className="block text-[17px] font-bold text-navy">
                     ¿Tienes otra pregunta?
                   </strong>
-                  <span className="text-[13px] text-muted">
+                  <span className="text-[15px] text-muted">
                     Escríbenos y con gusto te ayudamos.
                   </span>
                 </div>

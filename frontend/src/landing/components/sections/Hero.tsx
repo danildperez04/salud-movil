@@ -52,7 +52,7 @@ export function Hero() {
 
           {/* Cada frase es un bloque: el salto de línea cae entre frases, no a
               mitad de una ("Más / clara"), y entran una tras otra. */}
-          <h1 className="my-4.5 mb-6 max-w-190 text-[44px] leading-[0.98] tracking-[-0.045em] text-navy landing-sm:text-[clamp(46px,5.2vw,68px)]">
+          <h1 className="my-4.5 mb-6 max-w-210 text-[48px] leading-[0.98] tracking-[-0.045em] text-navy landing-sm:text-[clamp(48px,5.6vw,82px)]">
             {heroHeadline.lines.map((line, index) => (
               <FadeInOnScroll
                 key={line}
@@ -75,7 +75,7 @@ export function Hero() {
           </h1>
 
           <FadeInOnScroll delay={600}>
-            <p className="mb-7.5 max-w-160 text-[16px] leading-[1.7] text-muted landing-sm:text-[18px]">
+            <p className="mb-7.5 max-w-175 text-[18px] leading-[1.7] text-muted landing-sm:text-[21px]">
               Salud Móvil reúne tus citas, medicamentos, indicadores y
               expediente clínico para que cuidar de ti sea más simple,
               organizado y accesible desde tu celular.
@@ -98,7 +98,7 @@ export function Hero() {
           </FadeInOnScroll>
 
           <FadeInOnScroll delay={840}>
-            <ul className="m-0 flex list-none flex-wrap gap-x-5 gap-y-2.5 p-0 text-xs font-bold text-muted">
+            <ul className="m-0 flex list-none flex-wrap gap-x-5 gap-y-2.5 p-0 text-[14px] font-bold text-muted">
               {heroPoints.map((point) => (
                 <li key={point} className="flex items-center gap-1.75">
                   <CheckBadge />
@@ -154,10 +154,10 @@ export function Hero() {
                   <div className="mb-2.25 grid h-8 w-8 place-items-center rounded-full bg-mint-soft text-mint-dark">
                     <Icon size={17} strokeWidth={2.2} aria-hidden="true" />
                   </div>
-                  <strong className="mb-1 block text-xs text-navy">
+                  <strong className="mb-1 block text-[14px] text-navy">
                     {card.title}
                   </strong>
-                  <small className="text-[10px] text-muted">{card.text}</small>
+                  <small className="text-[12px] text-muted">{card.text}</small>
                 </div>
               </FadeInOnScroll>
             );

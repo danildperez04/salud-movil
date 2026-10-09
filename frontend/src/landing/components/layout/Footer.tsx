@@ -7,7 +7,7 @@ import { footerProductLinks, footerExploreLinks } from "../../data/navigation";
 import { socialLinks } from "../../data/social";
 
 const linkClass =
-  "my-2.25 block w-fit text-[11px] text-muted transition duration-200 hover:translate-x-1 hover:text-mint-dark";
+  "my-2.25 block w-fit text-[13px] text-muted transition duration-200 hover:translate-x-1 hover:text-mint-dark";
 
 export function Footer() {
   return (
@@ -16,13 +16,13 @@ export function Footer() {
         <div className="grid grid-cols-1 gap-10 landing-sm:grid-cols-[1.4fr_1fr_1fr_1.2fr] landing-sm:gap-12.5">
           <FadeInOnScroll>
             <Logo animated={false} />
-            <p className="mt-4 max-w-95 text-xs leading-[1.7] text-muted">
+            <p className="mt-4 max-w-105 text-[14px] leading-[1.7] text-muted">
               Una experiencia móvil para organizar y consultar información de
               salud de manera más simple.
             </p>
             <a
               href="#sobre-nosotros"
-              className="group mt-2 inline-flex items-center justify-center gap-1.5 rounded-xl bg-mint px-3.5 py-2.75 text-[11px] font-[850] text-white transition duration-200 hover:-translate-y-0.5 hover:bg-mint-dark"
+              className="group mt-2 inline-flex items-center justify-center gap-1.5 rounded-xl bg-mint px-3.5 py-2.75 text-[13px] font-[850] text-white transition duration-200 hover:-translate-y-0.5 hover:bg-mint-dark"
             >
               Sobre nosotros
               <ArrowRight
@@ -33,7 +33,7 @@ export function Footer() {
           </FadeInOnScroll>
 
           <FadeInOnScroll delay={90}>
-            <h4 className="mb-3.5 text-xs font-bold text-navy">Producto</h4>
+            <h4 className="mb-3.5 text-[14px] font-bold text-navy">Producto</h4>
             {footerProductLinks.map((link) => (
               <a key={link.href} href={link.href} className={linkClass}>
                 {link.label}
@@ -42,7 +42,7 @@ export function Footer() {
           </FadeInOnScroll>
 
           <FadeInOnScroll delay={180}>
-            <h4 className="mb-3.5 text-xs font-bold text-navy">Explorar</h4>
+            <h4 className="mb-3.5 text-[14px] font-bold text-navy">Explorar</h4>
             {footerExploreLinks.map((link) =>
               link.href.startsWith("/") ? (
                 <Link key={link.href} to={link.href} className={linkClass}>
@@ -57,8 +57,8 @@ export function Footer() {
           </FadeInOnScroll>
 
           <FadeInOnScroll delay={270}>
-            <h4 className="mb-3.5 text-xs font-bold text-navy">Contacto</h4>
-            <p className="text-xs leading-[1.7] text-muted">
+            <h4 className="mb-3.5 text-[14px] font-bold text-navy">Contacto</h4>
+            <p className="text-[14px] leading-[1.7] text-muted">
               Síguenos y comunícate con el equipo de Salud Móvil.
             </p>
             <div className="mt-3.5 flex flex-wrap gap-2">
@@ -71,9 +71,9 @@ export function Footer() {
                     href={link.href}
                     target={isExternal ? "_blank" : undefined}
                     rel={isExternal ? "noopener noreferrer" : undefined}
-                    className="inline-flex items-center justify-center gap-1.75 rounded-xl border border-line bg-white px-2.75 py-2.25 text-[10px] font-bold text-navy transition duration-200 hover:-translate-y-0.5 hover:border-mint-line hover:bg-mint-soft-2"
+                    className="inline-flex items-center justify-center gap-1.75 rounded-xl border border-line bg-white px-2.75 py-2.25 text-[12px] font-bold text-navy transition duration-200 hover:-translate-y-0.5 hover:border-mint-line hover:bg-mint-soft-2"
                   >
-                    <Icon className="text-xs" />
+                    <Icon className="text-[14px]" />
                     {link.label}
                   </a>
                 );
@@ -82,7 +82,7 @@ export function Footer() {
           </FadeInOnScroll>
         </div>
 
-        <div className="mt-7.5 flex flex-wrap justify-between gap-4.5 border-t border-line pt-5 text-[10px] text-muted">
+        <div className="mt-7.5 flex flex-wrap justify-between gap-4.5 border-t border-line pt-5 text-[12px] text-muted">
           <span>© 2026 Salud Móvil. Prototipo de demostración.</span>
           <span>Tu salud, en tus manos.</span>
         </div>

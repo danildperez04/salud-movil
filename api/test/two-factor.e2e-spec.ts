@@ -300,6 +300,12 @@ describe('Verificación en dos pasos por OTP (e2e)', () => {
       const correct = lastCode();
       const wrong = wrongCode();
 
+      // supertest abre un puerto efímero por petición mientras el servidor no
+      // escucha. Con una ráfaga en paralelo eso es una carrera que en Linux
+      // (CI) acaba en `read ECONNRESET`: el servidor se pone a escuchar una vez
+      // y todas las peticiones reutilizan ese puerto.
+      await app.listen(0);
+
       // Más peticiones de las permitidas, lanzadas a la vez, y la correcta al final.
       await Promise.all(
         Array.from({ length: OTP_MAX_ATTEMPTS * 2 }, () =>

@@ -555,6 +555,18 @@ export const api = {
     );
   },
 
+  /**
+   * Listado de IPCP con filtros, paginación y orden (HU-32, HU-33).
+   *
+   * Los campos vacíos los descarta `withQuery`, así que `search: ''` viaja
+   * como "sin búsqueda" y no como un filtro que no matchea a nadie.
+   */
+  getPatientsIpcp(filters?: IpcpBatchFilters) {
+    return request<IpcpBatchResponse>(
+      withQuery('/patients/ipcp', filters as Record<string, QueryValue>),
+    );
+  },
+
   getPatientIpcp(patientId: string) {
     return request<PublicIpcp>(`/patients/${patientId}/ipcp`);
   },

@@ -15,7 +15,7 @@ export function ComingSoonSection() {
           <Badge>Salud Móvil</Badge>
           <h2
             aria-label="Próximamente"
-            className="my-3.5 mb-2.5 text-[34px] leading-none tracking-[-0.035em] text-navy landing-sm:text-[clamp(40px,5vw,68px)]"
+            className="my-3.5 mb-2.5 text-[38px] leading-none tracking-[-0.035em] text-navy landing-sm:text-[clamp(44px,5.4vw,78px)]"
           >
             Próximamente
             {/* Tres puntos que rebotan en cadena: eco de los puntos del logo */}
@@ -32,7 +32,7 @@ export function ComingSoonSection() {
               ))}
             </span>
           </h2>
-          <p className="mx-auto max-w-155 text-[16px] leading-[1.7] text-muted">
+          <p className="mx-auto max-w-170 text-[18px] leading-[1.7] text-muted">
             Estamos preparando la experiencia para que Salud Móvil esté cada vez
             más cerca de ti.
           </p>

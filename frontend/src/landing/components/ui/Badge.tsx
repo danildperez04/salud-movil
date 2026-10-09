@@ -16,7 +16,7 @@ export function Badge({ children, tone = "light", className = "" }: BadgeProps) 
 
   return (
     <span
-      className={`inline-flex items-center gap-2 rounded-full px-3 py-2 text-xs font-[850] tracking-[0.02em] ${pill} ${className}`}
+      className={`inline-flex items-center gap-2 rounded-full px-3 py-2 text-[14px] font-[850] tracking-[0.02em] ${pill} ${className}`}
     >
       {/* Punto con pulso: marca el badge como "vivo" sin distraer del texto */}
       <span className="relative grid h-1.75 w-1.75 place-items-center">

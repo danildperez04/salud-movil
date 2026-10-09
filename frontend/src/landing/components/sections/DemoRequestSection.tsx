@@ -22,7 +22,7 @@ export function DemoRequestSection() {
   return (
     <section
       id="demo"
-      className="bg-mint-soft-2 py-19.5 landing-sm:py-27.5"
+      className="bg-mint-soft-2 py-16 landing-sm:py-22"
     >
       <div className="container-x grid grid-cols-1 items-start gap-12 landing-md:grid-cols-[0.85fr_1.15fr] landing-md:gap-16">
         <div>
@@ -38,7 +38,7 @@ export function DemoRequestSection() {
                 key={point}
                 as="li"
                 delay={260 + index * 90}
-                className="flex items-start gap-3 text-[15px] leading-[1.6] text-navy"
+                className="flex items-start gap-3 text-[17px] leading-[1.6] text-navy"
               >
                 <CheckBadge className="mt-0.75" />
                 {point}
@@ -54,10 +54,10 @@ export function DemoRequestSection() {
                 <div className="mx-auto mb-5 grid h-16 w-16 place-items-center rounded-full bg-mint-soft text-mint-dark">
                   <CalendarCheck size={30} />
                 </div>
-                <h3 className="mb-2 text-[24px] font-bold text-navy">
+                <h3 className="mb-2 text-[28px] font-bold text-navy">
                   {demoSection.success.title}
                 </h3>
-                <p className="mx-auto mb-6 max-w-100 text-[15px] leading-[1.65] text-muted">
+                <p className="mx-auto mb-6 max-w-110 text-[17px] leading-[1.65] text-muted">
                   {demoSection.success.description}
                 </p>
                 <Button variant="secondary" onClick={reset}>
@@ -154,14 +154,14 @@ export function DemoRequestSection() {
                 {formError && (
                   <p
                     role="alert"
-                    className="rounded-[14px] bg-red-50 px-4 py-3 text-[13px] text-red-700"
+                    className="rounded-[14px] bg-red-50 px-4 py-3 text-[15px] text-red-700"
                   >
                     {formError}
                   </p>
                 )}
 
                 <div className="flex flex-col gap-3 landing-sm:flex-row landing-sm:items-center landing-sm:justify-between">
-                  <p className="text-[12px] leading-[1.5] text-muted landing-sm:max-w-65">
+                  <p className="text-[14px] leading-[1.5] text-muted landing-sm:max-w-72">
                     {demoSection.privacy}
                   </p>
                   <button

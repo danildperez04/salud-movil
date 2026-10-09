@@ -51,7 +51,7 @@ export function ShowcaseSection() {
   };
 
   return (
-    <section id="descubre" className="bg-white py-19.5 landing-sm:py-27.5">
+    <section id="descubre" className="bg-white py-16 landing-sm:py-22">
       <div className="container-x">
         <FadeInOnScroll
           direction="scale"
@@ -63,10 +63,10 @@ export function ShowcaseSection() {
           />
 
           <div className="relative mb-6 flex flex-col items-start justify-between gap-4 landing-md:flex-row landing-md:items-center landing-md:gap-8">
-            <h2 className="m-0 text-[27px] tracking-[-0.03em] text-white landing-sm:text-[33px]">
+            <h2 className="m-0 text-[30px] tracking-[-0.03em] text-white landing-sm:text-[37px]">
               Conoce Salud Móvil por dentro.
             </h2>
-            <p className="m-0 max-w-130 text-[13px] leading-[1.6] text-[#b9ccd6]">
+            <p className="m-0 max-w-140 text-[15px] leading-[1.6] text-[#b9ccd6]">
               Explora las funciones principales que acompañan el día a día del
               usuario.
             </p>
@@ -93,7 +93,7 @@ export function ShowcaseSection() {
                   onKeyDown={(event) => onTabKeyDown(event, index)}
                   onPointerEnter={() => preloadScreen(tab.key)}
                   onFocus={() => preloadScreen(tab.key)}
-                  className={`inline-flex cursor-pointer items-center gap-2 rounded-full border px-3.5 py-2.5 font-body text-[12px] font-extrabold transition duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mint-light ${
+                  className={`inline-flex cursor-pointer items-center gap-2 rounded-full border px-3.5 py-2.5 font-body text-[14px] font-extrabold transition duration-300 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-mint-light ${
                     selected
                       ? "border-mint bg-mint text-white shadow-brand"
                       : "border-white/15 bg-white/6 text-[#c7d7df] hover:-translate-y-0.5 hover:border-white/30 hover:bg-white/12 hover:text-white"
@@ -115,20 +115,20 @@ export function ShowcaseSection() {
             {/* `key` remonta el bloque al cambiar de pestaña y así se repite la
                 animación de entrada. */}
             <div key={activeTab} className="animate-panel-in">
-              <span className="text-[12px] font-black tracking-widest text-mint-light">
+              <span className="text-[14px] font-black tracking-widest text-mint-light">
                 {screen.num}
               </span>
-              <h3 className="my-3 text-[34px] leading-[1.04] tracking-[-0.04em] text-white landing-sm:text-[42px]">
+              <h3 className="my-3 text-[38px] leading-[1.04] tracking-[-0.04em] text-white landing-sm:text-[46px]">
                 {screen.title}
               </h3>
-              <p className="max-w-117.5 text-[14px] leading-[1.7] text-[#b9ccd6]">
+              <p className="max-w-117.5 text-[16px] leading-[1.7] text-[#b9ccd6]">
                 {screen.text}
               </p>
               <ul className="m-0 mt-6 grid list-none gap-2.5 p-0">
                 {screen.list.map((item, index) => (
                   <li
                     key={item}
-                    className="flex animate-panel-in items-center gap-2.5 text-[13px] text-[#dfe8ec]"
+                    className="flex animate-panel-in items-center gap-2.5 text-[15px] text-[#dfe8ec]"
                     style={{ animationDelay: `${180 + index * 90}ms` }}
                   >
                     <CheckBadge tone="dark" />
@@ -138,7 +138,7 @@ export function ShowcaseSection() {
               </ul>
             </div>
 
-            <div className="relative flex min-h-107.5 items-end justify-center [--mini-phone-secondary-width:155px] [--mini-phone-width:190px] landing-sm:min-h-125 landing-sm:[--mini-phone-secondary-width:190px] landing-sm:[--mini-phone-width:230px]">
+            <div className="relative flex min-h-107.5 items-end justify-center [--mini-phone-secondary-width:155px] [--mini-phone-width:190px] landing-sm:min-h-125 landing-sm:[--mini-phone-secondary-width:190px] landing-sm:[--mini-phone-width:230px] landing-md:min-h-150 landing-md:[--mini-phone-secondary-width:240px] landing-md:[--mini-phone-width:290px]">
               <div
                 aria-hidden="true"
                 className="absolute bottom-10 left-1/2 h-64 w-64 -translate-x-1/2 animate-glow rounded-full bg-mint/20 blur-3xl"

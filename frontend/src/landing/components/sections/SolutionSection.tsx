@@ -6,7 +6,7 @@ import { features } from "../../data/features";
 
 export function SolutionSection() {
   return (
-    <section id="funciones" className="bg-surface py-19.5 landing-sm:py-27.5">
+    <section id="funciones" className="bg-surface py-16 landing-sm:py-22">
       <div className="container-x">
         <SectionHeader
           badge="Una app pensada para acompañarte"
@@ -43,14 +43,14 @@ export function SolutionSection() {
                   className="relative mb-5"
                 />
                 <h3
-                  className={`relative mb-2.25 text-[18px] font-bold ${
+                  className={`relative mb-2.25 text-[21px] font-bold ${
                     feature.highlight ? "text-white" : "text-navy"
                   }`}
                 >
                   {feature.title}
                 </h3>
                 <p
-                  className={`relative m-0 text-[13px] leading-[1.65] ${
+                  className={`relative m-0 text-[15px] leading-[1.65] ${
                     feature.highlight ? "text-[#bdd0da]" : "text-muted"
                   }`}
                 >

@@ -6,7 +6,7 @@ import { problemCards } from "../../data/features";
 
 export function ProblemSection() {
   return (
-    <section id="beneficios" className="bg-white py-19.5 landing-sm:py-27.5">
+    <section id="beneficios" className="bg-white py-16 landing-sm:py-22">
       <div className="container-x grid grid-cols-1 items-center gap-11.25 landing-md:grid-cols-[0.9fr_1.1fr] landing-md:gap-17.5">
         <SectionHeader
           align="left"
@@ -22,12 +22,12 @@ export function ProblemSection() {
               delay={(index % 2) * 100 + Math.floor(index / 2) * 100}
               className="flex"
             >
-              <article className="group flex-1 rounded-[22px] border border-line bg-white p-5.5 shadow-soft transition duration-300 hover:-translate-y-1.5 hover:border-mint-line-strong hover:shadow-strong">
+              <article className="group flex-1 rounded-[22px] border border-line bg-white p-6 shadow-soft transition duration-300 hover:-translate-y-1.5 hover:border-mint-line-strong hover:shadow-strong">
                 <IconTile icon={ICONS[card.icon]} className="mb-4" />
-                <h3 className="mb-2 text-[16px] font-bold text-navy">
+                <h3 className="mb-2 text-[18px] font-bold text-navy">
                   {card.title}
                 </h3>
-                <p className="m-0 text-xs leading-[1.6] text-muted">
+                <p className="m-0 text-[14px] leading-[1.6] text-muted">
                   {card.text}
                 </p>
               </article>

@@ -8,8 +8,8 @@ import { useActiveSection } from "../../hooks/useActiveSection";
 import { useScrolled } from "../../hooks/useScrolled";
 import { navLinks } from "../../data/navigation";
 
-// Nota: el breakpoint 1200px está escrito de forma literal en cada
-// className (min-[1200px]:...) a propósito. Tailwind genera el CSS
+// Nota: el breakpoint 1320px está escrito de forma literal en cada
+// className (min-[1320px]:...) a propósito. Tailwind genera el CSS
 // escaneando el texto de tus archivos en busca de nombres de clase
 // completos — si se arma con una variable de JS (`${x}:flex`), Tailwind
 // nunca "ve" la clase final y no genera su regla, así que el elemento
@@ -46,7 +46,7 @@ export function Navbar() {
 
         <nav
           aria-label="Principal"
-          className="hidden items-center gap-5 min-[1200px]:flex"
+          className="hidden items-center gap-5 min-[1320px]:flex"
         >
           {navLinks.map((link) => {
             const active = activeId === link.href.slice(1);
@@ -55,7 +55,7 @@ export function Navbar() {
                 key={link.href}
                 href={link.href}
                 aria-current={active ? "location" : undefined}
-                className={`relative whitespace-nowrap py-1 text-[13px] font-medium transition-colors duration-200 after:absolute after:inset-x-0 after:-bottom-0.5 after:h-0.5 after:origin-left after:rounded-full after:bg-mint after:transition-transform after:duration-300 after:ease-out-expo hover:text-mint-dark hover:after:scale-x-100 ${
+                className={`relative whitespace-nowrap py-1 text-[14.5px] font-medium transition-colors duration-200 after:absolute after:inset-x-0 after:-bottom-0.5 after:h-0.5 after:origin-left after:rounded-full after:bg-mint after:transition-transform after:duration-300 after:ease-out-expo hover:text-mint-dark hover:after:scale-x-100 ${
                   active
                     ? "text-mint-dark after:scale-x-100"
                     : "text-muted after:scale-x-0"
@@ -67,10 +67,10 @@ export function Navbar() {
           })}
         </nav>
 
-        <div className="hidden items-center gap-3 min-[1200px]:flex">
+        <div className="hidden items-center gap-3 min-[1320px]:flex">
           <Link
             to="/login"
-            className="flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border border-line px-4 py-2 text-[13px] font-medium text-navy transition-colors duration-200 hover:border-mint hover:bg-mint-soft hover:text-mint-dark"
+            className="flex shrink-0 items-center gap-1.5 whitespace-nowrap rounded-full border border-line px-4 py-2 text-[14.5px] font-medium text-navy transition-colors duration-200 hover:border-mint hover:bg-mint-soft hover:text-mint-dark"
           >
             <LogIn size={15} />
             Acceso personal de salud
@@ -80,14 +80,14 @@ export function Navbar() {
           </Button>
         </div>
 
-        {/* Hamburguesa: visible hasta 1199px, oculta desde 1200px */}
+        {/* Hamburguesa: visible hasta 1319px, oculta desde 1320px */}
         <button
           type="button"
           onClick={() => setOpen((v) => !v)}
           aria-label={open ? "Cerrar menú" : "Abrir menú"}
           aria-expanded={open}
           aria-controls="mobile-menu"
-          className="relative grid h-10 w-10 shrink-0 place-items-center rounded-full text-navy transition-colors duration-200 hover:bg-mint-soft min-[1200px]:hidden"
+          className="relative grid h-10 w-10 shrink-0 place-items-center rounded-full text-navy transition-colors duration-200 hover:bg-mint-soft min-[1320px]:hidden"
         >
           <Menu
             size={22}
@@ -109,7 +109,7 @@ export function Navbar() {
       <div
         id="mobile-menu"
         inert={!open}
-        className={`grid transition-[grid-template-rows] duration-500 ease-out-expo min-[1200px]:hidden ${
+        className={`grid transition-[grid-template-rows] duration-500 ease-out-expo min-[1320px]:hidden ${
           open ? "grid-rows-[1fr]" : "grid-rows-[0fr]"
         }`}
       >
@@ -125,7 +125,7 @@ export function Navbar() {
                     onClick={() => setOpen(false)}
                     aria-current={active ? "location" : undefined}
                     style={{ transitionDelay: open ? `${90 + index * 50}ms` : "0ms" }}
-                    className={`rounded-xl px-3 py-2.5 text-sm font-medium transition duration-300 ${
+                    className={`rounded-xl px-3 py-3 text-[17px] font-medium transition duration-300 ${
                       active
                         ? "bg-mint-soft text-mint-dark"
                         : "text-navy hover:bg-mint-soft-2"
@@ -146,7 +146,7 @@ export function Navbar() {
               <Link
                 to="/login"
                 onClick={() => setOpen(false)}
-                className="flex items-center justify-center gap-1.5 rounded-full border border-line px-4 py-2.5 text-sm font-medium text-navy transition-colors duration-200 hover:border-mint hover:bg-mint-soft"
+                className="flex items-center justify-center gap-1.5 rounded-full border border-line px-4 py-3 text-[16px] font-medium text-navy transition-colors duration-200 hover:border-mint hover:bg-mint-soft"
               >
                 <LogIn size={16} />
                 Acceso personal de salud

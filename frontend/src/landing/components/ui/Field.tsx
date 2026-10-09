@@ -18,7 +18,7 @@ type FieldProps = {
 };
 
 const inputClasses =
-  "w-full rounded-[14px] border bg-white px-4 py-3 font-body text-[15px] text-navy placeholder:text-muted/70 transition duration-200 focus:outline-none focus:ring-3 disabled:cursor-not-allowed disabled:opacity-60";
+  "w-full rounded-[14px] border bg-white px-4 py-3 font-body text-[17px] text-navy placeholder:text-muted/70 transition duration-200 focus:outline-none focus:ring-3 disabled:cursor-not-allowed disabled:opacity-60";
 
 export function Field({
   label,
@@ -61,7 +61,7 @@ export function Field({
     <div>
       <label
         htmlFor={id}
-        className="mb-1.5 block text-[13px] font-[750] text-navy"
+        className="mb-1.5 block text-[15px] font-[750] text-navy"
       >
         {label}
         {required && (
@@ -76,7 +76,7 @@ export function Field({
         <input {...common} type={type} />
       )}
       {error && (
-        <p id={errorId} role="alert" className="mt-1.5 text-[12px] text-red-600">
+        <p id={errorId} role="alert" className="mt-1.5 text-[14px] text-red-600">
           {error}
         </p>
       )}

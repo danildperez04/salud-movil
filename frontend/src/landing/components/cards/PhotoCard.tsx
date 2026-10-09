@@ -35,13 +35,13 @@ export function PhotoCard({
         />
       </div>
       <div className="flex flex-1 flex-col p-5">
-        <span className="mb-3 inline-flex items-center self-start rounded-full bg-mint-soft px-2.5 py-1.75 text-[10px] font-black uppercase tracking-[0.04em] text-mint-dark">
+        <span className="mb-3 inline-flex items-center self-start rounded-full bg-mint-soft px-2.5 py-1.75 text-[12px] font-black uppercase tracking-[0.04em] text-mint-dark">
           {badge}
         </span>
         {title && (
-          <h3 className="mb-1.25 text-[18px] font-bold text-navy">{title}</h3>
+          <h3 className="mb-1.25 text-[21px] font-bold text-navy">{title}</h3>
         )}
-        <p className="m-0 text-[11px] leading-[1.6] text-muted">{description}</p>
+        <p className="m-0 text-[13px] leading-[1.6] text-muted">{description}</p>
       </div>
     </article>
   );

@@ -146,13 +146,13 @@
 }
 
 .container-x {
-  width: min(100% - 28px, 1180px);
+  width: min(100% - 28px, 1360px);
   margin-inline: auto;
 }
 
 @media (min-width: 680px) {
   .container-x {
-    width: min(1180px, calc(100% - 40px));
+    width: min(1360px, calc(100% - 48px));
   }
 }
 

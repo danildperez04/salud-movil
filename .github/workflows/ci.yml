@@ -53,7 +53,13 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # `defaults.run.working-directory` solo afecta a los pasos `run:`, no a
+      # `uses:`. Sin `package_json_file` la acción busca `package.json` en la
+      # raíz del repo (que no tiene) y falla con "No pnpm version is specified".
+      # La versión sale del campo `packageManager` de ese archivo.
       - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: api/package.json
 
       - uses: actions/setup-node@v4
         with:
@@ -90,8 +96,10 @@ jobs:
 
       # El `globalSetup` de los e2e aplica las migraciones sobre la base de
       # pruebas; no hace falta un paso previo.
+      # El reporter `github-actions` publica cada test fallido como anotación
+      # del job (visible en el resumen del PR, sin abrir el log completo).
       - name: Pruebas e2e
-        run: pnpm test:e2e
+        run: pnpm test:e2e --reporters=default --reporters=github-actions
 
       # Detecta el error más insidioso con migraciones: que una entidad cambie
       # sin que su migración lo refleje. Compara el esquema que producirían las
@@ -113,7 +121,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      # Ver el comentario del job `api`: hay que apuntar al `package.json` del
+      # subproyecto porque la raíz no tiene uno.
       - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: frontend/package.json
 
       - uses: actions/setup-node@v4
         with:

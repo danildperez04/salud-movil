@@ -17,10 +17,10 @@ export function TrustBar() {
           >
             <FadeInOnScroll delay={index * 90} className="flex flex-col items-center">
               <IconTile icon={ICONS[item.icon]} className="mb-3" />
-              <strong className="block text-[14px] font-bold text-navy">
+              <strong className="block text-[16px] font-bold text-navy">
                 {item.title}
               </strong>
-              <span className="mt-0.5 text-[11px] text-muted">
+              <span className="mt-0.5 text-[13px] text-muted">
                 {item.subtitle}
               </span>
             </FadeInOnScroll>
