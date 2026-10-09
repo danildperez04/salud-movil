@@ -1,0 +1,100 @@
+# Salud Móvil — despliegue con Docker.
+#
+#   cp .env.example .env     # y completar los valores marcados como obligatorios
+#   docker compose up -d --build
+#
+# Arquitectura:
+#
+#   Internet ──► web (nginx :8080) ──┬─ /      panel web (SPA estática)
+#                                    └─ /api/  ──► api (NestJS :3000) ──► db (PostgreSQL)
+#
+# Solo `web` publica un puerto. `api` y `db` quedan en redes internas: la base de
+# datos nunca es alcanzable desde fuera y la API solo a través de nginx.
+# Para TLS, ver docs/Docker.md.
+
+name: salud-movil
+
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER:-salud_movil}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Define DB_PASSWORD en .env}
+      POSTGRES_DB: ${DB_NAME:-salud_movil}
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+    networks: [backend]
+
+  api:
+    build:
+      context: ./api
+    image: salud-movil/api:${IMAGE_TAG:-latest}
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      NODE_ENV: production
+      PORT: 3000
+      # `DB_HOST` apunta al contenedor `db`. Para usar una base externa
+      # (Supabase, RDS...) define DB_HOST/DB_PORT en .env y levanta sin `db`:
+      #   docker compose up -d --no-deps api web
+      DB_TYPE: postgres
+      DB_HOST: ${DB_HOST:-db}
+      DB_PORT: ${DB_PORT:-5432}
+      DB_USER: ${DB_USER:-salud_movil}
+      DB_PASSWORD: ${DB_PASSWORD:?Define DB_PASSWORD en .env}
+      DB_NAME: ${DB_NAME:-salud_movil}
+      JWT_SECRET: ${JWT_SECRET:?Define JWT_SECRET en .env (openssl rand -base64 48)}
+      JWT_EXPIRES_IN: ${JWT_EXPIRES_IN:-1d}
+      OTP_EXPIRES_MINUTES: ${OTP_EXPIRES_MINUTES:-5}
+      # Orígenes que pueden llamar al API desde un navegador, separados por
+      # coma. Con el panel servido por nginx (mismo origen) no hace falta, pero
+      # se deja el origen público por defecto. La app móvil no usa CORS.
+      CORS_ORIGIN: ${CORS_ORIGIN:-${PUBLIC_URL:-http://localhost}}
+      # Un proxy (nginx) delante: sin esto el límite por IP vería a todos los
+      # usuarios como una sola IP. Súbelo si añades otro proxy/balanceador.
+      TRUST_PROXY: ${TRUST_PROXY:-1}
+      THROTTLE_LIMIT: ${THROTTLE_LIMIT:-100}
+      THROTTLE_TTL_MS: ${THROTTLE_TTL_MS:-60000}
+      RUN_MIGRATIONS: ${RUN_MIGRATIONS:-true}
+      # Credenciales de las cuentas iniciales. Si no se definen, el seed usa
+      # valores públicos conocidos (ver docs/Guia_de_Despliegue.md §7).
+      SEED_ADMIN_EMAIL: ${SEED_ADMIN_EMAIL:-}
+      SEED_ADMIN_PASSWORD: ${SEED_ADMIN_PASSWORD:-}
+      SEED_PERSONNEL_EMAIL: ${SEED_PERSONNEL_EMAIL:-}
+      SEED_PERSONNEL_PASSWORD: ${SEED_PERSONNEL_PASSWORD:-}
+    networks: [backend, edge]
+
+  web:
+    build:
+      context: ./frontend
+      args:
+        # Relativa: el panel llama a su propio origen y nginx reenvía a la API.
+        VITE_API_URL: ${VITE_API_URL:-/api}
+    image: salud-movil/web:${IMAGE_TAG:-latest}
+    restart: unless-stopped
+    depends_on:
+      api:
+        condition: service_healthy
+    environment:
+      API_UPSTREAM: http://api:3000
+    ports:
+      - "${HTTP_PORT:-80}:8080"
+    networks: [edge]
+
+networks:
+  # db <-> api
+  backend:
+  # api <-> web. `web` no ve la base de datos.
+  edge:
+
+volumes:
+  db-data:

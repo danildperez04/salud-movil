@@ -1,0 +1,19 @@
+# Override para desarrollo local. Se combina con el archivo base:
+#
+#   docker compose -f docker-compose.yml -f docker-compose.dev.yml up -d db api
+#
+# Publica la API y la base en localhost para trabajar con `pnpm dev` (Vite en
+# :5173) o con la app móvil, sin pasar por nginx.
+services:
+  db:
+    ports:
+      - "127.0.0.1:5432:5432"
+
+  api:
+    environment:
+      # Fuera de `production` el API registra el token de recuperación de
+      # contraseña y el código OTP en los logs (aún no hay correo/SMS).
+      NODE_ENV: development
+      CORS_ORIGIN: http://localhost:5173
+    ports:
+      - "127.0.0.1:3000:3000"
