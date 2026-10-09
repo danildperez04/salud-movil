@@ -12,6 +12,6 @@
     "^.+\\.(t|j)s$": "ts-jest"
   },
   "transformIgnorePatterns": [
-    "^(?!.*node_modules/(@nestjs/schedule|@nestjs/cache-manager)/).*node_modules"
+    "^(?!.*node_modules/(@nestjs/schedule|@nestjs/cache-manager|@nestjs/swagger)/).*node_modules"
   ]
 }
