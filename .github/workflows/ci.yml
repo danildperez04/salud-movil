@@ -96,8 +96,10 @@ jobs:
 
       # El `globalSetup` de los e2e aplica las migraciones sobre la base de
       # pruebas; no hace falta un paso previo.
+      # El reporter `github-actions` publica cada test fallido como anotación
+      # del job (visible en el resumen del PR, sin abrir el log completo).
       - name: Pruebas e2e
-        run: pnpm test:e2e
+        run: pnpm test:e2e --reporters=default --reporters=github-actions
 
       # Detecta el error más insidioso con migraciones: que una entidad cambie
       # sin que su migración lo refleje. Compara el esquema que producirían las
