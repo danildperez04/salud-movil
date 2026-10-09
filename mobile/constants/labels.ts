@@ -17,6 +17,15 @@ export const APPOINTMENT_TYPE_LABELS: Record<string, string> = {
   Other: 'Consulta',
 };
 
+// cat_route_administration.name viene en inglés de la BD.
+export const ROUTE_ADMINISTRATION_LABELS: Record<string, string> = {
+  Oral: 'Vía oral',
+  Intravenous: 'Intravenosa',
+  Subcutaneous: 'Subcutánea',
+  Topical: 'Tópica',
+  Inhaled: 'Inhalada',
+};
+
 // cat_frequency de la BD → label en español para mostrar en ReminderCard
 export const FREQUENCY_LABELS: Record<string, string> = {
   Daily: 'Todos los días',

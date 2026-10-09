@@ -11,6 +11,12 @@ export function formatTime12h(date: Date): string {
   return `${pad(hours % 12 || 12)}:${pad(date.getMinutes())} ${period}`;
 }
 
+/** "14:30" -> "02:30 PM" (la hora del día tal como la guarda el backend). */
+export function hhmmToTimeLabel(hhmm: string): string {
+  const [hours, minutes] = hhmm.split(':').map(Number);
+  return `${pad(hours % 12 || 12)}:${pad(minutes)} ${hours < 12 ? 'AM' : 'PM'}`;
+}
+
 /** "10:00 AM" -> 600, "02:30 PM" -> 870. Formato inválido -> 0. */
 export function timeLabelToMinutes(label: string): number {
   const match = /^(\d{1,2}):(\d{2})\s*(AM|PM)$/i.exec(label.trim());

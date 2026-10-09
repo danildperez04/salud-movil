@@ -3,8 +3,8 @@
 // Sin dependencias de React.
 import { z } from 'zod';
 import { FREQUENCY_LABELS, MEDICATIONS_LABELS } from '@/constants/labels';
-import { startOfDay, startOfToday, timeLabelToMinutes } from '@/lib/date-format';
-import type { MedicationRecord } from '../api/mock-medications';
+import { startOfDay, startOfToday } from '@/lib/date-format';
+import { timeMinutes, type MedicationRecord } from './medication-record';
 
 const { errors } = MEDICATIONS_LABELS;
 
@@ -54,8 +54,6 @@ export const formatDose = (amount: string, unit: DoseUnit) => `${normalizeNumber
 /** Activos primero y, dentro de cada grupo, por hora de la toma. */
 export function sortMedications(medications: MedicationRecord[]): MedicationRecord[] {
   return [...medications].sort(
-    (a, b) =>
-      Number(b.active) - Number(a.active) ||
-      timeLabelToMinutes(a.time) - timeLabelToMinutes(b.time),
+    (a, b) => Number(b.active) - Number(a.active) || timeMinutes(a.time) - timeMinutes(b.time),
   );
 }

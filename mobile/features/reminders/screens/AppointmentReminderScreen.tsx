@@ -24,7 +24,7 @@ import type { AppointmentRecord } from '@/features/appointments/domain/appointme
 import { parseLocalDate } from '@/features/appointments/domain/appointment-date';
 import { isCancellable } from '@/features/appointments/domain/appointment-status';
 import { useAppointments } from '@/features/appointments/hooks/useAppointments';
-import type { AppointmentReminder } from '../api/mock-reminders';
+import type { AppointmentReminder } from '../domain/reminder-records';
 import {
   NOTIFY_BEFORE_OPTIONS,
   appointmentReminderSchema,
