@@ -1,17 +1,16 @@
 // features/accessibility/hooks/useAccessibilitySettings.ts
+import { useTranslation } from 'react-i18next';
 import type { SwitchRow } from '@/components/ui/switch-rows-card';
-import { ACCESSIBILITY_LABELS } from '@/constants/labels';
 import { useSpeech } from '@/hooks/useSpeech';
 import { useAppStore } from '@/store';
 import type { AccessibilityPreferences, TextSize } from '@/types/preferences';
-
-const labels = ACCESSIBILITY_LABELS;
 
 /**
  * Ajustes de accesibilidad. Cada cambio se guarda y se aplica al instante en toda
  * la app (ver components/accessibility-effects.tsx).
  */
 export function useAccessibilitySettings() {
+  const { t } = useTranslation('accessibility');
   const settings = useAppStore((state) => state.accessibility);
   const setAccessibility = useAppStore((state) => state.setAccessibility);
   const resetAccessibility = useAppStore((state) => state.resetAccessibility);
@@ -30,17 +29,17 @@ export function useAccessibilitySettings() {
   });
 
   const rows: SwitchRow[] = [
-    toggle('highContrast', labels.highContrast.title, labels.highContrast.subtitle),
-    toggle('reduceMotion', labels.reduceMotion.title, labels.reduceMotion.subtitle),
-    toggle('simpleMode', labels.simpleMode.title, labels.simpleMode.subtitle),
-    toggle('readAloud', labels.readAloud.title, labels.readAloud.subtitle),
+    toggle('highContrast', t('highContrast.title'), t('highContrast.subtitle')),
+    toggle('reduceMotion', t('reduceMotion.title'), t('reduceMotion.subtitle')),
+    toggle('simpleMode', t('simpleMode.title'), t('simpleMode.subtitle')),
+    toggle('readAloud', t('readAloud.title'), t('readAloud.subtitle')),
   ];
 
   return {
     textSize: settings.textSize,
     setTextSize: (textSize: TextSize) => setAccessibility({ textSize }),
     rows,
-    testReading: () => speak(labels.testReadingText),
+    testReading: () => speak(t('testReadingText')),
     reset: resetAccessibility,
   };
 }

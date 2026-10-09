@@ -627,33 +627,6 @@ export const NOTIFICATION_SETTINGS_LABELS = {
   save: 'Guardar',
 } as const;
 
-export const ACCESSIBILITY_LABELS = {
-  textSizeTitle: 'Tamaño del texto',
-  textSizes: { normal: 'A', large: 'A+', xlarge: 'A++' },
-  textSizeDescriptions: {
-    normal: 'Texto normal',
-    large: 'Texto grande',
-    xlarge: 'Texto muy grande',
-  },
-  highContrast: {
-    title: 'Alto contraste',
-    subtitle: 'Mayor diferencia entre texto, bordes y fondos',
-  },
-  reduceMotion: { title: 'Reducir movimiento', subtitle: 'Evita animaciones y efectos visuales' },
-  simpleMode: {
-    title: 'Modo lectura simple',
-    subtitle: 'Reduce información secundaria y distracciones',
-  },
-  readAloud: {
-    title: 'Lectura en voz alta',
-    subtitle: 'Lee instrucciones importantes cuando lo solicites',
-  },
-  testReading: 'Probar lectura en voz alta',
-  testReadingText:
-    'Centro de accesibilidad. Puedes aumentar el texto, activar alto contraste, reducir movimiento o usar lectura simple.',
-  reset: 'Restablecer ajustes',
-} as const;
-
 export const SECURITY_LABELS = {
   menu: {
     password: { title: 'Cambiar contraseña', subtitle: 'Actualiza tu clave de acceso' },
