@@ -24,43 +24,36 @@ export default function TwoFactorVerify() {
   const mode = (searchParams.get('mode') as 'login' | 'enable' | null) ?? 'login';
 
   const [code, setCode] = useState('');
-  const [error, setError] = useState<string | null>(null);
+  const [actionError, setActionError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [resendLoading, setResendLoading] = useState(false);
   const [resendCooldown, setResendCooldown] = useState(0);
-  const [expired, setExpired] = useState(false);
-  const [timeRemaining, setTimeRemaining] = useState(0);
+  const [now, setNow] = useState(() => Date.now());
 
   const expiresAt = pendingTwoFactorChallenge?.expiresAt
     ? new Date(pendingTwoFactorChallenge.expiresAt).getTime()
     : null;
 
-  useEffect(() => {
-    if (!challengeId || !pendingTwoFactorChallenge) {
-      setError('Sesión de verificación inválida. Vuelve a iniciar sesión.');
-      return;
-    }
-    if (mode !== twoFactorMode) {
-      setError('Modo de verificación no coincide. Vuelve a intentarlo.');
-      return;
-    }
-  }, [challengeId, pendingTwoFactorChallenge, mode, twoFactorMode]);
+  // Estos dos se derivan en cada render: guardarlos en estado y sincronizarlos
+  // desde un effect provocaba un render extra por cada cambio.
+  const sessionError =
+    !challengeId || !pendingTwoFactorChallenge
+      ? 'Sesión de verificación inválida. Vuelve a iniciar sesión.'
+      : mode !== twoFactorMode
+        ? 'Modo de verificación no coincide. Vuelve a intentarlo.'
+        : null;
+  const error = actionError ?? sessionError;
 
+  const timeRemaining = expiresAt ? Math.max(0, expiresAt - now) : 0;
+  const expired = expiresAt !== null && timeRemaining === 0;
+
+  // El reloj solo corre mientras el código siga vigente.
   useEffect(() => {
     if (!expiresAt) return;
 
-    const remaining = expiresAt - Date.now();
-    setTimeRemaining(Math.max(0, remaining));
-
     const interval = setInterval(() => {
-      const rem = expiresAt - Date.now();
-      if (rem <= 0) {
-        setExpired(true);
-        setTimeRemaining(0);
-        clearInterval(interval);
-      } else {
-        setTimeRemaining(rem);
-      }
+      setNow(Date.now());
+      if (Date.now() >= expiresAt) clearInterval(interval);
     }, 1000);
 
     return () => clearInterval(interval);
@@ -89,12 +82,12 @@ export default function TwoFactorVerify() {
     if (!isFormValid || !challengeId) return;
 
     setLoading(true);
-    setError(null);
+    setActionError(null);
 
     try {
       await completeTwoFactorLogin(code, navigate, mode);
     } catch (err) {
-      setError(
+      setActionError(
         err instanceof ApiError
           ? err.message
           : 'Código inválido o expirado. Inténtalo de nuevo.',
