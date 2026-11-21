@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { FormEvent } from "react";
-import { useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router";
 import { useAuthStore } from "../store/auth";
 import { ApiError } from "../lib/api";
 import { Input } from "../components/ui/Input";
@@ -109,6 +109,15 @@ export default function Login() {
             Iniciar Sesión
           </Button>
         </form>
+        <p className="mt-6 text-center font-body text-sm text-muted">
+          ¿Aún no tienes cuenta?{" "}
+          <Link
+            to="/registro"
+            className="font-medium text-primary hover:underline"
+          >
+            Regístrate
+          </Link>
+        </p>
       </div>
     </div>
   );
