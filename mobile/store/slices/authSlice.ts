@@ -1,5 +1,7 @@
 // store/slices/authSlice.ts
 import { StateCreator } from 'zustand';
+import { clearLocalOverlays } from '@/lib/local-overlay';
+import { queryClient } from '@/lib/query-client';
 import { secureTokenStorage } from '@/lib/secure-token-storage';
 import type { AuthResponse } from '@/types/auth';
 import { AuthSlice, LogoutReason } from '../types';
@@ -33,6 +35,9 @@ export const createAuthSlice: StateCreator<AuthSlice> = (set) => ({
 
   logout: (reason: LogoutReason = 'user') => {
     secureTokenStorage.removeToken().catch(() => undefined);
+    // los datos en caché son del paciente que cierra sesión: no deben verse en la cuenta siguiente
+    queryClient.clear();
+    clearLocalOverlays();
     set({
       user: null,
       accessToken: null,

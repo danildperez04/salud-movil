@@ -125,7 +125,7 @@ function AppointmentReminders() {
     <ReminderCard
       key={reminder.id}
       icon={Calendar}
-      title={appointment.specialty}
+      title={appointment.title}
       description={`${formatDayMonth(parseLocalDate(appointment.date))} · Avisar ${REMINDERS_LABELS.appointment.notifyBefore[reminder.notifyBefore].toLowerCase()}`}
       active={reminder.pushEnabled}
       onPress={() => router.push(reminderRoutes.editAppointment(reminder.id))}

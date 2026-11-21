@@ -7,7 +7,8 @@ import { getAppointmentStatus } from '../domain/appointment-status';
 
 type AppointmentCardProps = {
   date: Date;
-  specialty: string;
+  /** especialidad o tipo de cita */
+  title: string;
   doctorName: string;
   time: string;
   /** valor tal cual viene de cat_appointment_state.name (ej "Scheduled") */
@@ -17,7 +18,7 @@ type AppointmentCardProps = {
 
 export function AppointmentCard({
   date,
-  specialty,
+  title,
   doctorName,
   time,
   status,
@@ -43,7 +44,7 @@ export function AppointmentCard({
 
       <View className="flex-1 gap-4">
         <View className="gap-1">
-          <Text className="text-body font-heading-semibold text-foreground">{specialty}</Text>
+          <Text className="text-body font-heading-semibold text-foreground">{title}</Text>
           <Text className="text-small font-body text-muted-foreground">{doctorName}</Text>
         </View>
 

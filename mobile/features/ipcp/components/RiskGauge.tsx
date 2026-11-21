@@ -10,7 +10,7 @@ import Animated, {
 import Svg, { Defs, LinearGradient, Path, Stop } from 'react-native-svg';
 import { Text } from '@/components/ui/text';
 import { IPCP_LABELS } from '@/constants/labels';
-import { MAX_SCORE } from '../domain/ipcp-score';
+import { MAX_SCORE } from '../domain/ipcp-model';
 
 const SIZE = 136;
 const STROKE = 14;

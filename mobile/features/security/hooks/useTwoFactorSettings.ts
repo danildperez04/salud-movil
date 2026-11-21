@@ -4,7 +4,7 @@ import { apiClient, ApiError } from '@/lib/api-client';
 import { useAppStore } from '@/store';
 import type { PublicUser, TwoFactorTicket } from '@/types/auth';
 
-// A diferencia del resto de Seguridad (mocks), estos hooks usan la API real.
+// Estos hooks usan la API real (las sesiones activas, en cambio, siguen siendo un mock).
 
 /** Estado vigente del 2FA: se pide a /auth/me y se sincroniza con el usuario de la sesión. */
 export function useTwoFactorStatus() {

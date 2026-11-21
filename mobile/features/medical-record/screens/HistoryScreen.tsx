@@ -8,7 +8,7 @@ import { SectionHeader } from '@/components/ui/section-header';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Text } from '@/components/ui/text';
 import { MEDICAL_RECORD_LABELS, SCREEN_TITLES } from '@/constants/labels';
-import type { HistoryEntry } from '../api/mock-medical-record';
+import type { HistoryEntry } from '../domain/record-types';
 import { describeHistoryEntry } from '../domain/record-format';
 import { useHistoryEntries } from '../hooks/useMedicalRecord';
 import { recordRoutes } from '../routes';

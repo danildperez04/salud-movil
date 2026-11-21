@@ -15,7 +15,7 @@ export default function HomeScreen() {
   const user = useAppStore((state) => state.user);
   const firstName = user?.name?.split(' ')[0] ?? '';
   const { data: indicators, isLoading } = useHealthIndicators();
-  // el mock devuelve los registros del más reciente al más antiguo
+  // la API devuelve las mediciones de la más reciente a la más antigua
   const latestIndicator = indicators?.[0];
 
   const today = new Date()

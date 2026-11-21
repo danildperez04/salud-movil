@@ -55,8 +55,10 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
     throw new ApiError(response.status, message, details);
   }
 
+  // Nest responde 201/200 sin cuerpo en los endpoints que devuelven void (ej. change-password).
   if (response.status === 204) return undefined as T;
-  return response.json() as Promise<T>;
+  const text = await response.text();
+  return (text ? JSON.parse(text) : undefined) as T;
 }
 
 export const apiClient = {

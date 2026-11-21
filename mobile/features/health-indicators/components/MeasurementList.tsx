@@ -2,7 +2,7 @@
 import { View } from 'react-native';
 import { Text } from '@/components/ui/text';
 import { INDICATOR_HISTORY_LABELS } from '@/constants/labels';
-import type { HealthIndicatorRecord } from '../api/mock-health-indicators';
+import type { HealthIndicatorRecord } from '../domain/indicator-record';
 import { formatMeasurementDate, formatMeasurementTime } from '../domain/measurement-format';
 
 function MeasurementRow({ record }: { record: HealthIndicatorRecord }) {

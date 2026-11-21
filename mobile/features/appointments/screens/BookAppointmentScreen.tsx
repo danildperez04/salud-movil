@@ -56,7 +56,7 @@ export default function BookAppointmentScreen() {
 
     createAppointment.mutate(
       {
-        specialty: specialty.name,
+        title: specialty.name,
         doctorName: professional.name,
         location: professional.location,
         date: toLocalIsoDate(form.date),

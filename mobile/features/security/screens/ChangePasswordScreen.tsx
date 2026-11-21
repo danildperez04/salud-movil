@@ -45,7 +45,9 @@ export default function ChangePasswordScreen() {
           autoCapitalize="none"
         />
 
-        {form.isError && <Text className="text-small text-destructive">{labels.saveError}</Text>}
+        {form.errorMessage && (
+          <Text className="text-small text-destructive">{form.errorMessage}</Text>
+        )}
       </ScrollView>
 
       <FooterButton label={labels.save} onPress={form.submit} isPending={form.isPending} />

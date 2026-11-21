@@ -4,11 +4,16 @@ import { useAuthStore } from "./store/auth";
 import { useCatalogueStore } from "./store/catalogues";
 import { RedirectIfAuthed, RequireAuth, RequireRole } from "./auth/guards";
 import AuthLayout from "./layouts/AuthLayout";
+import RegisterLayout from "./layouts/RegisterLayout";
 import AppLayout from "./layouts/AppLayout";
 import LandingPage from "./landing/LandingPage";
 import Login from "./pages/Login";
 import RecoverPassword from "./pages/RecoverPassword";
 import ResetPassword from "./pages/ResetPassword";
+import RegisterPlan from "./pages/register/RegisterPlan";
+import RegisterPayment from "./pages/register/RegisterPayment";
+import RegisterCard from "./pages/register/RegisterCard";
+import RegisterConfirmation from "./pages/register/RegisterConfirmation";
 import Profile from "./pages/Profile";
 import TwoFactorVerify from "./pages/TwoFactorVerify";
 import Home from "./pages/Home";
@@ -58,6 +63,16 @@ function App() {
               </RedirectIfAuthed>
             }
           />
+          {/* Registro de membresía (sin backend por ahora): plan → método de
+              pago → tarjeta nueva → confirmación. El layout redirige a /app si
+              ya hay sesión, como /login; los pasos 2 y 3 vuelven al paso 1 si
+              se llega sin haber elegido plan. */}
+          <Route path="/registro" element={<RegisterLayout />}>
+            <Route index element={<RegisterPlan />} />
+            <Route path="pago" element={<RegisterPayment />} />
+            <Route path="pago/nuevo" element={<RegisterCard />} />
+            <Route path="confirmacion" element={<RegisterConfirmation />} />
+          </Route>
           {/* 2FA verification - pública como /login pero sin RedirectIfAuthed
               porque el usuario puede llegar aquí tras login con 2FA pendiente */}
           <Route path="/2fa/verify" element={<TwoFactorVerify />} />

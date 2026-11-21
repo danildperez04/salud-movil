@@ -4,6 +4,7 @@ import { router } from 'expo-router';
 import { useForm } from 'react-hook-form';
 import { Alert } from 'react-native';
 import { SECURITY_LABELS } from '@/constants/labels';
+import { changePasswordErrorMessage } from '../domain/password-errors';
 import { changePasswordSchema, type ChangePasswordValues } from '../domain/password-schema';
 import { useChangePassword } from './useSecurity';
 
@@ -34,6 +35,6 @@ export function useChangePasswordForm() {
     control,
     submit,
     isPending: changePassword.isPending,
-    isError: changePassword.isError,
+    errorMessage: changePassword.error ? changePasswordErrorMessage(changePassword.error) : null,
   };
 }

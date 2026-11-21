@@ -7,7 +7,7 @@ import {
   ALLERGY_TYPE_LABELS,
   MEDICAL_RECORD_LABELS,
 } from '@/constants/labels';
-import type { Allergy } from '../api/mock-medical-record';
+import type { Allergy } from '../domain/record-types';
 import { joinParts } from '../domain/clinical-summary';
 import { ALLERGY_SEVERITY_COLORS } from './record-visuals';
 
@@ -22,10 +22,12 @@ export function AllergyCard({ allergy }: { allergy: Allergy }) {
         allergy.reaction ?? MEDICAL_RECORD_LABELS.allergies.unspecifiedReaction,
       ])}
       trailing={
-        <ToneBadge
-          label={ALLERGY_SEVERITY_LABELS[allergy.severity]}
-          color={ALLERGY_SEVERITY_COLORS[allergy.severity]}
-        />
+        allergy.severity && (
+          <ToneBadge
+            label={ALLERGY_SEVERITY_LABELS[allergy.severity]}
+            color={ALLERGY_SEVERITY_COLORS[allergy.severity]}
+          />
+        )
       }
     />
   );

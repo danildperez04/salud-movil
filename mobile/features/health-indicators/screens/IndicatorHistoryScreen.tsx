@@ -8,7 +8,7 @@ import { SegmentedControl, type SegmentedOption } from '@/components/ui/segmente
 import { Skeleton } from '@/components/ui/skeleton';
 import { Text } from '@/components/ui/text';
 import { INDICATOR_HISTORY_LABELS, INDICATOR_TYPE_LABELS, SCREEN_TITLES } from '@/constants/labels';
-import type { HealthIndicatorRecord } from '../api/mock-health-indicators';
+import type { HealthIndicatorRecord } from '../domain/indicator-record';
 import { MeasurementList } from '../components/MeasurementList';
 import { TrendChartCard } from '../components/TrendChartCard';
 import { typeNameFromSlug } from '../domain/indicator-type';

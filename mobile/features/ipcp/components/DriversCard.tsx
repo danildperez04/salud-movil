@@ -17,13 +17,9 @@ function describeDriver(driver: IpcpDriver): string {
     case 'lowAdherence':
       return labels.drivers.lowAdherence(Math.round(driver.rate * 100));
     case 'worseningTrend':
-      return labels.drivers.worseningTrend(labels.indicators[driver.indicator]);
-    case 'monitoringLapse':
-      return driver.days === null
-        ? labels.drivers.neverRecorded(labels.indicators[driver.indicator])
-        : labels.drivers.monitoringLapse(driver.days, labels.indicators[driver.indicator]);
+      return labels.drivers.worseningTrend;
     case 'missedAppointments':
-      return labels.drivers.missedAppointments(driver.count);
+      return labels.drivers.missedAppointments(Math.round(driver.rate * 100));
   }
 }
 

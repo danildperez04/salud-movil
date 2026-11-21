@@ -36,7 +36,11 @@
 }
 
 #root {
-  width: 100vw;
+  /* `100%` y no `100vw`: el ancho del viewport incluye la barra de scroll
+     vertical (15 px en Windows), así que con `100vw` toda página más alta que
+     la ventana quedaba 15 px más ancha que lo visible y mostraba además una
+     barra de scroll horizontal. */
+  width: 100%;
   height: 100vh;
   margin: 0;
   padding: 0;

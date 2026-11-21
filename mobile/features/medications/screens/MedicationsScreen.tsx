@@ -46,11 +46,11 @@ export default function MedicationsScreen() {
                 key={medication.id}
                 drugName={medication.drugName}
                 dose={medication.dose}
-                quantityLabel={medication.quantityLabel}
+                detail={medication.detail}
                 frequency={medication.frequency}
                 time={medication.time}
                 active={medication.active}
-                onToggleActive={(active) => toggleMedication.mutate({ id: medication.id, active })}
+                onToggleActive={(active) => toggleMedication.mutate({ medication, active })}
               />
             ))}
           </>

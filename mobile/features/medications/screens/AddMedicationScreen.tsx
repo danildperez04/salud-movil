@@ -72,7 +72,7 @@ export default function AddMedicationScreen() {
       {
         drugName: form.drugName,
         dose: formatDose(form.doseAmount, form.doseUnit),
-        quantityLabel: form.quantityLabel,
+        detail: form.quantityLabel,
         time: formatTime12h(form.time),
         frequency: form.frequency,
         activeIngredient: form.activeIngredient || undefined,
