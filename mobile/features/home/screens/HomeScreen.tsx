@@ -1,6 +1,6 @@
 // features/home/screens/HomeScreen.tsx
 import { router } from 'expo-router';
-import { Bell, Calendar, FileText, LineChart, Pill } from 'lucide-react-native';
+import { Bell, Calendar, FileText, LineChart, Pill } from '@/lib/icons';
 import { Pressable, ScrollView, View } from 'react-native';
 import { CircularProgress } from '@/components/ui/circular-progress';
 import { Skeleton } from '@/components/ui/skeleton';

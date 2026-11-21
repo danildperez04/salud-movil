@@ -1,5 +1,5 @@
 // features/medical-record/components/AttachmentPicker.tsx
-import { Camera, FileText, type LucideIcon } from 'lucide-react-native';
+import { Camera, FileText, type LucideIcon } from '@/lib/icons';
 import { View } from 'react-native';
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';

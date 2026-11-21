@@ -9,7 +9,7 @@ import {
   Pill,
   Syringe,
   type LucideIcon,
-} from 'lucide-react-native';
+} from '@/lib/icons';
 import { statusColors } from '@/lib/tokens';
 import type { ResourceType } from '../domain/resource-catalog';
 import type { WaitTier } from '../domain/resource-format';

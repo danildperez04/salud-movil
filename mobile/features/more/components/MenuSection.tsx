@@ -1,6 +1,6 @@
 // features/more/components/MenuSection.tsx
 import { router } from 'expo-router';
-import { ChevronRight } from 'lucide-react-native';
+import { ChevronRight } from '@/lib/icons';
 import { Fragment } from 'react';
 import { Pressable, View } from 'react-native';
 import { Text } from '@/components/ui/text';

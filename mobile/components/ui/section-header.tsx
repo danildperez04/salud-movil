@@ -1,5 +1,5 @@
 // components/ui/section-header.tsx
-import { ChevronRight } from 'lucide-react-native';
+import { ChevronRight } from '@/lib/icons';
 import { Pressable, View } from 'react-native';
 import { Text } from '@/components/ui/text';
 import { colors } from '@/lib/tokens';

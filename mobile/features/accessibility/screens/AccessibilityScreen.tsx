@@ -1,5 +1,5 @@
 // features/accessibility/screens/AccessibilityScreen.tsx
-import { Volume2 } from 'lucide-react-native';
+import { Volume2 } from '@/lib/icons';
 import { ScrollView, View } from 'react-native';
 import { Button } from '@/components/ui/button';
 import { OptionButtons, type OptionButton } from '@/components/ui/option-buttons';

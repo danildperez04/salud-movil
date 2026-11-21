@@ -1,5 +1,5 @@
 // features/medical-record/components/DocumentSheet.tsx
-import { FileText } from 'lucide-react-native';
+import { FileText } from '@/lib/icons';
 import { View } from 'react-native';
 import { Text } from '@/components/ui/text';
 import { DOCUMENT_CATEGORIES } from '@/constants/labels';

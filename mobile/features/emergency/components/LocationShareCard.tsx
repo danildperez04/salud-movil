@@ -1,5 +1,5 @@
 // features/emergency/components/LocationShareCard.tsx
-import { MapPin } from 'lucide-react-native';
+import { MapPin } from '@/lib/icons';
 import { View } from 'react-native';
 import { Switch } from '@/components/ui/switch';
 import { Text } from '@/components/ui/text';

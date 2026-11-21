@@ -1,5 +1,5 @@
 // features/medical-record/components/LabResultCard.tsx
-import { FlaskConical } from 'lucide-react-native';
+import { FlaskConical } from '@/lib/icons';
 import { ListItemCard } from '@/components/ui/list-item-card';
 import { Text } from '@/components/ui/text';
 import { ToneBadge } from '@/components/ui/tone-badge';

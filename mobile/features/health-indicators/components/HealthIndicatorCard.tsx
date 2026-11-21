@@ -7,7 +7,7 @@ import {
   Scale,
   Thermometer,
   type LucideIcon,
-} from 'lucide-react-native';
+} from '@/lib/icons';
 import { Pressable, View } from 'react-native';
 import { Text } from '@/components/ui/text';
 import {

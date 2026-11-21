@@ -1,5 +1,5 @@
 // features/reminders/components/ReminderCard.tsx
-import { Bell, type LucideIcon } from 'lucide-react-native';
+import { Bell, type LucideIcon } from '@/lib/icons';
 import { Badge } from '@/components/ui/badge';
 import { ListItemCard } from '@/components/ui/list-item-card';
 import { Text } from '@/components/ui/text';

@@ -1,6 +1,6 @@
 // app/(app)/(tabs)/_layout.tsx
 import { Tabs } from 'expo-router';
-import { Calendar, Home, MoreHorizontal, Pill } from 'lucide-react-native';
+import { Calendar, Home, MoreHorizontal, Pill } from '@/lib/icons';
 import { TAB_LABELS } from '@/constants/labels';
 
 const ACTIVE_COLOR = '#2DB79A';

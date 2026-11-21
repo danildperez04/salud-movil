@@ -1,5 +1,5 @@
 // features/home/components/QuickActionCard.tsx
-import { ArrowUpRight, type LucideIcon } from 'lucide-react-native';
+import { ArrowUpRight, type LucideIcon } from '@/lib/icons';
 import { Pressable, View } from 'react-native';
 import { Text } from '@/components/ui/text';
 

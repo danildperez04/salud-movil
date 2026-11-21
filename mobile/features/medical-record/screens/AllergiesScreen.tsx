@@ -1,6 +1,6 @@
 // features/medical-record/screens/AllergiesScreen.tsx
 import { router } from 'expo-router';
-import { TriangleAlert } from 'lucide-react-native';
+import { TriangleAlert } from '@/lib/icons';
 import { ScrollView, View } from 'react-native';
 import { EmptyStateCard } from '@/components/ui/empty-state-card';
 import { FooterButton } from '@/components/ui/footer-button';

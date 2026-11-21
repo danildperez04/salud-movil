@@ -2,7 +2,7 @@
 import { zodResolver } from '@hookform/resolvers/zod';
 import DateTimePicker, { DateTimePickerAndroid } from '@react-native-community/datetimepicker';
 import { router, useLocalSearchParams } from 'expo-router';
-import { TriangleAlert } from 'lucide-react-native';
+import { TriangleAlert } from '@/lib/icons';
 import { useMemo, useState } from 'react';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 import { Platform, ScrollView, View } from 'react-native';

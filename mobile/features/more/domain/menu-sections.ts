@@ -15,7 +15,7 @@ import {
   Siren,
   Stethoscope,
   type LucideIcon,
-} from 'lucide-react-native';
+} from '@/lib/icons';
 import { MORE_LABELS } from '@/constants/labels';
 
 export type MenuItem = {

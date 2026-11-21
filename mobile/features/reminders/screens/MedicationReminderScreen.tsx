@@ -1,7 +1,7 @@
 // features/reminders/screens/MedicationReminderScreen.tsx
 import { zodResolver } from '@hookform/resolvers/zod';
 import { router, useLocalSearchParams } from 'expo-router';
-import { Clock, Pill } from 'lucide-react-native';
+import { Clock, Pill } from '@/lib/icons';
 import { Alert, ScrollView, View } from 'react-native';
 import { Controller, useForm, useWatch } from 'react-hook-form';
 import { Button } from '@/components/ui/button';

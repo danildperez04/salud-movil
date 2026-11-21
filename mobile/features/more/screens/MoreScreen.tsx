@@ -1,6 +1,6 @@
 // features/more/screens/MoreScreen.tsx
 import { router } from 'expo-router';
-import { LogOut } from 'lucide-react-native';
+import { LogOut } from '@/lib/icons';
 import { Pressable, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Text } from '@/components/ui/text';

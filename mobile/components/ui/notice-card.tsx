@@ -1,5 +1,5 @@
 // components/ui/notice-card.tsx
-import { Info, type LucideIcon } from 'lucide-react-native';
+import { Info, type LucideIcon } from '@/lib/icons';
 import { View } from 'react-native';
 import { Text } from '@/components/ui/text';
 import { colors } from '@/lib/tokens';

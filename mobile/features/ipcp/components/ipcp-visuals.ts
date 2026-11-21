@@ -8,7 +8,7 @@ import {
   ShieldCheck,
   TrendingUp,
   TriangleAlert,
-} from 'lucide-react-native';
+} from '@/lib/icons';
 import type { LucideIcon } from 'lucide-react-native';
 import { statusColors } from '@/lib/tokens';
 import type { IpcpDriver, IpcpLevel } from '../domain/ipcp-model';

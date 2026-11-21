@@ -1,5 +1,5 @@
 // features/help/screens/ReportProblemScreen.tsx
-import { Paperclip } from 'lucide-react-native';
+import { Paperclip } from '@/lib/icons';
 import { ScrollView, View } from 'react-native';
 import { Button } from '@/components/ui/button';
 import { SelectFormField, TextFormField } from '@/components/ui/controlled-fields';

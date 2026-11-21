@@ -1,5 +1,5 @@
 // features/security/components/DeviceCard.tsx
-import { Globe, Smartphone } from 'lucide-react-native';
+import { Globe, Smartphone } from '@/lib/icons';
 import { Pressable } from 'react-native';
 import { ListItemCard } from '@/components/ui/list-item-card';
 import { Text } from '@/components/ui/text';

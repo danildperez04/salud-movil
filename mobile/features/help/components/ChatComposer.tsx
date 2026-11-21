@@ -1,5 +1,5 @@
 // features/help/components/ChatComposer.tsx
-import { Send } from 'lucide-react-native';
+import { Send } from '@/lib/icons';
 import { Pressable, View } from 'react-native';
 import { Input } from '@/components/ui/input';
 import { HELP_LABELS } from '@/constants/labels';

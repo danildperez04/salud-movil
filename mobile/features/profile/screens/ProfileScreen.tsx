@@ -1,5 +1,5 @@
 // features/profile/screens/ProfileScreen.tsx
-import { LogOut } from 'lucide-react-native';
+import { LogOut } from '@/lib/icons';
 import { ScrollView, View } from 'react-native';
 import { Button } from '@/components/ui/button';
 import { HeroCard } from '@/components/ui/hero-card';

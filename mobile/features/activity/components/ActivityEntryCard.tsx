@@ -1,5 +1,5 @@
 // features/activity/components/ActivityEntryCard.tsx
-import { Check, Moon } from 'lucide-react-native';
+import { Check, Moon } from '@/lib/icons';
 import { ListItemCard } from '@/components/ui/list-item-card';
 import { ToneBadge } from '@/components/ui/tone-badge';
 import { ACTIVITY_LABELS } from '@/constants/labels';
