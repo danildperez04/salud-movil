@@ -1,0 +1,70 @@
+// lib/i18n/locales/es/navigation.ts
+export const navigation = {
+  // Labels de los 4 tabs del Bottom Navigation Bar
+  tabs: {
+    home: 'Home',
+    appointments: 'Citas',
+    medications: 'Medicamentos',
+    more: 'Más',
+  },
+
+  // Títulos de header de las pantallas internas (las que se abren en Stack por encima de los
+  // tabs). Toda pantalla nueva debe sumar su título acá, no hardcodearlo en el componente.
+  screens: {
+    healthIndicators: 'Indicadores de Salud',
+    indicatorHistory: 'Historial de Indicadores',
+    indicatorEvolution: 'Evolución',
+    appointments: 'Citas Médicas',
+    appointmentDetail: 'Detalle de cita',
+    appointmentForm: 'Agendar Cita',
+    medications: 'Medicamentos',
+    medicationForm: 'Agregar Medicamento',
+    medicationScanner: 'Escáner de medicamentos',
+    reminders: 'Recordatorios',
+    medicationReminder: 'Recordatorio de medicamento',
+    appointmentReminder: 'Recordatorio de cita',
+    // expediente clínico
+    medicalRecord: 'Expediente clínico',
+    clinicalSummary: 'Resumen clínico',
+    diagnosis: 'Diagnóstico',
+    diagnosisForm: 'Agregar diagnóstico',
+    history: 'Antecedentes',
+    historyForm: 'Agregar antecedente',
+    allergies: 'Alergias',
+    allergyForm: 'Agregar alergia',
+    documents: 'Documentos',
+    documentDetail: 'Documento',
+    documentUpload: 'Subir documento',
+    labs: 'Laboratorios',
+    labScan: 'Escanear laboratorio',
+    labDetail: 'Examen escaneado',
+    // cuenta y preferencias
+    register: 'Crear usuario',
+    profile: 'Mi cuenta',
+    notifications: 'Notificaciones',
+    notificationSettings: 'Notificaciones',
+    security: 'Privacidad y seguridad',
+    twoFactor: 'Verificación en dos pasos',
+    changePassword: 'Cambiar contraseña',
+    biometric: 'Acceso biométrico',
+    devices: 'Dispositivos vinculados',
+    accessibility: 'Accesibilidad',
+    language: 'Idioma y multilenguaje',
+    // servicios complementarios
+    activity: 'Actividad física',
+    voiceAssistant: 'Asistente por voz',
+    ipcp: 'IPCP · Mi prioridad',
+    referral: 'Sistema de referencia',
+    hospitalGuide: 'Guía dentro del hospital',
+    waitTimes: 'Estimación de espera',
+    healthMap: 'Recursos sanitarios',
+    healthResource: 'Recurso sanitario',
+    // ayuda y seguridad
+    emergency: 'Modo emergencia',
+    emergencyContactForm: 'Agregar contacto',
+    help: 'Ayuda y soporte',
+    faq: 'Preguntas frecuentes',
+    supportChat: 'Soporte',
+    reportProblem: 'Reportar problema',
+  },
+};

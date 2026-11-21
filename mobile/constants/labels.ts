@@ -1,4 +1,5 @@
 // constants/labels.ts
+import { es } from '@/lib/i18n/locales/es';
 import type { LanguageCode } from '@/types/preferences';
 
 // Claves = cat_appointment_state.name. El Figma muestra "Confirmada" para las programadas.
@@ -52,135 +53,9 @@ export const INDICATOR_STATUS_LABELS = {
   high: 'Alto',
 } as const;
 
-// Labels de los 4 tabs del Bottom Navigation Bar
-export const TAB_LABELS = {
-  home: 'Home',
-  appointments: 'Citas',
-  medications: 'Medicamentos',
-  more: 'Más',
-} as const;
-
-// Títulos de header de las pantallas internas (las que se abren en Stack
-// por encima de los tabs). Toda pantalla nueva debe sumar su título acá,
-// no hardcodearlo directo en el componente.
-export const SCREEN_TITLES = {
-  healthIndicators: 'Indicadores de Salud',
-  indicatorHistory: 'Historial de Indicadores',
-  indicatorEvolution: 'Evolución',
-  appointments: 'Citas Médicas',
-  appointmentDetail: 'Detalle de cita',
-  appointmentForm: 'Agendar Cita',
-  medications: 'Medicamentos',
-  medicationForm: 'Agregar Medicamento',
-  medicationScanner: 'Escáner de medicamentos',
-  reminders: 'Recordatorios',
-  medicationReminder: 'Recordatorio de medicamento',
-  appointmentReminder: 'Recordatorio de cita',
-  // expediente clínico
-  medicalRecord: 'Expediente clínico',
-  clinicalSummary: 'Resumen clínico',
-  diagnosis: 'Diagnóstico',
-  diagnosisForm: 'Agregar diagnóstico',
-  history: 'Antecedentes',
-  historyForm: 'Agregar antecedente',
-  allergies: 'Alergias',
-  allergyForm: 'Agregar alergia',
-  documents: 'Documentos',
-  documentDetail: 'Documento',
-  documentUpload: 'Subir documento',
-  labs: 'Laboratorios',
-  labScan: 'Escanear laboratorio',
-  labDetail: 'Examen escaneado',
-  // cuenta y preferencias
-  register: 'Crear usuario',
-  profile: 'Mi cuenta',
-  notifications: 'Notificaciones',
-  notificationSettings: 'Notificaciones',
-  security: 'Privacidad y seguridad',
-  twoFactor: 'Verificación en dos pasos',
-  changePassword: 'Cambiar contraseña',
-  biometric: 'Acceso biométrico',
-  devices: 'Dispositivos vinculados',
-  accessibility: 'Accesibilidad',
-  language: 'Idioma y multilenguaje',
-  // servicios complementarios
-  activity: 'Actividad física',
-  voiceAssistant: 'Asistente por voz',
-  ipcp: 'IPCP · Mi prioridad',
-  referral: 'Sistema de referencia',
-  hospitalGuide: 'Guía dentro del hospital',
-  waitTimes: 'Estimación de espera',
-  healthMap: 'Recursos sanitarios',
-  healthResource: 'Recurso sanitario',
-  // ayuda y seguridad
-  emergency: 'Modo emergencia',
-  emergencyContactForm: 'Agregar contacto',
-  help: 'Ayuda y soporte',
-  faq: 'Preguntas frecuentes',
-  supportChat: 'Soporte',
-  reportProblem: 'Reportar problema',
-} as const;
-
-// Pantalla de bienvenida — TODO: falta el texto real del Figma de onboarding
-// (no se compartió esa pantalla todavía), esto es placeholder.
-export const ONBOARDING_LABELS = {
-  brand: 'Salud Móvil',
-  description: 'La forma mas fácil de cuidar tu salud y la de los que amas.',
-  cta: 'Comenzar',
-  welcomePrefix: 'Bienvenido a',
-} as const;
-
-// Texto exacto del Figma (pantalla "Inicio de Sesión")
-export const LOGIN_LABELS = {
-  brand: 'Salud Móvil',
-  tagline: 'Tu salud, en tus manos',
-  title: 'Inicio de Sesión',
-  subtitle: 'Ingresa tus datos para continuar',
-  emailLabel: 'Correo electrónico',
-  emailPlaceholder: 'tu@email.com',
-  passwordLabel: 'Contraseña',
-  forgotPassword: '¿Olvidaste tu contraseña?',
-  submit: 'Iniciar Sesión',
-  emailRequired: 'Ingresá tu correo',
-  emailInvalid: 'Correo inválido',
-  passwordRequired: 'Ingresá tu contraseña',
-  invalidCredentials: 'Correo o contraseña incorrectos',
-  twoFactor: {
-    title: 'Verificá tu identidad',
-    subtitle: 'Ingresá el código de 6 dígitos que te enviamos para completar el inicio de sesión.',
-    codeLabel: 'Código de verificación',
-    codePlaceholder: '000000',
-    submit: 'Verificar',
-    expiresIn: (time: string) => `El código vence en ${time}`,
-    expired: 'El código venció. Pedí uno nuevo para continuar.',
-    resend: 'Reenviar código',
-    resendIn: (seconds: number) => `Reenviar código en ${seconds} s`,
-    resent: 'Te enviamos un código nuevo. El anterior ya no sirve.',
-    backToLogin: 'Volver a iniciar sesión',
-    errors: {
-      codeRequired: 'Ingresá el código',
-      codeInvalid: 'El código tiene 6 dígitos',
-      wrongOrExpired: 'El código es incorrecto o ya venció. Revisalo o pedí uno nuevo.',
-      tooManyRequests: 'Hiciste demasiados intentos. Esperá un momento y probá de nuevo.',
-      resendTooSoon: 'Esperá unos segundos antes de pedir otro código.',
-      challengeGone: 'La verificación ya no está disponible. Volvé a iniciar sesión.',
-    },
-  },
-} as const;
-
-// Texto exacto del Figma (pantalla Home)
-export const HOME_LABELS = {
-  greetingPrefix: 'Hola,',
-  statusTitle: 'Tu estado de hoy',
-  statusHeadline: '¡Vas por buen camino!',
-  statusSubtitle: 'Sigue así, mantén tus hábitos saludables',
-  quickActions: {
-    appointments: { title: 'Citas', subtitle: 'Agenda y gestión' },
-    medications: { title: 'Medicamentos', subtitle: 'Control y recetas' },
-    indicators: { title: 'Indicadores', subtitle: 'Métricas de salud' },
-    medicalRecord: { title: 'Expediente', subtitle: 'Historial clínico' },
-  },
-} as const;
+// Títulos de header de las pantallas internas. Viven en lib/i18n/locales (navigation.screens);
+// este alias en español es para las pantallas que todavía no se migran a i18n.
+export const SCREEN_TITLES = es.navigation.screens;
 
 export const HEALTH_INDICATORS_LABELS = {
   registerButton: 'Registrar nuevo indicador',
@@ -672,6 +547,7 @@ export const MEDICAL_RECORD_LABELS = {
 } as const;
 
 // ===== Cuenta, preferencias y ayuda =====
+// Nombre de cada lengua escrito en esa lengua: no se traduce, se reconoce desde cualquier idioma.
 export const LANGUAGE_LABELS: Record<LanguageCode, string> = {
   es: 'Español',
   bzk: 'Inglés Creole (Kriol)',
@@ -682,45 +558,12 @@ export const LANGUAGE_LABELS: Record<LanguageCode, string> = {
   rma: 'Rama',
 };
 
-export const LANGUAGE_SCREEN_LABELS = {
-  introTitle: 'Selecciona tu idioma',
-  introDescription: 'Elige tu idioma de preferencia.',
-  save: 'Guardar',
-} as const;
-
 export const NOTIFICATION_SETTINGS_LABELS = {
   medications: { title: 'Medicamentos', subtitle: 'Recordatorios de dosis y horarios' },
   appointments: { title: 'Citas médicas', subtitle: 'Avisos de próximas citas' },
   indicators: { title: 'Indicadores de salud', subtitle: 'Recordatorios de medición' },
   news: { title: 'Novedades', subtitle: 'Consejos y novedades de la app' },
   save: 'Guardar',
-} as const;
-
-export const ACCESSIBILITY_LABELS = {
-  textSizeTitle: 'Tamaño del texto',
-  textSizes: { normal: 'A', large: 'A+', xlarge: 'A++' },
-  textSizeDescriptions: {
-    normal: 'Texto normal',
-    large: 'Texto grande',
-    xlarge: 'Texto muy grande',
-  },
-  highContrast: {
-    title: 'Alto contraste',
-    subtitle: 'Mayor diferencia entre texto, bordes y fondos',
-  },
-  reduceMotion: { title: 'Reducir movimiento', subtitle: 'Evita animaciones y efectos visuales' },
-  simpleMode: {
-    title: 'Modo lectura simple',
-    subtitle: 'Reduce información secundaria y distracciones',
-  },
-  readAloud: {
-    title: 'Lectura en voz alta',
-    subtitle: 'Lee instrucciones importantes cuando lo solicites',
-  },
-  testReading: 'Probar lectura en voz alta',
-  testReadingText:
-    'Centro de accesibilidad. Puedes aumentar el texto, activar alto contraste, reducir movimiento o usar lectura simple.',
-  reset: 'Restablecer ajustes',
 } as const;
 
 export const SECURITY_LABELS = {
@@ -1110,59 +953,10 @@ export const ACTIVITY_LABELS = {
   },
 } as const;
 
-// Roles de `user.role` (types/auth.ts) -> texto visible
-export const ROLE_LABELS: Record<string, string> = {
-  patient: 'Paciente',
-  caregiver: 'Cuidador/a',
-  health_staff: 'Personal de salud',
-  admin: 'Administrador',
-};
-
-// Pantalla "Más". Las entradas sin ruta todavía se muestran con la etiqueta `comingSoon`.
-export const MORE_LABELS = {
-  title: 'Más',
-  fallbackName: 'Usuario',
-  comingSoon: 'Pronto',
-  logout: 'Cerrar sesión',
-  ipcp: {
-    title: 'IPCP · Mi prioridad',
-    description: 'Tu nivel de prioridad, calculado con tus indicadores, medicamentos y citas.',
-    cta: 'Ver mi prioridad',
-  },
-  sections: {
-    health: 'Salud y seguimiento',
-    services: 'Servicios complementarios',
-    accessibility: 'Accesibilidad e inclusión',
-    preferences: 'Preferencias',
-    help: 'Ayuda y seguridad',
-  },
-  items: {
-    reminders: { title: 'Recordatorios', subtitle: 'Medicamentos y citas' },
-    medicalRecord: { title: 'Expediente clínico', subtitle: 'Diagnósticos, alergias y documentos' },
-    indicators: { title: 'Indicadores de salud', subtitle: 'Presión, glucosa, peso y más' },
-    activity: { title: 'Actividad física', subtitle: 'Registra tu ejercicio para el seguimiento' },
-    scanner: { title: 'Escáner de medicamentos', subtitle: 'Identifica caja, uso y advertencias' },
-    voice: { title: 'Asistente por voz', subtitle: 'Habla en lugar de escribir' },
-    referral: {
-      title: 'Sistema de referencia',
-      subtitle: 'Te orienta al centro con el servicio que necesitas',
-    },
-    waitTimes: { title: 'Estimación de espera', subtitle: 'Compara tiempos de atención' },
-    healthMap: {
-      title: 'Mapa de recursos sanitarios',
-      subtitle: 'Hospitales, farmacias y laboratorios',
-    },
-    accessibilityCenter: {
-      title: 'Centro de accesibilidad',
-      subtitle: 'Texto, contraste, movimiento y lectura',
-    },
-    language: { title: 'Idioma', subtitle: 'Español y lenguas de la Costa Caribe' },
-    notifications: { title: 'Notificaciones', subtitle: 'Medicamentos, citas y salud' },
-    privacy: { title: 'Privacidad y seguridad', subtitle: 'Acceso y protección de datos' },
-    emergency: { title: 'Modo emergencia', subtitle: 'Información médica, contactos y ubicación' },
-    support: { title: 'Ayuda y soporte', subtitle: 'Preguntas frecuentes y contacto' },
-  },
-} as const;
+// Roles y pantalla "Más". Viven en lib/i18n/locales (ya se traducen); estos alias en español son
+// para las pantallas que todavía no se migran a i18n (perfil, resumen clínico).
+export const ROLE_LABELS: Record<string, string> = es.common.roles;
+export const MORE_LABELS = es.more;
 
 // IPCP · Mi prioridad: resultado calculado automáticamente con los datos de la app
 export const IPCP_LABELS = {
@@ -1270,18 +1064,6 @@ export const IPCP_LABELS = {
   },
 } as const;
 
-// Textos generales reutilizables en toda la app
-export const COMMON_LABELS = {
-  loading: 'Cargando...',
-  retry: 'Reintentar',
-  save: 'Guardar',
-  cancel: 'Cancelar',
-  confirm: 'Confirmar',
-  noData: 'No hay datos para mostrar',
-  back: 'Volver',
-  externalLinkErrorTitle: 'No se pudo abrir',
-  externalLinkErrorMessage: 'Tu teléfono no tiene una aplicación disponible para esta acción.',
-  comingSoonTitle: 'Disponible próximamente',
-  comingSoonDescription: 'Estamos trabajando en esta sección. Pronto podrás usarla desde aquí.',
-  networkError: 'No se pudo conectar. Revisá tu conexión e intentá de nuevo',
-} as const;
+// Textos generales reutilizables en toda la app. Viven en lib/i18n/locales (ya se traducen);
+// este alias en español es para las pantallas que todavía no se migran a i18n.
+export const COMMON_LABELS = es.common;

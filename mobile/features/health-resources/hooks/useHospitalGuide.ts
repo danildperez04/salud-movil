@@ -41,6 +41,7 @@ export function useHospitalGuide(resourceId?: string, initialService?: string) {
     route,
     steps,
     activeZones,
-    start: () => speak(labels.spoken(service, route.area, route.hint)),
+    // TODO(i18n): quitar el 'es' cuando esta pantalla se migre a i18n
+    start: () => speak(labels.spoken(service, route.area, route.hint), 'es'),
   };
 }

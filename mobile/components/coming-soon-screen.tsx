@@ -1,11 +1,11 @@
 // components/coming-soon-screen.tsx
 import { router } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { Construction } from '@/lib/icons';
 import { View } from 'react-native';
 import { Button } from '@/components/ui/button';
 import { ScreenHeader } from '@/components/ui/screen-header';
 import { Text } from '@/components/ui/text';
-import { COMMON_LABELS } from '@/constants/labels';
 import { colors } from '@/lib/tokens';
 
 /**
@@ -14,6 +14,8 @@ import { colors } from '@/lib/tokens';
  * `app/` por la pantalla real cuando exista (ver el comentario de cada ruta).
  */
 function ComingSoonScreen({ title }: { title: string }) {
+  const { t } = useTranslation();
+
   return (
     <View className="bg-background flex-1">
       <ScreenHeader title={title} align="center" />
@@ -23,13 +25,13 @@ function ComingSoonScreen({ title }: { title: string }) {
           <Construction size={34} color={colors.brandGreen} />
         </View>
         <Text className="text-body font-heading-semibold text-foreground text-center">
-          {COMMON_LABELS.comingSoonTitle}
+          {t('comingSoonTitle')}
         </Text>
         <Text className="text-small font-body text-muted-foreground text-center">
-          {COMMON_LABELS.comingSoonDescription}
+          {t('comingSoonDescription')}
         </Text>
         <Button variant="outline" className="mt-2 px-8" onPress={() => router.back()}>
-          <Text className="text-body font-heading-semibold">{COMMON_LABELS.back}</Text>
+          <Text className="text-body font-heading-semibold">{t('back')}</Text>
         </Button>
       </View>
     </View>

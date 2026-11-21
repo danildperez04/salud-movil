@@ -3,6 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { router } from 'expo-router';
 import { useEffect } from 'react';
 import { Controller, useForm } from 'react-hook-form';
+import { useTranslation } from 'react-i18next';
 import { KeyboardAvoidingView, Platform, Pressable, ScrollView, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { z } from 'zod';
@@ -12,16 +13,21 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Spinner } from '@/components/ui/spinner';
 import { Text } from '@/components/ui/text';
-import { LOGIN_LABELS } from '@/constants/labels';
 import { colors, fonts } from '@/lib/tokens';
 import { ApiError } from '@/lib/api-client';
+import { userMessage } from '@/lib/error-messages';
+import { i18n } from '@/lib/i18n';
 import { useAppStore } from '@/store';
 import { isTwoFactorChallenge } from '../domain/login-response';
 import { useLogin } from '../hooks/useLogin';
 
+// Los mensajes son funciones: se traducen al validar, no al cargar el módulo.
 const loginSchema = z.object({
-  email: z.string().min(1, LOGIN_LABELS.emailRequired).email(LOGIN_LABELS.emailInvalid),
-  password: z.string().min(1, LOGIN_LABELS.passwordRequired),
+  email: z
+    .string()
+    .min(1, { error: () => i18n.t('login:emailRequired') })
+    .email({ error: () => i18n.t('login:emailInvalid') }),
+  password: z.string().min(1, { error: () => i18n.t('login:passwordRequired') }),
 });
 
 type LoginFormValues = z.infer<typeof loginSchema>;
@@ -32,6 +38,7 @@ const INPUT_CLASS =
   'font-heading-regular text-brand-blue focus:border-primary h-13 rounded-2xl border-[#E5E7EB] px-4 text-[14px] dark:border-input dark:text-neutral-white';
 
 export default function LoginScreen() {
+  const { t } = useTranslation('login');
   const login = useLogin();
   const insets = useSafeAreaInsets();
   const authNotice = useAppStore((state) => state.authNotice);
@@ -65,11 +72,11 @@ export default function LoginScreen() {
 
   const errorMessage = (() => {
     if (!login.error) return null;
-    if (login.error instanceof ApiError) {
-      // Solo /auth/login: en /auth/2fa/verify un 401 significa código inválido (ver TwoFactorScreen).
-      return login.error.status === 401 ? LOGIN_LABELS.invalidCredentials : login.error.message;
+    // Solo /auth/login: en /auth/2fa/verify un 401 significa código inválido (ver TwoFactorScreen).
+    if (login.error instanceof ApiError && login.error.status === 401) {
+      return t('invalidCredentials');
     }
-    return login.error.message;
+    return userMessage(login.error);
   })();
 
   return (
@@ -87,8 +94,8 @@ export default function LoginScreen() {
       >
         <View className="w-full max-w-md items-center self-center">
           <BrandLogo />
-          <Text className="font-heading-medium text-secondary-steel mt-3.5 text-[14px] leading-[21px]">
-            {LOGIN_LABELS.tagline}
+          <Text className="font-heading-medium text-secondary-steel mt-3.5 text-[14px] leading-5.5">
+            {t('tagline')}
           </Text>
 
           <View className="mt-8 w-full flex-row items-center gap-3">
@@ -104,24 +111,24 @@ export default function LoginScreen() {
           )}
 
           <View
-            className="bg-card dark:border-border mt-8 w-full rounded-[20px] border border-[#E5E7EB] px-5 pt-4 pb-5"
+            className="bg-card dark:border-border rounded-brand mt-8 w-full border border-[#E5E7EB] px-5 pt-4 pb-5"
             style={{ boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.05)' }}
           >
             <Text
               role="heading"
               aria-level={1}
-              className="font-heading text-brand-blue dark:text-neutral-white text-[24px] leading-[36px]"
+              className="font-heading text-brand-blue dark:text-neutral-white text-[24px] leading-9"
             >
-              {LOGIN_LABELS.title}
+              {t('title')}
             </Text>
-            <Text className="font-heading-regular text-secondary-steel mt-1 text-[14px] leading-[21px]">
-              {LOGIN_LABELS.subtitle}
+            <Text className="font-heading-regular text-secondary-steel mt-1 text-[14px] leading-5.25">
+              {t('subtitle')}
             </Text>
 
             <View className="mt-4 gap-4">
               <View className="gap-1.5">
                 <Label nativeID="email" className={LABEL_CLASS}>
-                  {LOGIN_LABELS.emailLabel}
+                  {t('emailLabel')}
                 </Label>
                 <Controller
                   control={control}
@@ -130,7 +137,7 @@ export default function LoginScreen() {
                     <Input
                       aria-labelledby="email"
                       testID="email-input"
-                      placeholder={LOGIN_LABELS.emailPlaceholder}
+                      placeholder={t('emailPlaceholder')}
                       keyboardType="email-address"
                       autoCapitalize="none"
                       autoComplete="email"
@@ -150,7 +157,7 @@ export default function LoginScreen() {
 
               <View className="gap-1.5">
                 <Label nativeID="password" className={LABEL_CLASS}>
-                  {LOGIN_LABELS.passwordLabel}
+                  {t('passwordLabel')}
                 </Label>
                 <Controller
                   control={control}
@@ -179,7 +186,7 @@ export default function LoginScreen() {
               {/* TODO: conectar a /auth/forgot-password cuando armemos esa pantalla */}
               <Pressable className="self-end" hitSlop={8}>
                 <Text className="font-heading-semibold text-secondary-steel text-[13px] leading-[19.5px] underline">
-                  {LOGIN_LABELS.forgotPassword}
+                  {t('forgotPassword')}
                 </Text>
               </Pressable>
 
@@ -199,7 +206,7 @@ export default function LoginScreen() {
                     className="text-[16px] leading-6 text-white"
                     style={{ fontFamily: fonts.heading, fontWeight: '400' }}
                   >
-                    {LOGIN_LABELS.submit}
+                    {t('submit')}
                   </Text>
                 )}
               </Button>

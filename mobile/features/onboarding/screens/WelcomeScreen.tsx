@@ -1,12 +1,12 @@
 // features/onboarding/screens/WelcomeScreen.tsx
 import { router } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { ScrollView, useColorScheme, useWindowDimensions, View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { WelcomeIllustration, WELCOME_ILLUSTRATION_SIZE } from '@/components/welcome-illustration';
 import { Button } from '@/components/ui/button';
 import { Text } from '@/components/ui/text';
-import { LOGIN_LABELS, ONBOARDING_LABELS } from '@/constants/labels';
 import { colors, fonts } from '@/lib/tokens';
 import { useAppStore } from '@/store';
 
@@ -28,6 +28,7 @@ const MINT_LIGHT = '#DFF1EB';
 const MINT_DARK = 'rgba(45, 183, 154, 0.12)';
 
 export default function WelcomeScreen() {
+  const { t } = useTranslation(['onboarding', 'login']);
   const insets = useSafeAreaInsets();
   const { width } = useWindowDimensions();
   const isDark = useColorScheme() === 'dark';
@@ -92,7 +93,7 @@ export default function WelcomeScreen() {
               marginTop: -5.8,
             }}
           >
-            {LOGIN_LABELS.tagline}
+            {t('login:tagline')}
           </Text>
         </View>
 
@@ -115,7 +116,7 @@ export default function WelcomeScreen() {
           className="text-brand-blue dark:text-neutral-white text-center"
           style={{ fontFamily: fonts.heading, fontSize: 24, lineHeight: 36 }}
         >
-          {ONBOARDING_LABELS.welcomePrefix} SALUD{' '}
+          {t('welcomePrefix')} SALUD{' '}
           <Text
             className="text-brand-green"
             style={{ fontFamily: fonts.heading, fontSize: 24, lineHeight: 36 }}
@@ -133,7 +134,7 @@ export default function WelcomeScreen() {
             maxWidth: 300,
           }}
         >
-          {ONBOARDING_LABELS.description}
+          {t('description')}
         </Text>
 
         <Button
@@ -146,7 +147,7 @@ export default function WelcomeScreen() {
             className="text-white"
             style={{ fontFamily: fonts.heading, fontSize: 16, lineHeight: 24, fontWeight: '400' }}
           >
-            {ONBOARDING_LABELS.cta}
+            {t('cta')}
           </Text>
         </Button>
       </View>

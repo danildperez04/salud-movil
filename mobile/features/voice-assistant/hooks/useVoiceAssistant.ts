@@ -20,7 +20,8 @@ export function useVoiceAssistant() {
   const showTranscript = (text: string) => {
     setTranscript(text);
     setStatus('done');
-    speakIfEnabled(text);
+    // TODO(i18n): quitar el 'es' cuando esta pantalla se migre a i18n
+    speakIfEnabled(text, 'es');
   };
 
   const toggleListening = async () => {

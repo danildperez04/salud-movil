@@ -1,5 +1,6 @@
 // components/ui/screen-header.tsx
 import { router } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { ChevronLeft } from '@/lib/icons';
 import { Pressable, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -27,12 +28,14 @@ type BackButtonProps = {
 };
 
 function BackButton({ onPress, className, iconSize = 24 }: BackButtonProps) {
+  const { t } = useTranslation();
+
   return (
     <Pressable
       onPress={onPress}
       hitSlop={8}
       accessibilityRole="button"
-      accessibilityLabel="Volver"
+      accessibilityLabel={t('back')}
       className={cn('h-10 w-10 items-center justify-center active:opacity-60', className)}
     >
       <ChevronLeft size={iconSize} color={BACK_ICON_COLOR} />
@@ -47,6 +50,7 @@ export function ScreenHeader({
   align = 'start',
   backButton = 'plain',
 }: ScreenHeaderProps) {
+  const { t } = useTranslation();
   const insets = useSafeAreaInsets();
   const handleBack = onBack ?? (() => router.back());
   const paddingTop = insets.top + TOP_GAP;
@@ -94,7 +98,7 @@ export function ScreenHeader({
       <Pressable
         onPress={handleBack}
         accessibilityRole="button"
-        accessibilityLabel="Volver"
+        accessibilityLabel={t('back')}
         className="border-border h-9 w-9 items-center justify-center rounded-full border active:opacity-70"
       >
         <ChevronLeft size={18} color="#0E2A3A" />

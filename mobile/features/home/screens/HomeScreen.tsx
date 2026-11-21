@@ -1,17 +1,18 @@
 // features/home/screens/HomeScreen.tsx
 import { router } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { Bell, Calendar, FileText, LineChart, Pill } from '@/lib/icons';
 import { Pressable, ScrollView, View } from 'react-native';
 import { CircularProgress } from '@/components/ui/circular-progress';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Text } from '@/components/ui/text';
-import { HOME_LABELS } from '@/constants/labels';
 import { HealthIndicatorCard } from '@/features/health-indicators/components/HealthIndicatorCard';
 import { useHealthIndicators } from '@/features/health-indicators/hooks/useHealthIndicators';
 import { useAppStore } from '@/store';
 import { QuickActionCard } from '../components/QuickActionCard';
 
 export default function HomeScreen() {
+  const { t, i18n } = useTranslation('home');
   const user = useAppStore((state) => state.user);
   const firstName = user?.name?.split(' ')[0] ?? '';
   const { data: indicators, isLoading } = useHealthIndicators();
@@ -19,7 +20,7 @@ export default function HomeScreen() {
   const latestIndicator = indicators?.[0];
 
   const today = new Date()
-    .toLocaleDateString('es', { weekday: 'long', day: 'numeric', month: 'long' })
+    .toLocaleDateString(i18n.language, { weekday: 'long', day: 'numeric', month: 'long' })
     .replace(/^\w/, (c) => c.toUpperCase());
 
   return (
@@ -27,7 +28,7 @@ export default function HomeScreen() {
       <View className="mx-4 mt-8 flex-row items-start justify-between">
         <View className="h-11 flex-1 gap-0.5">
           <Text className="text-h3 font-heading">
-            {HOME_LABELS.greetingPrefix} {firstName} 👋
+            {t('greetingPrefix')} {firstName} 👋
           </Text>
           <Text className="text-small text-secondary">{today}</Text>
         </View>
@@ -38,13 +39,11 @@ export default function HomeScreen() {
       </View>
       <View className="bg-card flex-row items-center justify-between rounded-3xl p-5 shadow-lg shadow-black/5">
         <View className="flex-1 gap-1.5 pr-5">
-          <Text className="text-small font-body text-muted-foreground">
-            {HOME_LABELS.statusTitle}
-          </Text>
+          <Text className="text-small font-body text-muted-foreground">{t('statusTitle')}</Text>
           <Text className="text-body font-heading-medium text-foreground">
-            {HOME_LABELS.statusHeadline}
+            {t('statusHeadline')}
           </Text>
-          <Text className="text-small font-body text-primary">{HOME_LABELS.statusSubtitle}</Text>
+          <Text className="text-small font-body text-primary">{t('statusSubtitle')}</Text>
         </View>
         <CircularProgress value={75} size={72} strokeWidth={7}>
           <Text className="text-body font-heading-semibold text-foreground">75%</Text>
@@ -55,28 +54,28 @@ export default function HomeScreen() {
         <View className="flex-row gap-4">
           <QuickActionCard
             icon={Calendar}
-            title={HOME_LABELS.quickActions.appointments.title}
-            subtitle={HOME_LABELS.quickActions.appointments.subtitle}
+            title={t('quickActions.appointments.title')}
+            subtitle={t('quickActions.appointments.subtitle')}
             onPress={() => router.push('/(app)/(tabs)/appointments')}
           />
           <QuickActionCard
             icon={Pill}
-            title={HOME_LABELS.quickActions.medications.title}
-            subtitle={HOME_LABELS.quickActions.medications.subtitle}
+            title={t('quickActions.medications.title')}
+            subtitle={t('quickActions.medications.subtitle')}
             onPress={() => router.push('/(app)/(tabs)/medications')}
           />
         </View>
         <View className="flex-row gap-4">
           <QuickActionCard
             icon={LineChart}
-            title={HOME_LABELS.quickActions.indicators.title}
-            subtitle={HOME_LABELS.quickActions.indicators.subtitle}
+            title={t('quickActions.indicators.title')}
+            subtitle={t('quickActions.indicators.subtitle')}
             onPress={() => router.push('/(app)/health-indicators')}
           />
           <QuickActionCard
             icon={FileText}
-            title={HOME_LABELS.quickActions.medicalRecord.title}
-            subtitle={HOME_LABELS.quickActions.medicalRecord.subtitle}
+            title={t('quickActions.medicalRecord.title')}
+            subtitle={t('quickActions.medicalRecord.subtitle')}
             onPress={() => router.push('/(app)/medical-record')}
           />
         </View>

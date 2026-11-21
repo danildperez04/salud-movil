@@ -1,12 +1,14 @@
 // app/(app)/(tabs)/_layout.tsx
 import { Tabs } from 'expo-router';
+import { useTranslation } from 'react-i18next';
 import { Calendar, Home, MoreHorizontal, Pill } from '@/lib/icons';
-import { TAB_LABELS } from '@/constants/labels';
 
 const ACTIVE_COLOR = '#2DB79A';
 const INACTIVE_COLOR = '#6B7280';
 
 export default function TabsLayout() {
+  const { t } = useTranslation('navigation');
+
   return (
     <Tabs
       screenOptions={{
@@ -19,28 +21,28 @@ export default function TabsLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: TAB_LABELS.home,
+          title: t('tabs.home'),
           tabBarIcon: ({ color, size }) => <Home color={color} size={size} />,
         }}
       />
       <Tabs.Screen
         name="appointments"
         options={{
-          title: TAB_LABELS.appointments,
+          title: t('tabs.appointments'),
           tabBarIcon: ({ color, size }) => <Calendar color={color} size={size} />,
         }}
       />
       <Tabs.Screen
         name="medications"
         options={{
-          title: TAB_LABELS.medications,
+          title: t('tabs.medications'),
           tabBarIcon: ({ color, size }) => <Pill color={color} size={size} />,
         }}
       />
       <Tabs.Screen
         name="more"
         options={{
-          title: TAB_LABELS.more,
+          title: t('tabs.more'),
           tabBarIcon: ({ color, size }) => <MoreHorizontal color={color} size={size} />,
         }}
       />

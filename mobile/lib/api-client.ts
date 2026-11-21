@@ -1,4 +1,6 @@
 // lib/api-client.ts
+import { messageForStatus, UserFacingError } from '@/lib/error-messages';
+import { i18n } from '@/lib/i18n';
 import { RequestTimeoutError, withTimeout } from '@/lib/fetch-with-timeout';
 import { useAppStore } from '@/store';
 
@@ -11,12 +13,11 @@ const API_URL = process.env.EXPO_PUBLIC_API_URL ?? 'http://10.0.2.2:3000';
  */
 const REQUEST_TIMEOUT_MS = 60 * 1000;
 
-const NETWORK_ERROR_MESSAGE =
-  'No se pudo conectar con el servidor. Revisá tu conexión e intentá de nuevo.';
-const TIMEOUT_ERROR_MESSAGE =
-  'El servidor tardó demasiado en responder. Intentá de nuevo en unos segundos.';
-
-export class ApiError extends Error {
+/**
+ * `message` está pensado para mostrarse tal cual: nunca contiene el texto del backend ni el
+ * código HTTP. Para depurar, el cuerpo original de la respuesta queda en `details`.
+ */
+export class ApiError extends UserFacingError {
   constructor(
     /** código HTTP; 0 si no hubo respuesta (sin conexión o sin contestar a tiempo) */
     public status: number,
@@ -60,28 +61,31 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
       }
 
       if (!response.ok) {
-        let message = `Error ${response.status}`;
         let details: unknown;
         try {
-          const errorBody = await response.json();
-          message = Array.isArray(errorBody?.message)
-            ? errorBody.message.join(', ')
-            : (errorBody?.message ?? message);
-          details = errorBody;
+          details = await response.json();
         } catch {}
-        throw new ApiError(response.status, message, details);
+        throw new ApiError(response.status, messageForStatus(response.status), details);
       }
 
       // Nest responde 201/200 sin cuerpo en los endpoints que devuelven void (ej. change-password).
       if (response.status === 204) return undefined as T;
       const text = await response.text();
-      return (text ? JSON.parse(text) : undefined) as T;
+      if (!text) return undefined as T;
+      try {
+        return JSON.parse(text) as T;
+      } catch {
+        // 200 con un cuerpo que no es JSON (ej. la página de error de un proxy)
+        throw new ApiError(response.status, i18n.t('errors.unexpected'));
+      }
     });
   } catch (error) {
     if (error instanceof ApiError) throw error;
-    if (error instanceof RequestTimeoutError) throw new ApiError(0, TIMEOUT_ERROR_MESSAGE);
+    if (error instanceof RequestTimeoutError) {
+      throw new ApiError(0, i18n.t('errors.timeout'));
+    }
     // fetch falla con TypeError ("Network request failed") cuando no hay conexión
-    if (error instanceof TypeError) throw new ApiError(0, NETWORK_ERROR_MESSAGE);
+    if (error instanceof TypeError) throw new ApiError(0, i18n.t('errors.network'));
     throw error;
   }
 }

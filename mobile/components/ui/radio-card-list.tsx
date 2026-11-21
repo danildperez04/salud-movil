@@ -3,7 +3,14 @@ import { Pressable, View } from 'react-native';
 import { Text } from '@/components/ui/text';
 import { cn } from '@/lib/utils';
 
-export type RadioOption<T extends string> = { value: T; label: string };
+export type RadioOption<T extends string> = {
+  value: T;
+  label: string;
+  /** No se puede elegir (se ve atenuada y el lector de pantalla la anuncia como no disponible) */
+  disabled?: boolean;
+  /** Texto corto a la derecha, ej. "Próximamente" */
+  hint?: string;
+};
 
 type RadioCardListProps<T extends string> = {
   options: readonly RadioOption<T>[];
@@ -21,19 +28,28 @@ export function RadioCardList<T extends string>({
     <View accessibilityRole="radiogroup" className="gap-3">
       {options.map((option) => {
         const selected = option.value === value;
+        const disabled = option.disabled ?? false;
 
         return (
           <Pressable
             key={option.value}
             onPress={() => onValueChange(option.value)}
+            disabled={disabled}
             accessibilityRole="radio"
-            accessibilityState={{ selected }}
+            accessibilityState={{ selected, disabled }}
+            accessibilityHint={disabled ? option.hint : undefined}
             className={cn(
               'h-14 flex-row items-center justify-between gap-3 rounded-2xl border px-5 active:opacity-80',
               selected ? 'bg-primary/5 border-primary' : 'bg-card border-border',
+              disabled && 'opacity-50',
             )}
           >
-            <Text className="text-body font-heading-semibold text-foreground">{option.label}</Text>
+            <Text className="text-body font-heading-semibold text-foreground flex-1">
+              {option.label}
+            </Text>
+            {option.hint ? (
+              <Text className="text-small font-body text-muted-foreground">{option.hint}</Text>
+            ) : null}
             <View
               className={cn(
                 'h-6 w-6 items-center justify-center rounded-full border-2',

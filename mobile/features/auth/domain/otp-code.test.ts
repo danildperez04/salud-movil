@@ -1,8 +1,11 @@
 // features/auth/domain/otp-code.test.ts
 // Ejecutar con `npm test`.
 import assert from 'node:assert/strict';
-import { describe, it } from 'node:test';
+import { afterEach, describe, it } from 'node:test';
+import { applyLanguage, i18n } from '@/lib/i18n';
 import { otpCodeSchema, sanitizeOtpInput } from './otp-code';
+
+afterEach(() => applyLanguage('es'));
 
 describe('otpCodeSchema', () => {
   it('acepta exactamente 6 dígitos', () => {
@@ -14,6 +17,23 @@ describe('otpCodeSchema', () => {
     for (const code of ['', '12345', '1234567', '12345a', '12 345']) {
       assert.equal(otpCodeSchema.safeParse({ code }).success, false, code);
     }
+  });
+});
+
+describe('mensajes de otpCodeSchema', () => {
+  const firstMessage = (code: string) => {
+    const result = otpCodeSchema.safeParse({ code });
+    return result.success ? undefined : result.error.issues[0].message;
+  };
+
+  it('se traducen al validar, en el idioma activo en ese momento', () => {
+    assert.equal(firstMessage(''), 'Ingresá el código');
+    assert.equal(firstMessage('123'), 'El código tiene 6 dígitos');
+
+    applyLanguage('bzk');
+    assert.equal(firstMessage(''), 'Put in di code');
+    assert.equal(firstMessage('123'), 'Di code have 6 digits');
+    assert.equal(firstMessage(''), i18n.t('login:twoFactor.errors.codeRequired'));
   });
 });
 
