@@ -96,17 +96,17 @@ export default function TwoFactorScreen() {
           <BrandLogo />
 
           <View
-            className="bg-card dark:border-border mt-8 w-full rounded-[20px] border border-[#E5E7EB] px-5 pt-4 pb-5"
+            className="bg-card dark:border-border rounded-brand mt-8 w-full border border-[#E5E7EB] px-5 pt-4 pb-5"
             style={{ boxShadow: '0px 4px 20px rgba(0, 0, 0, 0.05)' }}
           >
             <Text
               role="heading"
               aria-level={1}
-              className="font-heading text-brand-blue dark:text-neutral-white text-[24px] leading-[36px]"
+              className="font-heading text-brand-blue dark:text-neutral-white text-[24px] leading-9"
             >
               {t('twoFactor.title')}
             </Text>
-            <Text className="font-heading-regular text-secondary-steel mt-1 text-[14px] leading-[21px]">
+            <Text className="font-heading-regular text-secondary-steel mt-1 text-[14px] leading-5.25">
               {t('twoFactor.subtitle')}
             </Text>
 
